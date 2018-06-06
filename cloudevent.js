@@ -21,6 +21,32 @@ const cloudEventMediaType = 'application/cloudevents+json'
 
 // TODO: check if use default values for arguments ... yes, but in a new CloudEventCreateFast without type checks (and call it from this and from the Minimal version); or move all type checks here in a CloudEventValidator called only if/when needed
 // TODO: add doc and write to call it with the new operator ...
+
+function CloudEventCreateFast ({
+  cloudEventsVersion = '0.1',
+  eventType,
+  eventTypeVersion = '1.0',
+  source,
+  eventID,
+  eventTime, // TODO: add as default: = getCurrentTimestamp() ma che torna Date/Timestamp ...
+  extensions = {},
+  contentType = 'application/json',
+  schemaURL } = {}, data = {} // TODO: check if add another for data-related fields ... wip
+) {
+  this.cloudEventsVersion = cloudEventsVersion
+  this.eventType = eventType
+  this.eventTypeVersion = eventTypeVersion
+  this.source = source
+  this.eventID = eventID
+  this.eventTime = eventTime
+  this.extensions = extensions
+  this.contentType = contentType
+  this.schemaURL = schemaURL
+  this.data = data
+}
+
+/*
+// TODO: deprecated, then comment and remove ... wip
 function CloudEventCreateFull (cloudEventsVersion,
   eventType, eventTypeVersion,
   source,
@@ -65,27 +91,35 @@ function CloudEventCreateFull (cloudEventsVersion,
     // TODO: data can be object, string, or Map ...
   }
 }
+ */
 
-// TODO: check if add CloudEvent (or similar) as type to prototype ...
+// TODO: check if add CloudEvent (or similar) as type to prototype ... no
 // TODO: last, check if instead use the class syntax ... probably no
 
-// TODO: check if add another CloudEventCreateMinimal with only most common arguments ...
+// TODO: check if add another CloudEventCreateMinimal with only most common arguments ... no, with destructuring and default arguments it's no more needed
 
-// TODO: ensure if name is not given, that all must work the same, otherwise get name from arg variable name ...
+// TODO: add a function CloudEventValidator (event), but check how to return a list on errors ... wip
+// TODO: add a function isCloudEventValid (event), that return a boolen value ... wip
+
+/*
+// TODO: uncomment later (used in the validator) ... wip
 function ensureIsString (arg, name) {
   if (typeof arg !== 'string') {
     throw new TypeError(`The argument ${name}' must be a string, instead got a '${typeof arg}'`)
   }
 }
 
+// TODO: uncomment later (used in the validator) ... wip
 function ensureIsStringNotEmpty (arg, name) {
   ensureIsString(arg, name)
   if (arg.length < 1) {
     throw new TypeError(`The string ${name}' must be not empty`)
   }
 }
+ */
 
 module.exports = {
   mediaType: cloudEventMediaType,
-  CloudEventCreate: CloudEventCreateFull
+  // CloudEventCreate: CloudEventCreateFull // TODO: remove ...
+  CloudEventCreate: CloudEventCreateFast
 }

@@ -54,6 +54,8 @@ test('create two CloudEvent instances (one minimal and one with all fields) and 
     t.ok(CECreator)
 
     // create an instance without mandatory arguments, expected failure ...
+    /*
+    // TODO: remove the try/catch and instead use t.throws(fn, [expectedError], message, extra) ... wip
     let ceEmpty = null
     try {
       ceEmpty = new CECreator()
@@ -61,27 +63,26 @@ test('create two CloudEvent instances (one minimal and one with all fields) and 
       // TODO: expected TypeError ...
       console.log(`DEBUG - e = ${e}`) // temp ...
     }
-    // const ceEmpty = new CECreator()
     // console.log(`DEBUG - ceEmpty = ${ceEmpty}`) // temp ...
     t.notOk(ceEmpty)
+     */
+    // TODO: let it work without the pending status message, urgent ... ok, had to change from 'new CECreator()' to 'CECreator'
+    // t.throws(new CECreator(), TypeError, 'Expected exception when creating a CloudEvent without mandatory arguments')
+    t.throws(CECreator, TypeError, 'Expected exception when creating a CloudEvent without mandatory arguments')
 
     // create an instance with only mandatory arguments (no optional arguments), expected success ...
-    const ceMinimal = new CECreator(null,
-      'org.fastify.plugins.cloudevents.testevent', null,
-      '/',
-      '1', null,
-      null,
-      null, null, null
+    const ceMinimal = new CECreator({
+      eventType: 'org.fastify.plugins.cloudevents.testevent',
+      source: '/',
+      eventID: '1' }
     )
-    console.log(`DEBUG - ceMinimal = ${ceMinimal}, with type '${typeof ceMinimal}'`) // temp ...
+    // console.log(`DEBUG - ceMinimal = ${ceMinimal}, with type '${typeof ceMinimal}'`) // temp ...
     t.ok(ceMinimal)
     // create another instance
-    const ceMinimal2 = new CECreator(null,
-      'org.fastify.plugins.cloudevents.testevent', null,
-      '/',
-      '2', null,
-      null,
-      null, null, null
+    const ceMinimal2 = new CECreator({
+      eventType: 'org.fastify.plugins.cloudevents.testevent',
+      source: '/',
+      eventID: '2' }
     )
     t.ok(ceMinimal2)
     t.notSame(ceMinimal, ceMinimal2)
