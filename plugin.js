@@ -30,7 +30,7 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   // execute plugin code
-  fastify.decorate('CloudEventFactory', cloudEventHandler.CloudEventCreate)
+  fastify.decorate('CloudEventCreate', cloudEventHandler.CloudEventCreate)
   // TODO: add others ... wip
 
   next()

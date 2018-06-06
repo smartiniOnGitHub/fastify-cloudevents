@@ -29,14 +29,14 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     fastify.server.unref()
     t.error(err)
 
-    // ensure CloudEventFactory function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('CloudEventFactory'))
-    const CEFactory = fastify.CloudEventFactory
+    // ensure CloudEventCreate constructor function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('CloudEventCreate'))
+    const CECreator = fastify.CloudEventCreate
     // optional, add some assertions with standard Node.js assert statements, as a sample
-    assert(CEFactory !== null)
-    assert(typeof CEFactory === 'function')
-    t.ok(CEFactory)
-    t.strictEqual(typeof CEFactory, 'function')
+    assert(CECreator !== null)
+    assert(typeof CECreator === 'function')
+    t.ok(CECreator)
+    t.strictEqual(typeof CECreator, 'function')
 
     // TODO: ensure other decorator functions exists ... wip
   })
@@ -50,23 +50,23 @@ test('create two CloudEvent instances (one minimal and one with all fields) and 
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CEFactory = fastify.CloudEventFactory
-    t.ok(CEFactory)
+    const CECreator = fastify.CloudEventCreate
+    t.ok(CECreator)
 
     // create an instance without mandatory arguments, expected failure ...
     let ceEmpty = null
     try {
-      ceEmpty = new CEFactory()
+      ceEmpty = new CECreator()
     } catch (e) {
       // TODO: expected TypeError ...
       console.log(`DEBUG - e = ${e}`) // temp ...
     }
-    // const ceEmpty = new CEFactory()
+    // const ceEmpty = new CECreator()
     // console.log(`DEBUG - ceEmpty = ${ceEmpty}`) // temp ...
     t.notOk(ceEmpty)
 
     // create an instance with only mandatory arguments (no optional arguments), expected success ...
-    const ceMinimal = new CEFactory(null,
+    const ceMinimal = new CECreator(null,
       'org.fastify.plugins.cloudevents.testevent', null,
       '/',
       '1', null,
@@ -76,7 +76,7 @@ test('create two CloudEvent instances (one minimal and one with all fields) and 
     console.log(`DEBUG - ceMinimal = ${ceMinimal}, with type '${typeof ceMinimal}'`) // temp ...
     t.ok(ceMinimal)
     // create another instance
-    const ceMinimal2 = new CEFactory(null,
+    const ceMinimal2 = new CECreator(null,
       'org.fastify.plugins.cloudevents.testevent', null,
       '/',
       '2', null,
