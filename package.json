@@ -10,7 +10,8 @@
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
-    "fastify-plugin": "^0.2.2"
+    "fastify-plugin": "^0.2.2",
+    "fast-json-stringify": "^1.5.4"
   },
   "devDependencies": {
     "fastify": "^0.43.0",
