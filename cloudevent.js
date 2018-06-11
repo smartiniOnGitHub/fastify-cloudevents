@@ -17,32 +17,45 @@
 
 // this module exports some useful definition and utility related to CloudEvents
 
+// const fastJsonStringify = require('fast-json-stringify') // TODO: enable when needed ...
+
 const cloudEventMediaType = 'application/cloudevents+json'
 
-// TODO: check if use default values for arguments ... yes, but in a new CloudEventCreateFast without type checks (and call it from this and from the Minimal version); or move all type checks here in a CloudEventValidator called only if/when needed
-// TODO: add doc and write to call it with the new operator ...
+// TODO: move options object as last argument (best practice), and extract from it most common arguments to set (mandatory) when creating a new CloudEvent; last, keep source in options, but set a good default for it ... ok
+// TODO: move all type checks here in a CloudEventValidator called only if/when needed; then rename CloudEventCreateFast back to CloudEventCreate ... wip
+// TODO: check if change CloudEventCreate in a class CloudEvent exported ... wip
+// TODO: add doc and write to call it with the new operator ... wip
 
-function CloudEventCreateFast ({
+function CloudEventCreate (eventID, eventType, data = {}, {
   cloudEventsVersion = '0.1',
-  eventType,
   eventTypeVersion = '1.0',
-  source,
-  eventID,
-  eventTime, // TODO: add as default: = getCurrentTimestamp() ma che torna Date/Timestamp ...
+  source = '/',
+  eventTime = new Date(),
   extensions = {},
   contentType = 'application/json',
-  schemaURL } = {}, data = {} // TODO: check if add another for data-related fields ... wip
+  schemaURL,
+  strict = false } = {}
+  // TODO: add a strict boolean option with default false, to throw if a mandatory field is missing ... ok
 ) {
-  this.cloudEventsVersion = cloudEventsVersion
-  this.eventType = eventType
-  this.eventTypeVersion = eventTypeVersion
-  this.source = source
+  // TODO: check how to exclude some properties (like 'strict') from json output, etc ...
+  // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`) // temp ...
+  if (strict === true) {
+    if (!eventID || !eventType || !data) {
+      throw new Error('Unable to create CloudEvent instance, mandatory field missing')
+    }
+  }
+
   this.eventID = eventID
-  this.eventTime = eventTime
-  this.extensions = extensions
-  this.contentType = contentType
-  this.schemaURL = schemaURL
+  this.eventType = eventType
   this.data = data
+
+  this.cloudEventsVersion = cloudEventsVersion
+  this.contentType = contentType
+  this.eventTime = eventTime
+  this.eventTypeVersion = eventTypeVersion
+  this.extensions = extensions
+  this.schemaURL = schemaURL
+  this.source = source
 }
 
 /*
@@ -121,5 +134,5 @@ function ensureIsStringNotEmpty (arg, name) {
 module.exports = {
   mediaType: cloudEventMediaType,
   // CloudEventCreate: CloudEventCreateFull // TODO: remove ...
-  CloudEventCreate: CloudEventCreateFast
+  CloudEventCreate: CloudEventCreate
 }

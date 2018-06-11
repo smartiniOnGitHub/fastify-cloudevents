@@ -19,12 +19,9 @@ const fp = require('fastify-plugin')
 
 const cloudEventHandler = require('./cloudevent.js') // get CloudEvent definition and related utilities
 
-function fastifyCloudEvents (fastify, options, next) {
-  const opts = options || {}
-  const serverUrl = opts.serverUrl || '/'
-  // TODO: handle other plugin options ... wip
-
-  // TODO: implement variables type checks ...
+function fastifyCloudEvents (fastify, { // options
+  serverUrl = '/'
+}, next) {
   if (typeof serverUrl !== 'string') {
     throw new TypeError(`The option serverUrl must be a string, instead got a '${typeof serverUrl}'`)
   }

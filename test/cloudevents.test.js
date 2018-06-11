@@ -42,7 +42,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   })
 })
 
-test('create two CloudEvent instances (one minimal and one with all fields) and ensure they are different objects', (t) => {
+test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
   t.plan(6)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
@@ -53,88 +53,103 @@ test('create two CloudEvent instances (one minimal and one with all fields) and 
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
 
-    // create an instance without mandatory arguments, expected failure ...
-    /*
-    // TODO: remove the try/catch and instead use t.throws(fn, [expectedError], message, extra) ... wip
-    let ceEmpty = null
+    // create an instance without mandatory arguments (but no strict mode): expected success ...
+    const ceEmpty = new CECreator()
+    // console.log(`DEBUG - ceEmpty = ${ceEmpty}, with type '${typeof ceEmpty}'`) // temp ...
+    t.ok(ceEmpty)
+
+    // create an instance without mandatory arguments (but with strict mode): expected failure ...
+    let ceEmpty2 = null
     try {
-      ceEmpty = new CECreator()
+      ceEmpty2 = new CECreator(undefined, undefined, undefined, { strict: true })
     } catch (e) {
-      // TODO: expected TypeError ...
-      console.log(`DEBUG - e = ${e}`) // temp ...
+      t.ok(e) // expected error here
+      // console.log(`DEBUG - e = ${e}, with message '${e.message}'`) // temp ...
     }
-    // console.log(`DEBUG - ceEmpty = ${ceEmpty}`) // temp ...
-    t.notOk(ceEmpty)
-     */
-    // TODO: let it work without the pending status message, urgent ... ok, had to change from 'new CECreator()' to 'CECreator'
-    // t.throws(new CECreator(), TypeError, 'Expected exception when creating a CloudEvent without mandatory arguments')
-    t.throws(CECreator, TypeError, 'Expected exception when creating a CloudEvent without mandatory arguments')
-
-    // create an instance with only mandatory arguments (no optional arguments), expected success ...
-    const ceMinimal = new CECreator({
-      eventType: 'org.fastify.plugins.cloudevents.testevent',
-      source: '/',
-      eventID: '1' }
-    )
-    // console.log(`DEBUG - ceMinimal = ${ceMinimal}, with type '${typeof ceMinimal}'`) // temp ...
-    t.ok(ceMinimal)
-    // create another instance
-    const ceMinimal2 = new CECreator({
-      eventType: 'org.fastify.plugins.cloudevents.testevent',
-      source: '/',
-      eventID: '2' }
-    )
-    t.ok(ceMinimal2)
-    t.notSame(ceMinimal, ceMinimal2)
-    // then ensure they are different objects ...
-
-    // create an instance with all arguments (mandatory and optional arguments), expected success ...
-    // TODO: use as test data ... wip
-    //   "eventType" : "com.example.someevent",
-    //     "eventTypeVersion" : "1.0",
-    //       "source" : "/mycontext",
-    //         "eventID" : "A234-1234-1234",
-    //           "eventTime" : "2018-04-05T17:31:00Z",
-    //             "extensions" : {
-    //   "comExampleExtension" : "value"
-    // },
-    // "contentType" : "text/xml",
-    //   "data"
-
-    // temp ...
-
-    // TODO: create other objects and check results ... wip
+    // console.log(`DEBUG - ceEmpty2 = ${ceEmpty2}, with type '${typeof ceEmpty2}'`) // temp ...
+    t.equal(ceEmpty2, null)
+    // the same test, but in a shorter form ...
+    t.throws(function () {
+      const ce = new CECreator(undefined, undefined, undefined, { strict: true })
+      assert(ce === null) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   })
 })
 
-// TODO: create CloudEvent instances not valid and ensure errors will be triggered ...
-
-// TODO: add more tests ...
-
-/*
-// TODO: cleanup ...
-test('default webhook (and empty body) does not return an error, but a good response (200) and some content', (t) => {
-  t.plan(5)
+test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
+  t.plan(7)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const port = fastify.server.address().port
+    const CECreator = fastify.CloudEventCreate
+    t.ok(CECreator)
 
-    sget({
-      method: 'POST',
-      timeout: 2000,
-      url: `http://localhost:${port}/webhook`
-    }, (err, response, body) => {
-      t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.strictEqual(response.headers['content-type'], 'application/json')
-      t.deepEqual(JSON.parse(body), { statusCode: 200, result: 'success' })
+    // create an instance with only mandatory arguments (but no strict mode): expected success ...
+    const ceMinimal = new CECreator('1', // eventID
+      'org.fastify.plugins.cloudevents.testevent', // eventType
+      {} // data (empty)
+    )
+    // console.log(`DEBUG - ceMinimal = ${ceMinimal}, with type '${typeof ceMinimal}'`) // temp ...
+    t.ok(ceMinimal)
+    // create another instance, similar
+    const ceMinimal2 = new CECreator('2', // eventID
+      'org.fastify.plugins.cloudevents.testevent', // eventType
+      {} // data (empty)
+    )
+    t.ok(ceMinimal2)
+    // then ensure they are different objects ...
+    t.notSame(ceMinimal, ceMinimal2)
 
-      fastify.close()
-    })
+    // create an instance without a mandatory argument (but with strict mode): expected failure ...
+    t.throws(function () {
+      const ceMinimalStrictBad = new CECreator('1.strict.bad', // eventID
+        'org.fastify.plugins.cloudevents.testevent', // eventType
+        undefined, // data
+        { strict: true }
+      )
+      assert(ceMinimalStrictBad === null) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+
+    // create an instance with a mandatory argument handled by defaults (undefined, not null), (but with strict mode) expected success ...
+    const ceMinimalStrictGood = new CECreator('1.strict.good', // eventID
+      'org.fastify.plugins.cloudevents.testevent', // eventType
+      undefined, // data
+      { strict: true }
+    )
+    t.ok(ceMinimalStrictGood)
   })
 })
- */
+
+test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
+  t.plan(3)
+  const fastify = Fastify()
+  fastify.register(require('../')) // configure this plugin with its default options
+
+  fastify.listen(0, (err) => {
+    fastify.server.unref()
+    t.error(err)
+    const CECreator = fastify.CloudEventCreate
+    t.ok(CECreator)
+
+    // create an instance with a null mandatory argument (handled by defaults), but with check flag enabled: expected success ...
+    const ceFull1 = new CECreator('1.strict', // eventID
+      'org.fastify.plugins.cloudevents.testevent', // eventType
+      { 'hello': 'world' }, // data
+      { cloudEventsVersion: '0.0.0',
+        eventTypeVersion: '1.0.0',
+        source: '/test',
+        eventTime: new Date(),
+        extensions: {},
+        contentType: 'application/json',
+        schemaURL: '',
+        strict: false
+      }
+    )
+    t.ok(ceFull1)
+  })
+})
+
+// TODO: add more tests ...
