@@ -21,7 +21,6 @@
 
 const cloudEventMediaType = 'application/cloudevents+json'
 
-// TODO: move options object as last argument (best practice), and extract from it most common arguments to set (mandatory) when creating a new CloudEvent; last, keep source in options, but set a good default for it ... ok
 // TODO: move all type checks here in a CloudEventValidator called only if/when needed; then rename CloudEventCreateFast back to CloudEventCreate ... wip
 // TODO: check if change CloudEventCreate in a class CloudEvent exported ... wip
 // TODO: add doc and write to call it with the new operator ... wip
