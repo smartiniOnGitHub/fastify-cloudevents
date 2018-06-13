@@ -28,6 +28,9 @@ function fastifyCloudEvents (fastify, { // options
 
   // execute plugin code
   fastify.decorate('CloudEventCreate', cloudEventHandler.CloudEventCreate)
+  fastify.decorate('isCloudEventValid', cloudEventHandler.isCloudEventValid)
+  // fastify.decorate('cloudEventValidator', cloudEventHandler.cloudEventValidator)
+
   // TODO: add others ... wip
 
   next()

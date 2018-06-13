@@ -21,8 +21,6 @@
 
 const cloudEventMediaType = 'application/cloudevents+json'
 
-// TODO: move all type checks here in a CloudEventValidator called only if/when needed; then rename CloudEventCreateFast back to CloudEventCreate ... wip
-// TODO: check if change CloudEventCreate in a class CloudEvent exported ... wip
 // TODO: add doc and write to call it with the new operator ... wip
 
 function CloudEventCreate (eventID, eventType, data = {}, {
@@ -34,9 +32,7 @@ function CloudEventCreate (eventID, eventType, data = {}, {
   contentType = 'application/json',
   schemaURL,
   strict = false } = {}
-  // TODO: add a strict boolean option with default false, to throw if a mandatory field is missing ... ok
 ) {
-  // TODO: check how to exclude some properties (like 'strict') from json output, etc ...
   // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`) // temp ...
   if (strict === true) {
     if (!eventID || !eventType || !data) {
@@ -105,13 +101,37 @@ function CloudEventCreateFull (cloudEventsVersion,
 }
  */
 
-// TODO: check if add CloudEvent (or similar) as type to prototype ... no
-// TODO: last, check if instead use the class syntax ... probably no
+// TODO: add a function cloudEventValidator (event) or similar, but check how to return a list on errors ... wip
+function cloudEventValidator (event, { strict = false } = {}) {
+  console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
+  if (event !== undefined && event !== null) {
+    console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ...`) // temp ...
+  }
+  /*
+  // TODO: future use ...
+  if (strict === true) {
+  }
+   */
 
-// TODO: check if add another CloudEventCreateMinimal with only most common arguments ... no, with destructuring and default arguments it's no more needed
+  // TODO: implement ... wip
+  return [] // temp ...
+}
 
-// TODO: add a function CloudEventValidator (event), but check how to return a list on errors ... wip
-// TODO: add a function isCloudEventValid (event), that return a boolen value ... wip
+// TODO: add a function isCloudEventValid (event) or similar, that return a boolen value ... wip
+function isValid (event, { strict = false } = {}) {
+  console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
+  if (event !== undefined && event !== null) {
+    console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ...`) // temp ...
+  }
+  /*
+  // TODO: future use ...
+  if (strict === true) {
+  }
+   */
+
+  // TODO: implement ... wip
+  return false // temp ...
+}
 
 /*
 // TODO: uncomment later (used in the validator) ... wip
@@ -132,6 +152,7 @@ function ensureIsStringNotEmpty (arg, name) {
 
 module.exports = {
   mediaType: cloudEventMediaType,
-  // CloudEventCreate: CloudEventCreateFull // TODO: remove ...
-  CloudEventCreate: CloudEventCreate
+  CloudEventCreate: CloudEventCreate,
+  isCloudEventValid: isValid,
+  cloudEventValidator: cloudEventValidator
 }
