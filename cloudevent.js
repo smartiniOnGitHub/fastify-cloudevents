@@ -51,108 +51,146 @@ function CloudEventCreate (eventID, eventType, data = {}, {
   this.extensions = extensions
   this.schemaURL = schemaURL
   this.source = source
+
+  this.strict = strict // could be useful ...
 }
 
-/*
-// TODO: deprecated, then comment and remove ... wip
-function CloudEventCreateFull (cloudEventsVersion,
-  eventType, eventTypeVersion,
-  source,
-  eventID, eventTime,
-  extensions,
-  contentType, schemaURL, data
-) {
-  this.cloudEventsVersion = cloudEventsVersion || '0.1'
-  this.eventType = eventType
-  this.eventTypeVersion = eventTypeVersion || '1.0'
-  this.source = source
-  this.eventID = eventID
-  this.eventTime = eventTime // TODO: or new date formatted to timestamp ...
-  this.extensions = extensions
-  this.contentType = contentType || 'application/json'
-  this.schemaURL = schemaURL
-  this.data = data || {}
-
-  // TODO: move in a validator, but check how to return a list on errors ...
-  if (cloudEventsVersion) {
-    ensureIsString(cloudEventsVersion, 'cloudEventsVersion')
+// TODO: add a function cloudEventValidation (event) or similar, but check how to return a list on errors ... wip
+function cloudEventValidation (event, { strict = false } = {}) {
+  // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
+  if (isUndefinedOrNull(event)) {
+    return [ new Error('CloudEvent undefined or null') ]
   }
-  ensureIsStringNotEmpty(eventType, 'eventType')
-  if (eventTypeVersion) {
-    ensureIsString(eventTypeVersion, 'eventTypeVersion')
-  }
-  ensureIsStringNotEmpty(source, 'source') // TODO: check if it's an URI ...
-  ensureIsStringNotEmpty(eventID, 'eventID')
-  if (eventTime) {
-    ensureIsString(eventTime, 'eventTime') // TODO: ensure is a timestamp in the right format, if given ...
-  } // TODO: else check if create a default one here ...
-  if (extensions) {
-    // TODO: extensions is a Map, and if present must contain at least 1 element ...
-  } // TODO: else check if define as empty object or empty Map ...
-  if (contentType) {
-    ensureIsString(contentType, 'contentType')
-  }
-  if (schemaURL) {
-    ensureIsString(schemaURL, 'schemaURL') // TODO: check if it's an URI ...
-  }
-  if (data) {
-    // TODO: data can be object, string, or Map ...
-  }
-}
- */
-
-// TODO: add a function cloudEventValidator (event) or similar, but check how to return a list on errors ... wip
-function cloudEventValidator (event, { strict = false } = {}) {
-  console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
-  if (event !== undefined && event !== null) {
-    console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ...`) // temp ...
-  }
-  /*
-  // TODO: future use ...
-  if (strict === true) {
-  }
-   */
+  // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`) // temp ...
+  let validationErrors = []
 
   // TODO: implement ... wip
-  return [] // temp ...
+  // validationErrors.push(ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
+  /*
+  // ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion')
+  ensureIsStringNotEmpty(event.eventID, 'eventID')
+  ensureIsStringNotEmpty(event.eventType, 'eventType')
+  // ensureIsObjectOrCollection(event.data, 'data')
+  ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion')
+  ensureIsStringNotEmpty(event.source, 'source')
+  // ensureIsDateValid(event.eventTime, 'eventTime')
+  // ensureIsObjectOrCollection(event.extensions, 'extensions')
+  ensureIsStringNotEmpty(event.contentType, 'contentType')
+  ensureIsStringNotEmpty(event.schemaURL, 'schemaURL')
+   */
+
+  // additional validation if strict mode enabled, or if enabled in the event ...
+  if (strict === true || event.strict === true) {
+    // TODO: implement ... wip
+    /*
+    ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion')
+    ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion')
+    ensureIsURI(event.source, 'source')
+    ensureIsDatePast(event.eventTime, 'eventTime')
+    ensureIsURI(event.schemaURL, 'schemaURL')
+     */
+  }
+
+  // TODO: check if change from array to Set for validation errors, using field as a key (non unique) ...
+  return validationErrors
 }
+
+// TODO: add isValidationSuccessful that checks the size of validationErrors, and expose outside ... wip
 
 // TODO: add a function isCloudEventValid (event) or similar, that return a boolen value ... wip
 function isValid (event, { strict = false } = {}) {
-  console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
-  if (event !== undefined && event !== null) {
-    console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ...`) // temp ...
+  // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
+  if (isUndefinedOrNull(event)) {
+    return false
   }
-  /*
-  // TODO: future use ...
-  if (strict === true) {
-  }
-   */
+  // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`) // temp ...
+  let valid = isStringNotEmpty(event.cloudEventsVersion) ||
+    isStringNotEmpty(event.eventID) ||
+    isStringNotEmpty(event.eventType) ||
+    isObjectOrCollection(event.data) || // can be object, Set, or Map ...
+    isStringNotEmpty(event.eventTypeVersion) ||
+    isStringNotEmpty(event.source) ||
+    isDateValid(event.eventTime) ||
+    isObjectOrCollection(event.extensions) || // can be object, Set, or Map ...
+    isStringNotEmpty(event.contentType) ||
+    isStringNotEmpty(event.schemaURL)
 
-  // TODO: implement ... wip
-  return false // temp ...
+  // additional checks if strict mode enabled, or if enabled in the event ...
+  if (valid === true && (strict === true || event.strict === true)) {
+    /*
+    // TODO: future use ...
+    valid = isVersion(event.cloudEventsVersion) ||
+      isVersion(event.eventTypeVersion) ||
+      isURI(event.source) ||
+      isDatePast(event.eventTime) ||
+      isURI(event.schemaURL)
+     */
+  }
+
+  return valid
+}
+
+// TODO: move isXxx and ensureXxx functions in a dedicated source ...
+
+function isUndefinedOrNull (arg) {
+  return (arg === undefined || arg === null)
+}
+
+function isDefinedAndNotNull (arg) {
+  return (arg !== undefined && arg !== null)
+}
+
+function isString (arg) {
+  return (isDefinedAndNotNull(arg) && (typeof arg === 'string'))
+}
+
+function isStringNotEmpty (arg) {
+  return (isString(arg) && (arg.length > 0))
+}
+
+function isDate (arg) {
+  return (isDefinedAndNotNull(arg) && (typeof arg === 'object' || arg instanceof Date))
+}
+
+function isDateValid (arg) {
+  return (isDate(arg) && !isNaN(arg))
 }
 
 /*
-// TODO: uncomment later (used in the validator) ... wip
+function isDatePast (arg) {
+  return (isDateValid(arg) && // TODO: and is in the past ...
+}
+ */
+
+function isObjectOrCollection (arg) {
+  return (isDefinedAndNotNull(arg) && (typeof arg === 'object' || 
+    arg instanceof Map || arg instanceof WeakMap ||
+    arg instanceof Set || arg instanceof WeakSet
+  ))
+}
+
+/*
 function ensureIsString (arg, name) {
-  if (typeof arg !== 'string') {
+  if (!isString(arg)) {
     throw new TypeError(`The argument ${name}' must be a string, instead got a '${typeof arg}'`)
   }
 }
 
-// TODO: uncomment later (used in the validator) ... wip
 function ensureIsStringNotEmpty (arg, name) {
-  ensureIsString(arg, name)
-  if (arg.length < 1) {
+  if (!isStringNotEmpty(arg)) {
     throw new TypeError(`The string ${name}' must be not empty`)
   }
 }
  */
 
+class CloudEvent {
+  // TODO: implement ...
+}
+
 module.exports = {
   mediaType: cloudEventMediaType,
   CloudEventCreate: CloudEventCreate,
   isCloudEventValid: isValid,
-  cloudEventValidator: cloudEventValidator
+  cloudEventValidation: cloudEventValidation,
+  CloudEvent: CloudEvent // temp, check if it's a good way ...
 }
