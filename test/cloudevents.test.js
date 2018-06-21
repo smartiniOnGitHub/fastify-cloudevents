@@ -124,7 +124,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
 })
 
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
-  t.plan(20)
+  t.plan(22)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -137,26 +137,29 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidation
     t.ok(ceValidate)
-    t.notSame(ceIsValid, ceValidate)
+    // t.notSame(ceIsValid, ceValidate)
     t.strictNotSame(ceIsValid, ceValidate)
 
     // create an instance with only mandatory arguments (but no strict mode): expected success ...
     const ceMinimal = new CECreator('1', // eventID
       'org.fastify.plugins.cloudevents.testevent', // eventType
-      {} // data (empty)
+      {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
     t.ok(ceIsValid(ceMinimal))
-    t.strictSame(ceValidate(ceMinimal), []) // TODO: fix test ... wip
+    t.strictSame(ceValidate(ceMinimal), [])
+    // t.strictSame(ceValidate(ceEmpty), []) // temp, to see the error during development ...
+    t.strictSame(ceValidate(ceMinimal).length, 0) // simplify comparison of results, check only the  number of expected errors ...
     // create another instance, similar
     const ceMinimal2 = new CECreator('2', // eventID
       'org.fastify.plugins.cloudevents.testevent', // eventType
-      {} // data (empty)
+      {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal2)
-    t.ok(ceIsValid(ceMinimal2)) // using strict mode in the event
+    t.ok(ceIsValid(ceMinimal2)) // using default strict mode in the event
     t.ok(ceIsValid(ceMinimal2, { strict: false })) // same of previous but using strict mode in validation options
-    t.strictSame(ceValidate(ceMinimal2), []) // TODO: fix test ... wip
+    t.strictSame(ceValidate(ceMinimal2), [])
+    t.strictSame(ceValidate(ceMinimal2).length, 0)
     assert(ceMinimal !== ceMinimal2) // they must be different object references
     // then ensure they are different (have different values inside) ...
     t.notSame(ceMinimal, ceMinimal2)
@@ -179,14 +182,15 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       { strict: true }
     )
     t.ok(ceMinimalStrictGood)
-    t.ok(ceIsValid(ceMinimalStrictGood)) // using strict mode in the event
+    t.ok(ceIsValid(ceMinimalStrictGood)) // using default strict mode in the event
     t.ok(ceIsValid(ceMinimalStrictGood, { strict: true })) // same of previous but using strict mode in validation options
-    t.strictSame(ceValidate(ceMinimalStrictGood), []) // TODO: fix test ... wip
+    t.strictSame(ceValidate(ceMinimalStrictGood), [])
+    t.strictSame(ceValidate(ceMinimalStrictGood).length, 0)
   })
 })
 
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
-  t.plan(14)
+  t.plan(16)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -206,14 +210,15 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
       eventTypeVersion: '1.0.0',
       source: '/test',
       eventTime: new Date(),
-      extensions: {},
+      extensions: { 'exampleExtension': 'value' },
       contentType: 'application/json',
       schemaURL: 'http://my-schema.localhost.localdomain',
       strict: false
     }
     // some common data
     const ceCommonData = { 'hello': 'world' }
-    // create an instance with a null mandatory argument (handled by defaults), but with check flag enabled: expected success ...
+    // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
     const ceFull1 = new CECreator('1/full',
       'org.fastify.plugins.cloudevents.testevent',
       ceCommonData,
@@ -222,7 +227,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     t.ok(ceFull1)
     t.ok(ceIsValid(ceFull1))
     t.ok(ceIsValid(ceFull1, { strict: false }))
-    t.strictSame(ceValidate(ceFull1), []) // TODO: fix test ... wip
+    t.strictSame(ceValidate(ceFull1), [])
+    t.strictSame(ceValidate(ceFull1).length, 0)
 
     // create another instance with all fields equals: expected success ...
     const ceFull1Clone = new CECreator('1/full', // should be '2/full/no-strict' ...
@@ -233,7 +239,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     t.ok(ceFull1Clone)
     t.ok(ceIsValid(ceFull1Clone))
     t.ok(ceIsValid(ceFull1Clone, { strict: false }))
-    t.strictSame(ceValidate(ceFull1Clone), []) // TODO: fix test ... wip
+    t.strictSame(ceValidate(ceFull1Clone), [])
+    t.strictSame(ceValidate(ceFull1Clone).length, 0)
 
     // then ensure they are different objects ...
     assert(ceFull1 !== ceFull1Clone) // they must be different object references
