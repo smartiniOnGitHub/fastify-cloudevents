@@ -25,10 +25,10 @@ const cloudEventMediaType = 'application/cloudevents+json'
 
 function CloudEventCreate (eventID, eventType, data = {}, {
   cloudEventsVersion = '0.1',
-  eventTypeVersion = '1.0',
+  eventTypeVersion,
   source = '/',
   eventTime = new Date(),
-  extensions = {},
+  extensions,
   contentType = 'application/json',
   schemaURL,
   strict = false } = {}
@@ -59,40 +59,68 @@ function CloudEventCreate (eventID, eventType, data = {}, {
 function cloudEventValidation (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`) // temp ...
   if (isUndefinedOrNull(event)) {
-    return [ new Error('CloudEvent undefined or null') ]
+    return [new Error('CloudEvent undefined or null')] // temp (old) ...
+    /*
+    // TODO: check later if enable something like this ... no, the current approach is simpler and works well the same
+    return {
+      errors: [ new Error('CloudEvent undefined or null') ],
+      count: 1
+    }
+     */
   }
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`) // temp ...
   let validationErrors = []
 
-  // TODO: implement ... wip
-  // validationErrors.push(ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
-  /*
-  // ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion')
-  ensureIsStringNotEmpty(event.eventID, 'eventID')
-  ensureIsStringNotEmpty(event.eventType, 'eventType')
-  // ensureIsObjectOrCollection(event.data, 'data')
-  ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion')
-  ensureIsStringNotEmpty(event.source, 'source')
-  // ensureIsDateValid(event.eventTime, 'eventTime')
-  // ensureIsObjectOrCollection(event.extensions, 'extensions')
-  ensureIsStringNotEmpty(event.contentType, 'contentType')
-  ensureIsStringNotEmpty(event.schemaURL, 'schemaURL')
-   */
+  // standard validation
+  // TODO: complete implementation ... wip
+  validationErrors.push(ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
+  validationErrors.push(ensureIsStringNotEmpty(event.eventID, 'eventID'))
+  validationErrors.push(ensureIsStringNotEmpty(event.eventType, 'eventType'))
+  // if (isDefinedAndNotNull(event.data)) { // no check here because I assign a default value, and I check in strict mode ...
+  // validationErrors.push(ensureIsObjectOrCollection(event.data, 'data')) // TODO: enable ...
+  // }
+  if (isDefinedAndNotNull(event.eventTypeVersion)) {
+    validationErrors.push(ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion'))
+  }
+  // if (isDefinedAndNotNull(event.source)) { // no check here because I assign a default value, and I check in strict mode ...
+  // validationErrors.push(ensureIsStringNotEmpty(event.source, 'source')) // TODO: keep commented here ... ok
+  // }
+  // no check here because I assign a default value, and I check in strict mode ... ok
+  // validationErrors.push(ensureIsDateValid(event.eventTime, 'eventTime'))
+  if (isDefinedAndNotNull(event.extensions)) {
+    // validationErrors.push(ensureIsObjectOrCollection(event.extensions, 'extensions')) // TODO: enable ...
+  }
+  // no check here because I assign a default value, and I check in strict mode ... ok
+  // validationErrors.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
+  if (isDefinedAndNotNull(event.schemaURL)) {
+    validationErrors.push(ensureIsStringNotEmpty(event.schemaURL, 'schemaURL'))
+  }
 
   // additional validation if strict mode enabled, or if enabled in the event ...
   if (strict === true || event.strict === true) {
     // TODO: implement ... wip
     /*
     ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion')
-    ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion')
+    ensureIsObjectOrCollection(event.data, 'data') // if present
+    ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion') // if present
     ensureIsURI(event.source, 'source')
+    ensureIsObjectOrCollection(event.extensions, 'extensions') // if present, ensure it contains at least 1 element
     ensureIsDatePast(event.eventTime, 'eventTime')
+    ensureIsStringNotEmpty(event.contentType, 'contentType')
     ensureIsURI(event.schemaURL, 'schemaURL')
      */
+    // TODO: check if raise excptions in this case, using assert statements ... wip
   }
 
-  // TODO: check if change from array to Set for validation errors, using field as a key (non unique) ...
-  return validationErrors
+  // TODO: check if change from array to Set for validation errors, using field as a key (non unique) ... no, but maybe add some useful properties to Error instances created ... wip
+  /*
+  // TODO: check if return something like this ... no, the other approach is simpler
+  return {
+    errors: validationErrors,
+    count: validationErrors.filter((i) => i !== null)
+  }
+   */
+  return validationErrors.filter((i) => i)
 }
 
 // TODO: add isValidationSuccessful that checks the size of validationErrors, and expose outside ... wip
@@ -107,13 +135,13 @@ function isValid (event, { strict = false } = {}) {
   let valid = isStringNotEmpty(event.cloudEventsVersion) ||
     isStringNotEmpty(event.eventID) ||
     isStringNotEmpty(event.eventType) ||
-    isObjectOrCollection(event.data) || // can be object, Set, or Map ...
-    isStringNotEmpty(event.eventTypeVersion) ||
+    (isDefinedAndNotNull(event.data) && isObjectOrCollection(event.data)) || // can be object, Set, or Map ...
+    (isDefinedAndNotNull(event.eventTypeVersion) && isStringNotEmpty(event.eventTypeVersion)) ||
     isStringNotEmpty(event.source) ||
     isDateValid(event.eventTime) ||
-    isObjectOrCollection(event.extensions) || // can be object, Set, or Map ...
+    (isDefinedAndNotNull(event.extensions) && isObjectOrCollection(event.extensions)) || // can be object, Set, or Map ...
     isStringNotEmpty(event.contentType) ||
-    isStringNotEmpty(event.schemaURL)
+    (isDefinedAndNotNull(event.schemaURL) && isStringNotEmpty(event.schemaURL))
 
   // additional checks if strict mode enabled, or if enabled in the event ...
   if (valid === true && (strict === true || event.strict === true)) {
@@ -160,10 +188,14 @@ function isDateValid (arg) {
 function isDatePast (arg) {
   return (isDateValid(arg) && // TODO: and is in the past ...
 }
+
+function isNumber (arg) {
+  return (isDefinedAndNotNull(arg) && typeof arg === 'number' && !isNaN(arg))
+}
  */
 
 function isObjectOrCollection (arg) {
-  return (isDefinedAndNotNull(arg) && (typeof arg === 'object' || 
+  return (isDefinedAndNotNull(arg) && (typeof arg === 'object' ||
     arg instanceof Map || arg instanceof WeakMap ||
     arg instanceof Set || arg instanceof WeakSet
   ))
@@ -172,16 +204,16 @@ function isObjectOrCollection (arg) {
 /*
 function ensureIsString (arg, name) {
   if (!isString(arg)) {
-    throw new TypeError(`The argument ${name}' must be a string, instead got a '${typeof arg}'`)
-  }
-}
-
-function ensureIsStringNotEmpty (arg, name) {
-  if (!isStringNotEmpty(arg)) {
-    throw new TypeError(`The string ${name}' must be not empty`)
+    return new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
   }
 }
  */
+
+function ensureIsStringNotEmpty (arg, name) {
+  if (!isStringNotEmpty(arg)) {
+    return new TypeError(`The string '${name}' must be not empty`)
+  }
+}
 
 class CloudEvent {
   // TODO: implement ...
