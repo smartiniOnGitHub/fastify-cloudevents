@@ -107,11 +107,8 @@ function cloudEventValidation (event, { strict = false } = {}) {
     // validationErrors.push(ensureIsDatePast(event.eventTime, 'eventTime'))
     validationErrors.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
     // validationErrors.push(ensureIsURI(event.schemaURL, 'schemaURL'))
-
-    // TODO: check if raise excptions in this case, using assert statements ... wip
   }
 
-  // TODO: check if change from array to Set for validation errors, using field as a key (non unique) ... no, but maybe add some useful properties to Error instances created
   return validationErrors.filter((i) => i)
 }
 

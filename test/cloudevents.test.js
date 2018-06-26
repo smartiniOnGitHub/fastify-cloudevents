@@ -147,9 +147,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // TODO: fix validation on this instance ... ok, remove debug statements later
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ceMinimalschemaURL = ${ceMinimal.schemaURL}`)
     t.ok(ceIsValid(ceMinimal))
     t.strictSame(ceValidate(ceMinimal), [])
     // t.strictSame(ceValidate(ceEmpty), []) // temp, to see the error during development ...
