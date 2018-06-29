@@ -17,6 +17,8 @@
 
 // this module exports some useful definition and utility related to CloudEvents
 
+const url = require('url')
+
 // const fastJsonStringify = require('fast-json-stringify') // TODO: enable when needed ...
 
 const cloudEventMediaType = 'application/cloudevents+json'
@@ -91,22 +93,22 @@ function cloudEventValidation (event, { strict = false } = {}) {
 
   // additional validation if strict mode enabled, or if enabled in the event ...
   if (strict === true || event.strict === true) {
-    // TODO: implement/uncomment to finish ... wip
-    // validationErrors.push(ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
+    validationErrors.push(ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
     if (isDefinedAndNotNull(event.data)) {
       validationErrors.push(ensureIsObjectOrCollectionNotString(event.data, 'data'))
     }
     if (isDefinedAndNotNull(event.eventTypeVersion)) {
-      // validationErrors.push(ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
+      validationErrors.push(ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
     }
-    // validationErrors.push(ensureIsURI(event.source, 'source'))
+    validationErrors.push(ensureIsURI(event.source, 'source'))
     if (isDefinedAndNotNull(event.extensions)) {
       validationErrors.push(ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
       // if present, ensure it contains at least 1 element
+      // TODO: implement/uncomment to finish ... wip
     }
-    // validationErrors.push(ensureIsDatePast(event.eventTime, 'eventTime'))
+    validationErrors.push(ensureIsDatePast(event.eventTime, 'eventTime'))
     validationErrors.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
-    // validationErrors.push(ensureIsURI(event.schemaURL, 'schemaURL'))
+    validationErrors.push(ensureIsURI(event.schemaURL, 'schemaURL'))
   }
 
   return validationErrors.filter((i) => i)
@@ -132,14 +134,11 @@ function isValid (event, { strict = false } = {}) {
 
   // additional checks if strict mode enabled, or if enabled in the event ...
   if (valid === true && (strict === true || event.strict === true)) {
-    /*
-    // TODO: future use ...
     valid = isVersion(event.cloudEventsVersion) &&
       isVersion(event.eventTypeVersion) &&
       isURI(event.source) &&
       isDatePast(event.eventTime) &&
       isURI(event.schemaURL)
-     */
   }
 
   return valid
@@ -171,11 +170,11 @@ function isDateValid (arg) {
   return (isDate(arg) && !isNaN(arg))
 }
 
-/*
 function isDatePast (arg) {
-  return (isDateValid(arg) && // TODO: and is in the past ...
+  return (isDateValid(arg) && arg < Date.now())
 }
 
+/*
 function isNumber (arg) {
   return (isDefinedAndNotNull(arg) && typeof arg === 'number' && !isNaN(arg))
 }
@@ -192,6 +191,35 @@ function isObjectOrCollectionNotString (arg) {
   return (isObjectOrCollection(arg) && (typeof arg !== 'string'))
 }
 
+function isVersion (arg) {
+  // quick check if the given string is in the format 'n.n.n'
+  // note that a trailing string (like '_hash') is not allowed at the moment
+  const versionRegex = /^(?:(\d+)\.){0,2}(\d+)$/gm
+  return (isStringNotEmpty(arg) && versionRegex.test(arg))
+}
+
+function isURI (arg) {
+  // quick check if the given string is an URI or an URL
+  if (!isStringNotEmpty(arg)) {
+    return false
+  }
+  // in future handle in a more general way with: new URL(input[, base]) ...
+  // simple check if it's an URI (or better, a relative URL)
+  if (arg.startsWith('/')) {
+    return true
+  }
+  // simple check if it's an URL, trying to instancing it
+  // note that this requires to import related module here (but not in Browsers) ...
+  try {
+    // return (new URL(arg) !== null)
+    const u = new url.URL(arg)
+    return (u !== null)
+  } catch (e) {
+    // console.error(e)
+    return false
+  }
+}
+
 /*
 function ensureIsString (arg, name) {
   if (!isString(arg)) {
@@ -202,7 +230,7 @@ function ensureIsString (arg, name) {
 
 function ensureIsStringNotEmpty (arg, name) {
   if (!isStringNotEmpty(arg)) {
-    return new TypeError(`The string '${name}' must be not empty`)
+    return new Error(`The string '${name}' must be not empty`)
   }
 }
 
@@ -217,6 +245,24 @@ function ensureIsObjectOrCollection (arg, name) {
 function ensureIsObjectOrCollectionNotString (arg, name) {
   if (!isObjectOrCollectionNotString(arg)) {
     return new TypeError(`The object '${name}' must be an object or a collection, and not a string`)
+  }
+}
+
+function ensureIsDatePast (arg, name) {
+  if (!isDatePast(arg)) {
+    return new Error(`The object '${name}' must be a Date that belongs to the past`)
+  }
+}
+
+function ensureIsVersion (arg, name) {
+  if (!isVersion(arg)) {
+    return new Error(`The object '${name}' must be a string in the format 'n.n.n', and not '${arg}'`)
+  }
+}
+
+function ensureIsURI (arg, name) {
+  if (!isURI(arg)) {
+    return new Error(`The object '${name}' must be an URI or URL string, and not '${arg}'`)
   }
 }
 
