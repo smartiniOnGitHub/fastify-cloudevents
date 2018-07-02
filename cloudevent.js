@@ -267,7 +267,7 @@ function ensureIsURI (arg, name) {
 }
 
 class CloudEvent {
-  // TODO: implement ...
+  // TODO: implement in its own repository [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js) and import/use here ... do it after first release ...
 }
 
 module.exports = {
