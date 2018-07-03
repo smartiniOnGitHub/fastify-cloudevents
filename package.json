@@ -5,7 +5,7 @@
   "main": "plugin",
   "scripts": {
     "example": "node example/example",
-    "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
+    "lint": "standard \"./*.js\" \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
     "test:unit": "tap test/*.test.js test/*/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
@@ -20,6 +20,9 @@
     "tap": "^12.0.1"
   },
   "peerDependencies": {},
+  "engines": {
+    "node": ">=8.11.3"
+  },
   "homepage": "https://github.com/smartiniOnGitHub/fastify-cloudevents#readme",
   "repository": {
     "type": "git",

@@ -103,8 +103,10 @@ function cloudEventValidation (event, { strict = false } = {}) {
     validationErrors.push(ensureIsURI(event.source, 'source'))
     if (isDefinedAndNotNull(event.extensions)) {
       validationErrors.push(ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
-      // if present, ensure it contains at least 1 element
-      // TODO: implement/uncomment to finish ... wip
+      const extensionsSize = getSize(event.extensions)
+      if (extensionsSize < 1) {
+        validationErrors.push(new Error(`The object 'extensions' must contain at least 1 property`))
+      }
     }
     validationErrors.push(ensureIsDatePast(event.eventTime, 'eventTime'))
     validationErrors.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
@@ -114,9 +116,10 @@ function cloudEventValidation (event, { strict = false } = {}) {
   return validationErrors.filter((i) => i)
 }
 
-// TODO: add isValidationSuccessful that checks the size of validationErrors, and expose outside ... wip
+// TODO: add isValidationSuccessful that checks the size of validationErrors, and expose outside ... no if I rewrite isValid
 
 function isValid (event, { strict = false } = {}) {
+  // TODO: rewrite using cloudEventValidation and check its result ... wip
   if (isUndefinedOrNull(event)) {
     return false
   }
@@ -139,6 +142,8 @@ function isValid (event, { strict = false } = {}) {
       isURI(event.source) &&
       isDatePast(event.eventTime) &&
       isURI(event.schemaURL)
+
+    // TODO: add test for event.data and extensions (when defined) ... no if I rewrite isValid
   }
 
   return valid
@@ -178,13 +183,27 @@ function isDatePast (arg) {
 function isNumber (arg) {
   return (isDefinedAndNotNull(arg) && typeof arg === 'number' && !isNaN(arg))
 }
+
+function isArray (arg) {
+  return (isDefinedAndNotNull(arg) && ( // arg instanceof Array
+    Array.isArray(arg)
+  ))
+}
  */
 
-function isObjectOrCollection (arg) {
-  return (isDefinedAndNotNull(arg) && (typeof arg === 'object' ||
+function isObject (arg) {
+  return (isDefinedAndNotNull(arg) && (typeof arg === 'object'))
+}
+
+function isKeyedCollection (arg) {
+  return (isDefinedAndNotNull(arg) && (
     arg instanceof Map || arg instanceof WeakMap ||
     arg instanceof Set || arg instanceof WeakSet
   ))
+}
+
+function isObjectOrCollection (arg) {
+  return (isObject(arg) || isKeyedCollection(arg))
 }
 
 function isObjectOrCollectionNotString (arg) {
@@ -195,6 +214,7 @@ function isVersion (arg) {
   // quick check if the given string is in the format 'n.n.n'
   // note that a trailing string (like '_hash') is not allowed at the moment
   const versionRegex = /^(?:(\d+)\.){0,2}(\d+)$/gm
+  // TODO: handle an optional postfix as a string ... wip
   return (isStringNotEmpty(arg) && versionRegex.test(arg))
 }
 
@@ -263,6 +283,22 @@ function ensureIsVersion (arg, name) {
 function ensureIsURI (arg, name) {
   if (!isURI(arg)) {
     return new Error(`The object '${name}' must be an URI or URL string, and not '${arg}'`)
+  }
+}
+
+function getSize (arg) {
+  if ((arg === undefined || arg === null)) {
+    return
+  }
+
+  if (Array.isArray(arg)) {
+    return arg.length
+  } else if (arg instanceof Map || arg instanceof Set) {
+    return arg.size
+  } else if (typeof arg === 'object') {
+    return Object.keys(arg).length
+  } else if (typeof arg === 'string') {
+    return arg.length
   }
 }
 
