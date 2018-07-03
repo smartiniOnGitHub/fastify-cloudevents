@@ -187,9 +187,8 @@ function isObjectOrCollectionNotString (arg) {
 
 function isVersion (arg) {
   // quick check if the given string is in the format 'n.n.n'
-  // note that a trailing string (like '_hash') is not allowed at the moment
-  const versionRegex = /^(?:(\d+)\.){0,2}(\d+)$/gm
-  // TODO: handle an optional postfix as a string ... wip
+  // note that anything after the third number will be considered as a string
+  const versionRegex = /^(?:(\d+)\.){0,2}(\d+)(?:\W|_)(\w+)$/gm
   return (isStringNotEmpty(arg) && versionRegex.test(arg))
 }
 
