@@ -192,25 +192,34 @@ function isVersion (arg) {
   return (isStringNotEmpty(arg) && versionRegex.test(arg))
 }
 
-function isURI (arg) {
+function isURI (arg, base) {
   // quick check if the given string is an URI or an URL
   if (!isStringNotEmpty(arg)) {
     return false
   }
-  // in future handle in a more general way with: new URL(input[, base]) ...
-  // simple check if it's an URI (or better, a relative URL)
-  if (arg.startsWith('/')) {
-    return true
-  }
   // simple check if it's an URL, trying to instancing it
   // note that this requires to import related module here (but not in Browsers) ...
-  try {
-    // return (new URL(arg) !== null)
-    const u = new url.URL(arg)
-    return (u !== null)
-  } catch (e) {
-    // console.error(e)
-    return false
+  if (isStringNotEmpty(base)) {
+    try {
+      const u = new url.URL(arg, base)
+      return (u !== null)
+    } catch (e) {
+      // console.error(e)
+      return false
+    }
+  } else {
+    // simple check if it's an URI (or better, a relative URL)
+    if (arg.startsWith('/')) {
+      return true
+    }
+    try {
+      // return (new URL(arg) !== null)
+      const u = new url.URL(arg)
+      return (u !== null)
+    } catch (e) {
+      // console.error(e)
+      return false
+    }
   }
 }
 
