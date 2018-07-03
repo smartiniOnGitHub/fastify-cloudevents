@@ -352,10 +352,11 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     )
     assert(ceFullDataString !== null)
     t.ok(ceFullDataString)
-    t.ok(!ceIsValid(ceFullDataString))
-    t.ok(!ceIsValid(ceFullDataString, { strict: false }))
-    t.strictSame(ceValidate(ceFullDataString), []) // data type errors handled only in strict mode currently ...
-    t.strictSame(ceValidate(ceFullDataString, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    // data type errors handled only in strict mode currently ...
+    t.ok(ceIsValid(ceFullDataString))
+    t.ok(ceIsValid(ceFullDataString, { strict: false }))
+    t.strictSame(ceValidate(ceFullDataString), [])
+    t.strictSame(ceValidate(ceFullDataString, { strict: false }).length, 0)
     // the same with with strict mode enabled ...
     const ceFullDataStringStrict = new CECreator('1/full/string-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
@@ -364,10 +365,11 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     )
     assert(ceFullDataStringStrict !== null)
     t.ok(ceFullDataStringStrict)
+    // data type errors handled only in strict mode currently ...
     t.ok(!ceIsValid(ceFullDataStringStrict))
     t.ok(!ceIsValid(ceFullDataStringStrict, { strict: true }))
-    t.strictSame(ceValidate(ceFullDataStringStrict).length, 1) // data type errors handled only in strict mode currently ...
-    t.strictSame(ceValidate(ceFullDataStringStrict, { strict: true }).length, 1) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceValidate(ceFullDataStringStrict).length, 1)
+    t.strictSame(ceValidate(ceFullDataStringStrict, { strict: true }).length, 1)
 
     // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...

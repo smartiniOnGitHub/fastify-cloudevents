@@ -116,40 +116,15 @@ function cloudEventValidation (event, { strict = false } = {}) {
   return validationErrors.filter((i) => i)
 }
 
-// TODO: add isValidationSuccessful that checks the size of validationErrors, and expose outside ... no if I rewrite isValid
-
 function isValid (event, { strict = false } = {}) {
-  // TODO: rewrite using cloudEventValidation and check its result ... wip
-  if (isUndefinedOrNull(event)) {
-    return false
-  }
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
-  let valid = isStringNotEmpty(event.cloudEventsVersion) &&
-    isStringNotEmpty(event.eventID) &&
-    isStringNotEmpty(event.eventType) &&
-    (isUndefinedOrNull(event.data) || isObjectOrCollectionNotString(event.data)) && // can be object, Set, or Map ...
-    (isUndefinedOrNull(event.eventTypeVersion) || isStringNotEmpty(event.eventTypeVersion)) &&
-    isStringNotEmpty(event.source) &&
-    isDateValid(event.eventTime) &&
-    (isUndefinedOrNull(event.extensions) || isObjectOrCollectionNotString(event.extensions)) && // can be object, Set, or Map ...
-    isStringNotEmpty(event.contentType) &&
-    (isUndefinedOrNull(event.schemaURL) || isStringNotEmpty(event.schemaURL))
-
-  // additional checks if strict mode enabled, or if enabled in the event ...
-  if (valid === true && (strict === true || event.strict === true)) {
-    valid = isVersion(event.cloudEventsVersion) &&
-      isVersion(event.eventTypeVersion) &&
-      isURI(event.source) &&
-      isDatePast(event.eventTime) &&
-      isURI(event.schemaURL)
-
-    // TODO: add test for event.data and extensions (when defined) ... no if I rewrite isValid
-  }
-
-  return valid
+  const validationErrors = cloudEventValidation(event, { strict = false } = {})
+  const size = getSize(validationErrors)
+  // console.log(`DEBUG - isValid: validationErrors = ${validationErrors}, size = ${size}`)
+  return (size === 0)
 }
 
-// TODO: move isXxx and ensureXxx functions in a dedicated source ...
+// TODO: move isXxx, ensureXxx, etc functions in a dedicated source ...
 
 function isUndefinedOrNull (arg) {
   return (arg === undefined || arg === null)
