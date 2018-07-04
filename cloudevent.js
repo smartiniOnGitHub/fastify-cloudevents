@@ -118,7 +118,7 @@ function validate (event, { strict = false } = {}) {
 
 function isValid (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
-  const validationErrors = validate(event, { strict = false } = {})
+  const validationErrors = validate(event, { strict })
   const size = validators.getSize(validationErrors)
   // console.log(`DEBUG - isValid: validationErrors = ${validationErrors}, size = ${size}`)
   return (size === 0)
