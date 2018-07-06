@@ -86,8 +86,11 @@ module.exports.isObjectOrCollectionNotString = function (arg) {
 
 module.exports.isVersion = function (arg) {
   // quick check if the given string is in the format 'n.n.n'
+  // note that as minimum a number is needed for an integer version
+  // note that at the beginning I can have an optional char 'v' or 'V'
   // note that anything after the third number will be considered as a string
-  const versionRegex = /^(?:(\d+)\.){0,2}(\d+)(?:\W|_)(\w+)$/gm
+  // note: updated to handle version output of 'git describe'
+  const versionRegex = /^(?:v|V?)((\d+)(?:\.?)){1,3}(?:\W|_?)(.*)$/gm
   return (this.isStringNotEmpty(arg) && versionRegex.test(arg))
 }
 
