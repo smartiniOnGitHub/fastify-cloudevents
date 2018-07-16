@@ -35,6 +35,7 @@ function Create (eventID, eventType, data, {
   schemaURL,
   strict = false } = {}
 ) {
+  // TODO: debug even using obj.toSource() utility function ... wip
   // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
   if (strict === true) {
     if (!eventID || !eventType) {
@@ -124,14 +125,9 @@ function isValid (event, { strict = false } = {}) {
   return (size === 0)
 }
 
-class CloudEvent {
-  // TODO: do some test here, then move implementation in its own repository [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js) and import/use here ... do it after first release ...
-}
-
 module.exports = {
   mediaType: mediaType,
   CloudEventCreate: Create,
   isCloudEventValid: isValid,
-  cloudEventValidation: validate,
-  CloudEvent: CloudEvent
+  cloudEventValidation: validate
 }
