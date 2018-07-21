@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "fastify-plugin": "^0.2.2",
-    "fast-json-stringify": "^1.5.4"
+    "fast-json-stringify": "^1.6.0"
   },
   "devDependencies": {
     "fastify": "^0.43.0",
