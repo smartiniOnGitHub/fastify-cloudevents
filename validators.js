@@ -15,9 +15,10 @@
  */
 'use strict'
 
-// this module exports some useful generic functions for the validation of objects
-
-// TODO: add doc ... wip
+/**
+ * Validators:
+ * this module exports some useful generic functions for the validation of objects.
+ */
 
 const url = require('url')
 

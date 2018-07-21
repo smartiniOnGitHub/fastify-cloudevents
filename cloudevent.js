@@ -15,7 +15,10 @@
  */
 'use strict'
 
-// this module exports some useful definition and utility related to CloudEvents
+/**
+ * CloudEvent:
+ * this module exports some useful definition and utility related to CloudEvents.
+ */
 
 const validators = require('./validators') // get validators from here
 
@@ -23,8 +26,29 @@ const validators = require('./validators') // get validators from here
 
 const mediaType = 'application/cloudevents+json'
 
-// TODO: add doc and write to call it with the new operator ... wip
+// TODO: add doc and write to call it with the new operator ... check if remove default values in the doc here ... then generate related docs (with esdoc but with npx) ... wip
+// TODO: then update to ensure strict has been put in the right place even here ... wip
 
+/**
+ * Create a new instance of a CloudEvent object.
+ * Must be called with the 'new' operator to return the new object instance.
+ *
+ * @see https://github.com/cloudevents/spec/blob/master/json-format.md
+ *
+ * @param {string} eventID the ID of the event (unique), mandatory
+ * @param {string} eventType the type of the event (usually), mandatory
+ * @param {object | Map | Set} data the real event data
+ * @param {object} [{
+ *   {string} cloudEventsVersion default '0.1',
+ *   {string} eventTypeVersion optional,
+ *   {uri} source default '/',
+ *   {timestamp} eventTime = new Date(),
+ *   {object} extensions optional but if given must contain at least 1 property (key/value),
+ *   {string} contentType default 'application/json',
+ *   {uri} schemaURL optional,
+ *   {boolean} strict default false
+ * }] optional attributes of the event; some has default values chosen here
+ */
 function Create (eventID, eventType, data, {
   cloudEventsVersion = '0.1',
   eventTypeVersion,
@@ -58,6 +82,15 @@ function Create (eventID, eventType, data, {
   this.strict = strict // could be useful ...
 }
 
+/**
+ * Validate the given CloudEvent.
+ *
+ * @param {object} event the CloudEvent to validate
+ * @param {object} [{
+ *   {boolean} strict default false, to validate it in a more strict way
+ * }] options, optional
+ * @returns an array of (non null) validation errors, or at least an empty array
+ */
 function validate (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
   if (validators.isUndefinedOrNull(event)) {
@@ -117,6 +150,15 @@ function validate (event, { strict = false } = {}) {
   return ve.filter((i) => i)
 }
 
+/**
+ * Tell the given CloudEvent, if it's valid.
+ *
+ * @param {object} event the CloudEvent to validate
+ * @param {object} [{
+ *   {boolean} strict default false, to check its validation in a more strict way
+ * }] options, optional
+ * @returns true if valid, otherwise false
+ */
 function isValid (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
   const validationErrors = validate(event, { strict })
