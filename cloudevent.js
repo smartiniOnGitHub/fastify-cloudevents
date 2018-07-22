@@ -59,7 +59,7 @@ function Create (eventID, eventType, data, {
   strict = false } = {}
 ) {
   // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-  // TODO: enable and fix the function ... wip
+  // TODO: enable and fix the function ... ok, but not it's unused so I'll remove from here
   // console.log(`DEBUG - ${dumpObject(eventID, 'eventID')}, ${dumpObject(eventType, 'eventType')}, ${dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
   if (strict === true) {
     if (!eventID || !eventType) {
@@ -82,14 +82,15 @@ function Create (eventID, eventType, data, {
   this.strict = strict // could be useful ...
 }
 
-/* *
+// TODO: no more used, to be removed soon ... wip
+/**
  * Utility function that return a dump of the given object.
  *
  * @param {object | Map | Set} obj the object to dump
  * @param {string} name the name to assign in the returned string
  * @returns {string} the dump of the object or a message when obj is undefined/null/not an object
  * @memberof CloudEvent
- * /
+ */
 function dumpObject (obj, name) {
   if (validators.isUndefined(obj)) {
     return `${name}: undefined`
@@ -98,10 +99,10 @@ function dumpObject (obj, name) {
   } else if (!validators.isObjectOrCollection(obj)) {
     return `${name}: '${obj.toString()}'`
   } else {
-    return `${name}: ${obj.toSource()}'`
+    // return `${name}: ${obj.toSource()}` // no because it's defined only in Firefox
+    return `${name}: ${JSON.stringify(obj)}`
   }
 }
- */
 
 /**
  * Validate the given CloudEvent.
