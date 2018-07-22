@@ -20,6 +20,7 @@ const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
 
+/** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(10)
   const fastify = Fastify()
@@ -56,6 +57,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   })
 })
 
+/** @test {CloudEvent} */
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
   t.plan(10)
   const fastify = Fastify()
@@ -83,6 +85,7 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
   })
 })
 
+/** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
   t.plan(12)
   const fastify = Fastify()
@@ -124,6 +127,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
   })
 })
 
+/** @test {CloudEvent} */
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
   t.plan(28)
   const fastify = Fastify()
@@ -201,7 +205,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   })
 })
 
-// create some common options
+/** create some common options, for better reuse in tests */
 const ceCommonOptions = {
   cloudEventsVersion: '0.0.0',
   eventTypeVersion: '1.0.0',
@@ -212,6 +216,7 @@ const ceCommonOptions = {
   schemaURL: 'http://my-schema.localhost.localdomain',
   strict: false
 }
+/** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = {
   cloudEventsVersion: '0.0.0',
   eventTypeVersion: '1.0.0',
@@ -222,13 +227,15 @@ const ceCommonOptionsStrict = {
   schemaURL: 'http://my-schema.localhost.localdomain',
   strict: true
 }
-// some common data
+/** create some common data from an object, for better reuse in tests */
 const ceCommonData = { 'hello': 'world' }
+/** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 
+/** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
   t.plan(16)
   const fastify = Fastify()
@@ -276,6 +283,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   })
 })
 
+/** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
   t.plan(44)
   const fastify = Fastify()
