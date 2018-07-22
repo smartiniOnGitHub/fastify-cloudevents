@@ -90,8 +90,10 @@ function Create (eventID, eventType, data, {
  * @private
  */
 function isStrict (event) {
-  if (validators.isDefinedAndNotNull(event) &&
-      validators.isDefinedAndNotNull(event.extensions)) {
+  if (validators.isUndefinedOrNull(event)) {
+    return [new Error('CloudEvent undefined or null')]
+  }
+  if (validators.isDefinedAndNotNull(event.extensions)) {
     return event.extensions.strict
   } else {
     return false
