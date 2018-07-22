@@ -77,7 +77,25 @@ function Create (eventID, eventType, data, {
   this.schemaURL = schemaURL
   this.source = source
 
-  this.strict = strict // could be useful ...
+  // add strict to extensions, but only when defined
+  if (strict === true) {
+    this.extensions = extensions || {}
+    this.extensions.strict = strict
+  }
+}
+
+/**
+ * Tell if the object has the strict flag enabled.
+ * @type {boolean}
+ * @private
+ */
+function isStrict (event) {
+  if (validators.isDefinedAndNotNull(event) &&
+      validators.isDefinedAndNotNull(event.extensions)) {
+    return event.extensions.strict
+  } else {
+    return false
+  }
 }
 
 /**
@@ -122,7 +140,7 @@ function validate (event, { strict = false } = {}) {
   }
 
   // additional validation if strict mode enabled, or if enabled in the event ...
-  if (strict === true || event.strict === true) {
+  if (strict === true || isStrict(event) === true) {
     ve.push(validators.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
     if (validators.isDefinedAndNotNull(event.data)) {
       ve.push(validators.ensureIsObjectOrCollectionNotString(event.data, 'data'))
