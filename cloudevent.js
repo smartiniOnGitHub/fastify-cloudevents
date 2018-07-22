@@ -38,16 +38,15 @@ const mediaType = 'application/cloudevents+json'
  * @param {string} eventID the ID of the event (unique), mandatory
  * @param {string} eventType the type of the event (usually), mandatory
  * @param {object | Map | Set} data the real event data
- * @param {object} [{
- *   {string} cloudEventsVersion default '0.1',
- *   {string} eventTypeVersion optional,
- *   {uri} source default '/',
- *   {timestamp} eventTime = new Date(),
- *   {object} extensions optional but if given must contain at least 1 property (key/value),
- *   {string} contentType default 'application/json',
- *   {uri} schemaURL optional,
- *   {boolean} strict default false
- * }] optional attributes of the event; some has default values chosen here
+ * @param {object} options optional attributes of the event; some has default values chosen here:
+ *        cloudEventsVersion (string, default '0.1'),
+ *        eventTypeVersion (string) optional,
+ *        source (uri, default '/'),
+ *        eventTime (timestamp, default now),
+ *        extensions (object) optional but if given must contain at least 1 property (key/value),
+ *        contentType (string, default 'application/json') tell how the data attribute must be encoded,
+ *        schemaURL (uri) optional,
+ *        strict (boolean, default false) tell if object instance will be validated in a more strict way
  */
 function Create (eventID, eventType, data, {
   cloudEventsVersion = '0.1',
@@ -59,8 +58,9 @@ function Create (eventID, eventType, data, {
   schemaURL,
   strict = false } = {}
 ) {
-  // TODO: debug even using obj.toSource() utility function ... wip
   // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
+  // TODO: enable and fix the function ... wip
+  // console.log(`DEBUG - ${dumpObject(eventID, 'eventID')}, ${dumpObject(eventType, 'eventType')}, ${dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
   if (strict === true) {
     if (!eventID || !eventType) {
       throw new Error('Unable to create CloudEvent instance, mandatory field missing')
@@ -82,14 +82,33 @@ function Create (eventID, eventType, data, {
   this.strict = strict // could be useful ...
 }
 
+/* *
+ * Utility function that return a dump of the given object.
+ *
+ * @param {object | Map | Set} obj the object to dump
+ * @param {string} name the name to assign in the returned string
+ * @returns {string} the dump of the object or a message when obj is undefined/null/not an object
+ * @memberof CloudEvent
+ * /
+function dumpObject (obj, name) {
+  if (validators.isUndefined(obj)) {
+    return `${name}: undefined`
+  } else if (validators.isNull(obj)) {
+    return `${name}: null`
+  } else if (!validators.isObjectOrCollection(obj)) {
+    return `${name}: '${obj.toString()}'`
+  } else {
+    return `${name}: ${obj.toSource()}'`
+  }
+}
+ */
+
 /**
  * Validate the given CloudEvent.
  *
  * @param {object} event the CloudEvent to validate
- * @param {object} [{
- *   {boolean} strict default false, to validate it in a more strict way
- * }] options, optional
- * @returns an array of (non null) validation errors, or at least an empty array
+ * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+ * @returns {array} an array of (non null) validation errors, or at least an empty array
  */
 function validate (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
@@ -154,10 +173,8 @@ function validate (event, { strict = false } = {}) {
  * Tell the given CloudEvent, if it's valid.
  *
  * @param {object} event the CloudEvent to validate
- * @param {object} [{
- *   {boolean} strict default false, to check its validation in a more strict way
- * }] options, optional
- * @returns true if valid, otherwise false
+ * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+ * @returns {boolean} true if valid, otherwise false
  */
 function isValid (event, { strict = false } = {}) {
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
