@@ -183,9 +183,50 @@ function isValid (event, { strict = false } = {}) {
   return (size === 0)
 }
 
+const fastJson = require('fast-json-stringify')
+// define a schema for serializing a CloudEvent object to JSON
+// note that additionalProperties will be ignored
+const ceSchema = {
+  title: 'CloudEvent Schema with required fields',
+  type: 'object',
+  properties: {
+    cloudEventsVersion: { type: 'string' },
+    eventID: { type: 'string' },
+    eventType: { type: 'string' },
+    data: { type: 'object' },
+    eventTypeVersion: { type: 'string' },
+    source: { type: 'string' },
+    eventTime: { type: 'string' },
+    extensions: { type: 'object' },
+    contentType: { type: 'string' },
+    // TODO: use if/then/else on contantType ... wip
+    schemaURL: { type: 'string' }
+  },
+  required: ['cloudEventsVersion', 'eventID', 'eventType',
+    'source', 'contentType'
+  ]
+}
+const stringify = fastJson(ceSchema)
+
+// TODO: check how to handle serialization in a different format (maybe via a serializer function) ... wip
+/**
+ * Serialize the given CloudEvent in JSON format.
+ *
+ * @param {!object} event the CloudEvent to serialize
+ * @return {string} the serialized event, as a string
+ */
+function serialize (event) {
+  console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
+  const serialized = stringify(event)
+  console.log(`DEBUG - serialize: serialized = '${serialized}'`)
+  // TODO: comment log statements ... wip
+  return serialized
+}
+
 module.exports = {
   mediaType: mediaType,
   CloudEventCreate: Create,
   isCloudEventValid: isValid,
-  cloudEventValidation: validate
+  cloudEventValidation: validate,
+  cloudEventSerialization: serialize
 }

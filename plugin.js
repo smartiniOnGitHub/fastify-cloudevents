@@ -30,6 +30,7 @@ function fastifyCloudEvents (fastify, { // options
   fastify.decorate('CloudEventCreate', cloudEventHandler.CloudEventCreate)
   fastify.decorate('isCloudEventValid', cloudEventHandler.isCloudEventValid)
   fastify.decorate('cloudEventValidation', cloudEventHandler.cloudEventValidation)
+  fastify.decorate('cloudEventSerialization', cloudEventHandler.cloudEventSerialization)
 
   next()
 }
