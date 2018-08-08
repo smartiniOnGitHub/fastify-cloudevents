@@ -50,11 +50,12 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 })
 
 /** create some common options, for better reuse in tests */
+const commonEventTime = new Date()
 const ceCommonOptions = {
   cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
-  eventTime: new Date(),
+  eventTime: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
   contentType: 'application/json',
   schemaURL: 'http://my-schema.localhost.localdomain',
@@ -67,7 +68,7 @@ const ceCommonOptionsStrict = {
   cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
-  eventTime: new Date(),
+  eventTime: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
   contentType: 'application/json',
   schemaURL: 'http://my-schema.localhost.localdomain',
@@ -81,7 +82,7 @@ const ceCommonData = { 'hello': 'world', 'year': 2018 }
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(11)
+  t.plan(13)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -112,8 +113,13 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.strictSame(ceValidate(ceFullData, { strict: false }).length, 0)
     const ceFullDataSerialized = ceSerialize(ceFullData)
     t.ok(ceFullDataSerialized)
-    // TODO: check why serialized data doesn't have its attributes ... wip
-    // TODO: add more test on the generated string ... better, check on a re-built object by de-serializing the string ... wip
+    // TODO: check why serialized data doesn't have its attributes ... ok, see my question at [fast-json-stringify/issues/108](https://github.com/fastify/fast-json-stringify/issues/108)
+    const eventSerializedComparison = `{"data":{"hello":"world","year":2018},"extensions":{"exampleExtension":"value"},"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullDataSerialized, eventSerializedComparison)
+    // TODO: check on a re-built object by de-serializing the string ... ok
+    const eventDeserialized = JSON.parse(ceFullDataSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    eventDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute
+    t.same(ceFullData, eventDeserialized)
     // the same with with strict mode enabled ...
     // const ceFullDataStrict = new CECreator('1/full/sample-data/strict',
     // TODO: add more test ... wip

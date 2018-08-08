@@ -193,22 +193,24 @@ const ceSchema = {
     cloudEventsVersion: { type: 'string' },
     eventID: { type: 'string' },
     eventType: { type: 'string' },
-    data: { type: 'object' },
+    // data: { type: 'object' },
     eventTypeVersion: { type: 'string' },
     source: { type: 'string' },
     eventTime: { type: 'string' },
-    extensions: { type: 'object' },
+    // extensions: { type: 'object' },
     contentType: { type: 'string' },
     // TODO: use if/then/else on contantType ... wip
     schemaURL: { type: 'string' }
   },
   required: ['cloudEventsVersion', 'eventID', 'eventType',
     'source', 'contentType'
-  ]
+  ],
+  additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
 }
 const stringify = fastJson(ceSchema)
 
 // TODO: check how to handle serialization in a different format (maybe via a serializer function) ... wip
+// TODO: add options argument like: serialization schema for data (and another for extensions) to merge with the current one, additionalProperties to override, etc ... wip
 /**
  * Serialize the given CloudEvent in JSON format.
  *
@@ -216,9 +218,9 @@ const stringify = fastJson(ceSchema)
  * @return {string} the serialized event, as a string
  */
 function serialize (event) {
-  console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
+  // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
   const serialized = stringify(event)
-  console.log(`DEBUG - serialize: serialized = '${serialized}'`)
+  // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
   // TODO: comment log statements ... wip
   return serialized
 }
