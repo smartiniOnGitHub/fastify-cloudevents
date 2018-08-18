@@ -75,11 +75,9 @@ const ceCommonOptionsStrict = {
 /** create some common data from an object, for better reuse in tests */
 const ceCommonData = { 'hello': 'world', 'year': 2018 }
 
-// TODO: add a test without mandatory fields ... wip
-
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(21)
+  t.plan(25)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -115,6 +113,17 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceFullDataDeserialized = JSON.parse(ceFullDataSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDataDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
     t.same(ceFullData, ceFullDataDeserialized)
+    const ceFullDataSerializedCustom1 = ceSerialize(ceFullData, { schema: { additionalProperties: false } }) // override the schema
+    t.ok(ceFullDataSerializedCustom1)
+    const ceFullDataSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullDataSerializedCustom1, ceFullDataSerializedCustomComparison1)
+    /*
+    // TODO: check the schema merge, and the definition of the custom schema here ... wip
+    const ceFullDataSerializedCustom2 = ceSerialize(ceFullData, { schema: { properties: { data: { type: 'object', hello: { type: 'string' }, world: { type: 'number' } } }, additionalProperties: false } }) // override the schema
+    t.ok(ceFullDataSerializedCustom2)
+    const ceFullDataSerializedCustomComparison2 = ceFullDataSerializedComparison
+    t.strictSame(ceFullDataSerializedCustom2, ceFullDataSerializedCustomComparison2)
+     */
     // the same with with strict mode enabled ...
     const ceFullDataStrict = new CECreator('1/full/sample-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
@@ -134,7 +143,14 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceFullDataStrictDeserialized = JSON.parse(ceFullDataStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDataStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
     t.same(ceFullDataStrict, ceFullDataStrictDeserialized)
+    const ceFullDataStrictSerializedCustom1 = ceSerialize(ceFullDataStrict, { schema: { additionalProperties: false } }) // override the schema
+    t.ok(ceFullDataStrictSerializedCustom1)
+    const ceFullDataStrictSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullDataStrictSerializedCustom1, ceFullDataStrictSerializedCustomComparison1)
+    // TODO: add another but with the right custom schema for my events here and additionalProperties false ... wip
   })
 })
 
-// TODO: add more test, like: with custom dataSchema and additionalProperties false, with additional fields to skip, etc ... wip
+// TODO: add a test without mandatory fields ... wip
+
+// TODO: add test with a non default contentType ... wip

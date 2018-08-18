@@ -215,14 +215,31 @@ const stringify = fastJson(ceSchema)
  * Serialize the given CloudEvent in JSON format.
  *
  * @param {!object} event the CloudEvent to serialize
+ * @param {object} options containing: schema (object, default null) to override default schema
  * @return {string} the serialized event, as a string
  */
-function serialize (event) {
+function serialize (event, { schema = null } = {}) {
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
+  if (validators.isUndefinedOrNull(event)) {
+    throw new Error('CloudEvent undefined or null')
+  }
+  // TODO: handle only contentType for now ... ok
+  if (event.contentType !== 'application/json') {
+    throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
+  }
+
+  // TODO: add an option to serialize only if valid ... wip
   // TODO: handle contentType when serializing the data attribute ... wip
-  const serialized = stringify(event)
+  let serialized
+  if (validators.isObject(schema)) {
+    const schemaMerged = { ...ceSchema, ...schema }
+    const stringifyMerged = fastJson(schemaMerged)
+    // TODO: later check for performances with this approach (or maybe extract this setup in a different function) ... wip
+    serialized = stringifyMerged(event)
+  } else {
+    serialized = stringify(event)
+  }
   // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
-  // TODO: comment log statements ... wip
   return serialized
 }
 
