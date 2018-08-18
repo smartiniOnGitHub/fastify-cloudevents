@@ -219,6 +219,7 @@ const stringify = fastJson(ceSchema)
  */
 function serialize (event) {
   // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
+  // TODO: handle contentType when serializing the data attribute ... wip
   const serialized = stringify(event)
   // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
   // TODO: comment log statements ... wip

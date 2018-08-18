@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "fastify": "^0.43.0",
-    "simple-get": "^3.0.2",
+    "simple-get": "^3.0.3",
     "standard": "^11.0.1",
     "tap": "^12.0.1"
   },
