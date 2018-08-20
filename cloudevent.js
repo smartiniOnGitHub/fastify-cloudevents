@@ -22,12 +22,7 @@
 
 const validators = require('./validators') // get validators from here
 
-// const fastJsonStringify = require('fast-json-stringify') // TODO: enable when needed ...
-
 const mediaType = 'application/cloudevents+json'
-
-// TODO: add doc and write to call it with the new operator ... check if remove default values in the doc here ... then generate related docs (with esdoc but with npx) ... wip
-// TODO: then update to ensure strict has been put in the right place even here ... wip
 
 /**
  * Create a new instance of a CloudEvent object.
@@ -199,7 +194,6 @@ const ceSchema = {
     eventTime: { type: 'string' },
     extensions: { type: 'object', additionalProperties: true },
     contentType: { type: 'string' },
-    // TODO: use if/then/else on contentType for the type of data ... wip
     schemaURL: { type: 'string' }
   },
   required: ['cloudEventsVersion', 'eventID', 'eventType',
@@ -209,8 +203,6 @@ const ceSchema = {
 }
 const stringify = fastJson(ceSchema)
 
-// TODO: check how to handle serialization in a different format (maybe via a serializer function) ... wip
-// TODO: add options argument like: serialization schema for data (and another for extensions) to merge with the current one, additionalProperties to override, etc ... wip
 /**
  * Serialize the given CloudEvent in JSON format.
  *
@@ -223,18 +215,14 @@ function serialize (event, { schema = null } = {}) {
   if (validators.isUndefinedOrNull(event)) {
     throw new Error('CloudEvent undefined or null')
   }
-  // TODO: handle only contentType for now ... ok
   if (event.contentType !== 'application/json') {
     throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
   }
 
-  // TODO: add an option to serialize only if valid ... wip
-  // TODO: handle contentType when serializing the data attribute ... wip
   let serialized
   if (validators.isObject(schema)) {
     const schemaMerged = { ...ceSchema, ...schema }
     const stringifyMerged = fastJson(schemaMerged)
-    // TODO: later check for performances with this approach (or maybe extract this setup in a different function) ... wip
     serialized = stringifyMerged(event)
   } else {
     serialized = stringify(event)
