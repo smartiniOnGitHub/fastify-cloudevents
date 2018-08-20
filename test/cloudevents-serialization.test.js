@@ -77,7 +77,7 @@ const ceCommonData = { 'hello': 'world', 'year': 2018 }
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(29)
+  t.plan(33)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -150,7 +150,14 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(ceFullDataStrictSerializedCustom1)
     const ceFullDataStrictSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
     t.strictSame(ceFullDataStrictSerializedCustom1, ceFullDataStrictSerializedCustomComparison1)
-    // TODO: add another but with the right custom schema for my events here and additionalProperties false ... wip
+    const ceFullDataStrictSerializedCustom2 = ceSerialize(ceFullDataStrictEnhanced, { schema: { additionalProperties: true } }) // override the schema, additional properties enabled
+    t.ok(ceFullDataStrictSerializedCustom2)
+    const ceFullDataStrictSerializedCustomComparison2 = `{"otherAttribute":"sample value","cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullDataStrictSerializedCustom2, ceFullDataStrictSerializedCustomComparison2)
+    const ceFullDataStrictSerializedCustom3 = ceSerialize(ceFullDataStrictEnhanced, { schema: { properties: { data: { type: 'object', additionalProperties: false, properties: { hello: { type: 'string' }, year: { type: 'number' } } } }, additionalProperties: true } }) // override the schema, with a fixed set of nested attributes for data
+    t.ok(ceFullDataStrictSerializedCustom3)
+    const ceFullDataStrictSerializedCustomComparison3 = `{"eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value","data":{"hello":"world","year":2018}}`
+    t.strictSame(ceFullDataStrictSerializedCustom3, ceFullDataStrictSerializedCustomComparison3)
   })
 })
 
