@@ -193,19 +193,19 @@ const ceSchema = {
     cloudEventsVersion: { type: 'string' },
     eventID: { type: 'string' },
     eventType: { type: 'string' },
-    // data: { type: 'object' },
+    data: { type: 'object', additionalProperties: true },
     eventTypeVersion: { type: 'string' },
     source: { type: 'string' },
     eventTime: { type: 'string' },
-    // extensions: { type: 'object' },
+    extensions: { type: 'object', additionalProperties: true },
     contentType: { type: 'string' },
-    // TODO: use if/then/else on contantType ... wip
+    // TODO: use if/then/else on contentType for the type of data ... wip
     schemaURL: { type: 'string' }
   },
   required: ['cloudEventsVersion', 'eventID', 'eventType',
     'source', 'contentType'
-  ],
-  additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
+  ] // ,
+  // additionalProperties: true // no need to handle other (non-standard) properties
 }
 const stringify = fastJson(ceSchema)
 
