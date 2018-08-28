@@ -62,16 +62,7 @@ const ceCommonOptions = {
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = {
-  cloudEventsVersion: '0.1.0',
-  eventTypeVersion: '1.0.0',
-  source: '/test',
-  eventTime: commonEventTime,
-  extensions: { 'exampleExtension': 'value' },
-  contentType: 'application/json',
-  schemaURL: 'http://my-schema.localhost.localdomain',
-  strict: true
-}
+const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 /** create some common data from an object, for better reuse in tests */
 const ceCommonData = { 'hello': 'world', 'year': 2018 }
 
