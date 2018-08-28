@@ -18,13 +18,14 @@ temp/
 scripts/
 src/
 test/
-example/
+# example/
 
 .env
 .babelrc
 .eslintignore
 .eslintrc*
 .eslintcache
+.esdoc.json
 .yarn-integrity
 
 .editorconfig
