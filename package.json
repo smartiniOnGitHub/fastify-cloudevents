@@ -11,17 +11,18 @@
   },
   "dependencies": {
     "fastify-plugin": "^0.2.2",
-    "fast-json-stringify": "^1.7.1"
+    "fast-json-stringify": "^1.7.1",
+    "cloudevent.js": "^0.1.0"
   },
   "devDependencies": {
     "fastify": "^0.43.0",
     "simple-get": "^3.0.3",
-    "standard": "^11.0.1",
+    "standard": "^12.0.1",
     "tap": "^12.0.1"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.11.3"
+    "node": ">=8.11.4"
   },
   "homepage": "https://github.com/smartiniOnGitHub/fastify-cloudevents#readme",
   "repository": {

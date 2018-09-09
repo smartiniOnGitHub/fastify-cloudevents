@@ -104,7 +104,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceFullDataDeserialized = JSON.parse(ceFullDataSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDataDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
     t.same(ceFullData, ceFullDataDeserialized)
-    const ceFullDataEnhanced = {...ceFullData, ...{otherAttribute: 'sample value'}}
+    const ceFullDataEnhanced = { ...ceFullData, ...{ otherAttribute: 'sample value' } }
     const ceFullDataSerializedCustom1 = ceSerialize(ceFullDataEnhanced, { schema: { additionalProperties: false } }) // override the schema, additional properties disabled (default)
     t.ok(ceFullDataSerializedCustom1)
     const ceFullDataSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
