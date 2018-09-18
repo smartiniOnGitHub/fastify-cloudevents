@@ -17,8 +17,11 @@
 
 const fp = require('fastify-plugin')
 
-const cloudEventHandler = require('./cloudevent.js') // get CloudEvent definition and related utilities
+// TODO: remove internal definition of CloudEvent and use the external one ... wip
+// TODO: check if use upper initial for the class imported and assigned to cloudEventHandler ... wip
+const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition and related utilities
 
+// TODO: for serverUrl, check if a better default would be current home page URL ... wip
 function fastifyCloudEvents (fastify, { // options
   serverUrl = '/'
 }, next) {
@@ -27,10 +30,11 @@ function fastifyCloudEvents (fastify, { // options
   }
 
   // execute plugin code
-  fastify.decorate('CloudEventCreate', cloudEventHandler.CloudEventCreate)
-  fastify.decorate('isCloudEventValid', cloudEventHandler.isCloudEventValid)
-  fastify.decorate('cloudEventValidation', cloudEventHandler.cloudEventValidation)
-  fastify.decorate('cloudEventSerialization', cloudEventHandler.cloudEventSerialization)
+  fastify.decorate('CloudEventCreate', cloudEventHandler)
+  // TODO: check if do not expose anymore ... wip
+  fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
+  fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
+  fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
 
   next()
 }

@@ -39,17 +39,17 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     t.ok(CECreator)
     t.strictEqual(typeof CECreator, 'function')
 
-    // ensure isCloudEventValid function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('isCloudEventValid'))
-    const ceIsValid = fastify.isCloudEventValid
+    // ensure cloudEventIsValid function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('cloudEventIsValid'))
+    const ceIsValid = fastify.cloudEventIsValid
     assert(ceIsValid !== null)
     assert(typeof ceIsValid === 'function')
     t.ok(ceIsValid)
     t.strictEqual(typeof ceIsValid, 'function')
 
-    // ensure cloudEventValidation function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventValidation'))
-    const ceValidate = fastify.cloudEventValidation
+    // ensure cloudEventValidate function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('cloudEventValidate'))
+    const ceValidate = fastify.cloudEventValidate
     assert(ceValidate !== null)
     assert(typeof ceValidate === 'function')
     t.ok(ceValidate)
@@ -68,9 +68,9 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
     t.error(err)
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
-    const ceIsValid = fastify.isCloudEventValid
+    const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidation
+    const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
 
     // undefined
@@ -96,9 +96,9 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.error(err)
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
-    const ceIsValid = fastify.isCloudEventValid
+    const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidation
+    const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
 
     // create an instance without mandatory arguments (but no strict mode): expected success ...
@@ -138,9 +138,9 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.error(err)
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
-    const ceIsValid = fastify.isCloudEventValid
+    const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidation
+    const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
     // t.notSame(ceIsValid, ceValidate)
     t.strictNotSame(ceIsValid, ceValidate)
@@ -246,9 +246,9 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     t.error(err)
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
-    const ceIsValid = fastify.isCloudEventValid
+    const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidation
+    const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
 
     // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
@@ -294,9 +294,9 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.error(err)
     const CECreator = fastify.CloudEventCreate
     t.ok(CECreator)
-    const ceIsValid = fastify.isCloudEventValid
+    const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidation
+    const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
