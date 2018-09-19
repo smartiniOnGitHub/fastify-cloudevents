@@ -22,7 +22,7 @@ const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(7)
+  t.plan(9)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
@@ -30,14 +30,18 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     fastify.server.unref()
     t.error(err)
 
-    // ensure CloudEventCreate constructor function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('CloudEventCreate'))
-    const CECreator = fastify.CloudEventCreate
+    // ensure CloudEvent class exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('CloudEvent'))
+    const CloudEvent = fastify.CloudEvent
     // optional, add some assertions with standard Node.js assert statements, as a sample
-    assert(CECreator !== null)
-    assert(typeof CECreator === 'function')
-    t.ok(CECreator)
-    t.strictEqual(typeof CECreator, 'function')
+    assert(CloudEvent !== null)
+    assert(typeof CloudEvent === 'function')
+    assert(new CloudEvent() instanceof CloudEvent)
+    assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.ok(CloudEvent)
+    t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
+    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
 
     // ensure cloudEventSerialize function exist in Fastify decorators ...
     t.ok(fastify.hasDecorator('cloudEventSerialize'))
@@ -65,18 +69,23 @@ const ceCommonOptions = {
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 /** create some common data from an object, for better reuse in tests */
 const ceCommonData = { 'hello': 'world', 'year': 2018 }
+/** create some common data from a Map, for better reuse in tests */
+const ceMapData = new Map() // empty Map
+// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
+ceMapData.set('key-1', 'value 1')
+ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(33)
+  t.plan(41)
   const fastify = Fastify()
   fastify.register(require('../')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
@@ -86,73 +95,112 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFullData = new CECreator('1/full/sample-data/no-strict',
-      'org.fastify.plugins.cloudevents.testevent',
+    const ceFull = new CloudEvent('1/full/sample-data/no-strict',
+      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
       ceCommonData, // data
       ceCommonOptions
     )
-    assert(ceFullData !== null)
-    t.ok(ceFullData)
-    t.ok(ceIsValid(ceFullData))
-    t.ok(ceIsValid(ceFullData, { strict: false }))
-    t.strictSame(ceValidate(ceFullData), [])
-    t.strictSame(ceValidate(ceFullData, { strict: false }).length, 0)
-    const ceFullDataSerialized = ceSerialize(ceFullData)
-    t.ok(ceFullDataSerialized)
-    const ceFullDataSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
-    t.strictSame(ceFullDataSerialized, ceFullDataSerializedComparison)
-    const ceFullDataDeserialized = JSON.parse(ceFullDataSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-    ceFullDataDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-    t.same(ceFullData, ceFullDataDeserialized)
-    const ceFullDataEnhanced = { ...ceFullData, ...{ otherAttribute: 'sample value' } }
-    const ceFullDataSerializedCustom1 = ceSerialize(ceFullDataEnhanced, { schema: { additionalProperties: false } }) // override the schema, additional properties disabled (default)
-    t.ok(ceFullDataSerializedCustom1)
-    const ceFullDataSerializedCustomComparison1 = `{"eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value"}`
-    // TODO: check if it's right to have even 'otherAttribute' in the output here ... wip
-    t.strictSame(ceFullDataSerializedCustom1, ceFullDataSerializedCustomComparison1)
-    const ceFullDataSerializedCustom2 = ceSerialize(ceFullDataEnhanced, { schema: { additionalProperties: true } }) // override the schema, additional properties enabled
-    t.ok(ceFullDataSerializedCustom2)
-    const ceFullDataSerializedCustomComparison2 = `{"otherAttribute":"sample value","cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullDataSerializedCustom2, ceFullDataSerializedCustomComparison2)
-    const ceFullDataSerializedCustom3 = ceSerialize(ceFullDataEnhanced, { schema: { properties: { data: { type: 'object', additionalProperties: false, properties: { hello: { type: 'string' }, year: { type: 'number' } } } }, additionalProperties: true } }) // override the schema, with a fixed set of nested attributes for data
-    t.ok(ceFullDataSerializedCustom3)
-    const ceFullDataSerializedCustomComparison3 = `{"eventID":"1/full/sample-data/no-strict","eventType":"org.fastify.plugins.cloudevents.testevent","cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value","data":{"hello":"world","year":2018}}`
-    t.strictSame(ceFullDataSerializedCustom3, ceFullDataSerializedCustomComparison3)
+    assert(ceFull !== null)
+    t.ok(ceFull)
+    t.ok(ceFull.isValid())
+    t.ok(ceFull.validate().length === 0)
+    t.ok(ceFull.validate({ strict: false }).length === 0)
+    t.ok(ceFull.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFull))
+    t.ok(CloudEvent.validateEvent(ceFull).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+
+    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+    t.ok(ceFullSerializedStatic)
+    const ceFullSerialized = ceFull.serialize()
+    t.ok(ceFullSerialized)
+    assert(ceFullSerializedStatic === ceFullSerialized)
+    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+    // const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullSerializedFunction = ceSerialize(ceFull)
+    t.ok(ceFullSerializedFunction)
+    t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
+    t.strictSame(ceFullSerializedFunction, ceFullSerialized)
+
+    const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
+    t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+    const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFull, ceFullDeserialized)
+
     // the same with with strict mode enabled ...
-    const ceFullDataStrict = new CECreator('1/full/sample-data/strict',
-      'org.fastify.plugins.cloudevents.testevent',
+    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
       ceCommonData, // data
       ceCommonOptionsStrict
     )
-    assert(ceFullDataStrict !== null)
-    t.ok(ceFullDataStrict)
-    t.ok(ceIsValid(ceFullDataStrict))
-    t.ok(ceIsValid(ceFullDataStrict, { strict: true }))
-    t.strictSame(ceValidate(ceFullDataStrict), [])
-    t.strictSame(ceValidate(ceFullDataStrict, { strict: true }).length, 0)
-    const ceFullDataStrictSerialized = ceSerialize(ceFullDataStrict)
-    t.ok(ceFullDataStrictSerialized)
-    const ceFullDataStrictSerializedComparison = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullDataStrictSerialized, ceFullDataStrictSerializedComparison)
-    const ceFullDataStrictDeserialized = JSON.parse(ceFullDataStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-    ceFullDataStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-    t.same(ceFullDataStrict, ceFullDataStrictDeserialized)
-    const ceFullDataStrictEnhanced = { ...ceFullDataStrict, ...{ otherAttribute: 'sample value' } }
-    const ceFullDataStrictSerializedCustom1 = ceSerialize(ceFullDataStrictEnhanced, { schema: { additionalProperties: false } }) // override the schema, additional properties disabled (default)
-    t.ok(ceFullDataStrictSerializedCustom1)
-    const ceFullDataStrictSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullDataStrictSerializedCustom1, ceFullDataStrictSerializedCustomComparison1)
-    const ceFullDataStrictSerializedCustom2 = ceSerialize(ceFullDataStrictEnhanced, { schema: { additionalProperties: true } }) // override the schema, additional properties enabled
-    t.ok(ceFullDataStrictSerializedCustom2)
-    const ceFullDataStrictSerializedCustomComparison2 = `{"otherAttribute":"sample value","cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullDataStrictSerializedCustom2, ceFullDataStrictSerializedCustomComparison2)
-    const ceFullDataStrictSerializedCustom3 = ceSerialize(ceFullDataStrictEnhanced, { schema: { properties: { data: { type: 'object', additionalProperties: false, properties: { hello: { type: 'string' }, year: { type: 'number' } } } }, additionalProperties: true } }) // override the schema, with a fixed set of nested attributes for data
-    t.ok(ceFullDataStrictSerializedCustom3)
-    const ceFullDataStrictSerializedCustomComparison3 = `{"eventID":"1/full/sample-data/strict","eventType":"org.fastify.plugins.cloudevents.testevent","cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value","data":{"hello":"world","year":2018}}`
-    t.strictSame(ceFullDataStrictSerializedCustom3, ceFullDataStrictSerializedCustomComparison3)
+    assert(ceFullStrict !== null)
+    t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.validate().length === 0)
+    t.ok(ceFullStrict.validate({ strict: true }).length === 0)
+    t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFullStrict))
+    t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+
+    const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+    t.ok(ceFullStrictSerializedStatic)
+    const ceFullStrictSerialized = ceFullStrict.serialize()
+    t.ok(ceFullStrictSerialized)
+    assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
+    t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
+    // const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
+    t.ok(ceFullStrictSerializedFunction)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
+
+    const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
+    t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+    const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFullStrict, ceFullStrictDeserialized)
   })
 })
 
-// TODO: add a test without mandatory fields ... wip
+// TODO: this is a limit if the current implementation, and will be resolved soon ... wip
+/** @test {CloudEvent} */
+test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
+  t.plan(5)
 
-// TODO: add test with a non default contentType ... wip
+  const fastify = Fastify()
+  fastify.register(require('../')) // configure this plugin with its default options
+
+  fastify.listen(0, (err) => {
+    fastify.server.unref()
+    t.error(err)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
+
+    // create an instance with non default contentType (other options default): expected success ...
+    // but when I try to serialize it, expect to have an error raised ...
+    const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
+      ceCommonData, // data
+      {
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentType !== null)
+    t.ok(ceFullOtherContentType)
+    t.ok(ceFullOtherContentType.isValid())
+    // const ceFullStrictSerialized = ceFullOtherContentType.serialize()
+    // t.ok(ceFullStrictSerialized)
+    t.throws(function () {
+      const ceFullStrictSerialized = ceFullOtherContentType.serialize()
+      assert(ceFullStrictSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+  })
+})

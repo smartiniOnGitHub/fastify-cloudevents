@@ -30,14 +30,14 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     fastify.server.unref()
     t.error(err)
 
-    // ensure CloudEventCreate constructor function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('CloudEventCreate'))
-    const CECreator = fastify.CloudEventCreate
+    // ensure CloudEvent constructor function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('CloudEvent'))
+    const CloudEvent = fastify.CloudEvent
     // optional, add some assertions with standard Node.js assert statements, as a sample
-    assert(CECreator !== null)
-    assert(typeof CECreator === 'function')
-    t.ok(CECreator)
-    t.strictEqual(typeof CECreator, 'function')
+    assert(CloudEvent !== null)
+    assert(typeof CloudEvent === 'function')
+    t.ok(CloudEvent)
+    t.strictEqual(typeof CloudEvent, 'function')
 
     // ensure cloudEventIsValid function exist in Fastify decorators ...
     t.ok(fastify.hasDecorator('cloudEventIsValid'))
@@ -66,8 +66,8 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
@@ -94,15 +94,15 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
     t.ok(ceValidate)
 
     // create an instance without mandatory arguments (but no strict mode): expected success ...
-    const ceEmpty = new CECreator()
+    const ceEmpty = new CloudEvent()
     t.ok(ceEmpty)
     t.ok(!ceIsValid(ceEmpty))
     // t.strictSame(ceValidate(ceEmpty), []) // temp, to see the error during development ...
@@ -111,7 +111,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     // create an instance without mandatory arguments (but with strict mode): expected failure ...
     let ceEmpty2 = null
     try {
-      ceEmpty2 = new CECreator(undefined, undefined, undefined, { strict: true })
+      ceEmpty2 = new CloudEvent(undefined, undefined, undefined, { strict: true })
       assert(ceEmpty2 === null) // never executed
     } catch (e) {
       t.ok(e) // expected error here
@@ -121,7 +121,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.equal(ceEmpty2, null)
     // the same test, but in a shorter form ...
     t.throws(function () {
-      const ce = new CECreator(undefined, undefined, undefined, { strict: true })
+      const ce = new CloudEvent(undefined, undefined, undefined, { strict: true })
       assert(ce === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   })
@@ -136,8 +136,8 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
@@ -146,7 +146,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.strictNotSame(ceIsValid, ceValidate)
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CECreator('1', // eventID
+    const ceMinimal = new CloudEvent('1', // eventID
       'org.fastify.plugins.cloudevents.testevent', // eventType
       {} // data (empty) // optional, but useful the same in this sample usage
     )
@@ -157,7 +157,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     // t.strictSame(ceValidate(ceEmpty), []) // temp, to see the error during development ...
     t.strictSame(ceValidate(ceMinimal).length, 0) // simplify comparison of results, check only the  number of expected errors ...
     // create another instance, similar
-    const ceMinimal2 = new CECreator('2', // eventID
+    const ceMinimal2 = new CloudEvent('2', // eventID
       'org.fastify.plugins.cloudevents.testevent', // eventType
       {} // data (empty) // optional, but useful the same in this sample usage
     )
@@ -173,7 +173,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
     // create an instance with a mandatory argument undefined (but no strict mode): expected success ...
     // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-    const ceMinimalMandatoryUndefinedNoStrict = new CECreator(undefined, undefined, undefined, { strict: false })
+    const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, { strict: false })
     assert(ceMinimalMandatoryUndefinedNoStrict !== null)
     t.ok(ceMinimalMandatoryUndefinedNoStrict)
     t.ok(!ceIsValid(ceMinimalMandatoryUndefinedNoStrict)) // using default strict mode in the event
@@ -183,13 +183,13 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
     // the same but with strict mode: expected exception ...
     t.throws(function () {
-      const ceMinimalMandatoryUndefinedStrict = new CECreator(undefined, undefined, undefined, { strict: true })
+      const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, { strict: true })
       assert(ceMinimalMandatoryUndefinedStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
 
     // create an instance with a mandatory argument null (but no strict mode): expected success ...
     // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-    const ceMinimalMandatoryNullNoStrict = new CECreator(null, null, null, { strict: false })
+    const ceMinimalMandatoryNullNoStrict = new CloudEvent(null, null, null, { strict: false })
     assert(ceMinimalMandatoryNullNoStrict !== null)
     t.ok(ceMinimalMandatoryNullNoStrict)
     t.ok(!ceIsValid(ceMinimalMandatoryNullNoStrict)) // using default strict mode in the event
@@ -199,7 +199,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
     // the same but with strict mode: expected exception ...
     t.throws(function () {
-      const ceMinimalMandatoryNullStrict = new CECreator(null, null, null, { strict: true })
+      const ceMinimalMandatoryNullStrict = new CloudEvent(null, null, null, { strict: true })
       assert(ceMinimalMandatoryNullStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   })
@@ -244,8 +244,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
@@ -253,7 +253,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 
     // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFull1 = new CECreator('1/full',
+    const ceFull1 = new CloudEvent('1/full',
       'org.fastify.plugins.cloudevents.testevent',
       ceCommonData,
       ceCommonOptions
@@ -265,7 +265,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     t.strictSame(ceValidate(ceFull1).length, 0)
 
     // create another instance with all fields equals: expected success ...
-    const ceFull1Clone = new CECreator('1/full', // should be '2/full/no-strict' ...
+    const ceFull1Clone = new CloudEvent('1/full', // should be '2/full/no-strict' ...
       'org.fastify.plugins.cloudevents.testevent',
       ceCommonData,
       ceCommonOptions
@@ -292,8 +292,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   fastify.listen(0, (err) => {
     fastify.server.unref()
     t.error(err)
-    const CECreator = fastify.CloudEventCreate
-    t.ok(CECreator)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
     const ceIsValid = fastify.cloudEventIsValid
     t.ok(ceIsValid)
     const ceValidate = fastify.cloudEventValidate
@@ -301,7 +301,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFullDataUndefined = new CECreator('1/full/undefined-data/no-strict',
+    const ceFullDataUndefined = new CloudEvent('1/full/undefined-data/no-strict',
       'org.fastify.plugins.cloudevents.testevent',
       undefined, // data
       ceCommonOptions
@@ -313,7 +313,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceValidate(ceFullDataUndefined), [])
     t.strictSame(ceValidate(ceFullDataUndefined, { strict: false }).length, 0)
     // the same with with strict mode enabled ...
-    const ceFullDataUndefinedStrict = new CECreator('1/full/undefined-data/strict',
+    const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       undefined, // data
       ceCommonOptionsStrict
@@ -327,7 +327,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
     // create an instance with null data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFullDataNull = new CECreator('1/full/null-data/no-strict',
+    const ceFullDataNull = new CloudEvent('1/full/null-data/no-strict',
       'org.fastify.plugins.cloudevents.testevent',
       null, // data
       ceCommonOptions
@@ -339,7 +339,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceValidate(ceFullDataNull), [])
     t.strictSame(ceValidate(ceFullDataNull, { strict: false }).length, 0)
     // the same with with strict mode enabled ...
-    const ceFullDataNullStrict = new CECreator('1/full/null-data/strict',
+    const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       null, // data
       ceCommonOptionsStrict
@@ -353,7 +353,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
     // create an instance with null data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFullDataString = new CECreator('1/full/string-data/no-strict',
+    const ceFullDataString = new CloudEvent('1/full/string-data/no-strict',
       'org.fastify.plugins.cloudevents.testevent',
       'data as a string, bad here', // data
       ceCommonOptions
@@ -366,7 +366,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceValidate(ceFullDataString), [])
     t.strictSame(ceValidate(ceFullDataString, { strict: false }).length, 0)
     // the same with with strict mode enabled ...
-    const ceFullDataStringStrict = new CECreator('1/full/string-data/strict',
+    const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       'data as a string, bad here', // data
       ceCommonOptionsStrict
@@ -381,7 +381,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
     // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ceFullDataMap = new CECreator('1/full/map-data/no-strict',
+    const ceFullDataMap = new CloudEvent('1/full/map-data/no-strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceMapData, // data
       ceCommonOptions
@@ -393,7 +393,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceValidate(ceFullDataMap), []) // data type errors handled only in strict mode currently ...
     t.strictSame(ceValidate(ceFullDataMap, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
     // the same with with strict mode enabled ...
-    const ceFullDataMapStrict = new CECreator('1/full/map-data/strict',
+    const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceMapData, // data
       ceCommonOptionsStrict

@@ -30,7 +30,7 @@ function fastifyCloudEvents (fastify, { // options
   }
 
   // execute plugin code
-  fastify.decorate('CloudEventCreate', cloudEventHandler)
+  fastify.decorate('CloudEvent', cloudEventHandler)
   // TODO: check if do not expose anymore ... wip
   fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
   fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
