@@ -6,12 +6,12 @@
   "scripts": {
     "example": "node example/example",
     "lint": "standard \"./*.js\" \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
-    "test:unit": "tap test/*.test.js test/*/*.test.js",
+    "test:unit": "tap -J test/*.test.js test/*/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
     "fastify-plugin": "^0.2.2",
-    "fast-json-stringify": "^1.7.1",
+    "fast-json-stringify": "^1.8.0",
     "cloudevent.js": "^0.1.0"
   },
   "devDependencies": {
