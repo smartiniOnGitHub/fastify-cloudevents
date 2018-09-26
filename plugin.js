@@ -18,18 +18,54 @@
 const fp = require('fastify-plugin')
 const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition and related utilities
 
-function fastifyCloudEvents (fastify, { // options
-  serverUrl = '/'
-}, next) {
+function fastifyCloudEvents (fastify, options, next) {
+  const {
+    serverUrl = '/',
+    // onRequestCallback = null // TODO: enable me be default, and all others the same ... wip
+    onRequestCallback = function () {} // TODO: temp, just to try by default ... wip
+  } = options
+
   if (typeof serverUrl !== 'string') {
     throw new TypeError(`The option serverUrl must be a string, instead got a '${typeof serverUrl}'`)
   }
+  // TODO: sanitize callbacks (must be functions) ... wip
 
   // execute plugin code
   fastify.decorate('CloudEvent', cloudEventHandler)
   fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
   fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
   fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
+
+  if (onRequestCallback !== null) {
+    fastify.addHook('onRequest', (req, res, next) => {
+      // TODO: add route-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      // TODO: send the event to the callback ... wip
+
+      next()
+    })
+  }
+
+  /*
+  // TODO: enable later ...
+  fastify.addHook('preHandler', (request, reply, next) => {
+    // TODO: ...
+    next()
+  })
+
+  fastify.addHook('onSend', (request, reply, payload, next) => {
+    // TODO: ...
+    next()
+  })
+
+  fastify.addHook('onResponse', (res, next) => {
+    // TODO: ...
+    next()
+  })
+
+  // TODO: other hooks ...
+   */
 
   next()
 }
