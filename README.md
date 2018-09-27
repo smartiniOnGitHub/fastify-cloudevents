@@ -10,8 +10,10 @@ Fastify Plugin to serialize events in the CloudEvents standard format.
 The purpose of this plugin is to let Fastify web applications create instances of CloudEvents in a simple way (with some useful defaults), 
 or in a full way (all attributes).
 Optional, it's possible to validate created instances to be sure they are compliant with the standard.
-
 Then, created instances can be serialized, for example to be sent (or saved/stored) somewhere.
+
+Other features of the plugin let enable the forwarding of Fastify events to given callbacks, wrapping the original event in a specific CloudEvent instance.
+
 
 Note that all CloudEvents features exposed here, by using the library [cloudevent.js](https://npmjs.org/package/cloudevent.js/).
 
@@ -22,6 +24,10 @@ More features will follow in the plugin.
 
 ```js
 const fastify = require('fastify')()
+
+fastify.register(require('fastify-cloudevents'), {
+  // TODO: add plugin options ... wip
+})
 
 // TODO: ...
 

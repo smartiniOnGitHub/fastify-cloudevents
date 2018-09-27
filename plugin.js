@@ -21,14 +21,12 @@ const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
-    // onRequestCallback = null // TODO: enable me be default, and all others the same ... wip
-    onRequestCallback = function () {} // TODO: temp, just to try by default ... wip
+    onRequestCallback = null
+    // TODO: check how to pass cloudEventOptions here ... wip
   } = options
 
-  if (typeof serverUrl !== 'string') {
-    throw new TypeError(`The option serverUrl must be a string, instead got a '${typeof serverUrl}'`)
-  }
-  // TODO: sanitize callbacks (must be functions) ... wip
+  ensureIsString(serverUrl, 'serverUrl')
+  ensureIsFunction(onRequestCallback, 'onRequestCallback')
 
   // execute plugin code
   fastify.decorate('CloudEvent', cloudEventHandler)
@@ -40,8 +38,9 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onRequest', (req, res, next) => {
       // TODO: add route-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent()
-      console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
-      // TODO: send the event to the callback ... wip
+      // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      // send the event to the callback
+      onRequestCallback(ce)
 
       next()
     })
@@ -68,6 +67,18 @@ function fastifyCloudEvents (fastify, options, next) {
    */
 
   next()
+}
+
+function ensureIsString (arg, name) {
+  if (arg !== null && typeof arg !== 'string') {
+    throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
+  }
+}
+
+function ensureIsFunction (arg, name) {
+  if (arg !== null && typeof arg !== 'function') {
+    throw new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
+  }
 }
 
 module.exports = fp(fastifyCloudEvents, {

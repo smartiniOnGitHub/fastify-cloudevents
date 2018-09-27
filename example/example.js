@@ -18,7 +18,15 @@
 const fastify = require('fastify')()
 
 fastify.register(require('../plugin'), {
+  serverUrl: 'localhost:3000/',
+  onRequestCallback: loggingCallback
 })
+
+function loggingCallback (ce) {
+  console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+}
+
+// TODO: add a fileCallback, to serialize CloudEvents to file ... wip
 
 // example to handle a sample home request to serve a static page, optional here
 fastify.get('/', function (req, reply) {
