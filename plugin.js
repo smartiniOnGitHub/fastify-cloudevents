@@ -21,8 +21,13 @@ const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
-    onRequestCallback = null
     // TODO: check how to pass cloudEventOptions here ... wip
+    onRequestCallback = null,
+    preHandlerCallback = null,
+    onSendCallback = null,
+    onResponseCallback = null,
+    onRouteCallback = null,
+    onCloseCallback = null
   } = options
 
   ensureIsString(serverUrl, 'serverUrl')
@@ -36,7 +41,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
-      // TODO: add route-specific data, and test it later ... wip
+      // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent()
       // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       // send the event to the callback
@@ -46,25 +51,60 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  /*
-  // TODO: enable later ...
-  fastify.addHook('preHandler', (request, reply, next) => {
-    // TODO: ...
-    next()
-  })
+  if (preHandlerCallback !== null) {
+    fastify.addHook('preHandler', (req, reply, next) => {
+      // TODO: add hook-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - preHandler: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      preHandlerCallback(ce)
 
-  fastify.addHook('onSend', (request, reply, payload, next) => {
-    // TODO: ...
-    next()
-  })
+      next()
+    })
+  }
 
-  fastify.addHook('onResponse', (res, next) => {
-    // TODO: ...
-    next()
-  })
+  if (onSendCallback !== null) {
+    fastify.addHook('onSend', (req, reply, payload, next) => {
+      // TODO: add hook-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - onSend: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      onSendCallback(ce)
 
-  // TODO: other hooks ...
-   */
+      next()
+    })
+  }
+
+  if (onResponseCallback !== null) {
+    fastify.addHook('onResponse', (res, next) => {
+      // TODO: add hook-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - onResponse: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      onResponseCallback(ce)
+
+      next()
+    })
+  }
+
+  if (onRouteCallback !== null) {
+    fastify.addHook('onRoute', (routeOptions) => {
+      // TODO: add hook-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - onRoute: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      onRouteCallback(ce)
+    })
+  }
+
+  if (onCloseCallback !== null) {
+    fastify.addHook('onClose', (instance, done) => {
+      // TODO: add hook-specific data, and test it later ... wip
+      const ce = new fastify.CloudEvent()
+      console.log(`DEBUG - onClose: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      onCloseCallback(ce)
+
+      done()
+    })
+  }
+
+  // TODO: other events: fastify.ready (if good to have here) ...
 
   next()
 }
