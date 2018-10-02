@@ -21,6 +21,7 @@ const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
+    baseNamespace = 'org.fastify.plugins.cloudevents',
     onRequestCallback = null,
     preHandlerCallback = null,
     onSendCallback = null,
@@ -47,6 +48,7 @@ function fastifyCloudEvents (fastify, options, next) {
    */
 
   ensureIsString(serverUrl, 'serverUrl')
+  ensureIsString(baseNamespace, 'baseNamespace')
   ensureIsFunction(onRequestCallback, 'onRequestCallback')
   ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
   ensureIsFunction(onSendCallback, 'onSendCallback')
@@ -65,7 +67,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onRequest', (req, res, next) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.onRequest',
+        `${baseNamespace}.onRequest`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -81,7 +83,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('preHandler', (req, reply, next) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.preHandler',
+        `${baseNamespace}.preHandler`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -96,7 +98,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (req, reply, payload, next) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.onSend',
+        `${baseNamespace}.onSend`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -111,7 +113,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onResponse', (res, next) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.onResponse',
+        `${baseNamespace}.onResponse`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -126,7 +128,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onRoute', (routeOptions) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.onRoute',
+        `${baseNamespace}.onRoute`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -139,7 +141,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onClose', (instance, done) => {
       // TODO: add hook-specific data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
-        'org.fastify.plugins.cloudevents.onClose',
+        `${baseNamespace}.onClose`,
         null, // TODO: add temp attributes and data ...
         undefined // cloudEventOptions
       )
@@ -154,7 +156,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onReadyCallback !== null) {
     // TODO: add hook-specific data, and test it later ... wip
     const ce = new fastify.CloudEvent('id',
-      'org.fastify.plugins.cloudevents.ready',
+      `${baseNamespace}.ready`,
       null, // TODO: add temp attributes and data ...
       undefined // cloudEventOptions
     )
