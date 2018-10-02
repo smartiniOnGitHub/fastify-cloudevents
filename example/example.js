@@ -19,7 +19,13 @@ const fastify = require('fastify')()
 
 fastify.register(require('../plugin'), {
   serverUrl: 'localhost:3000/',
-  onRequestCallback: loggingCallback
+  onRequestCallback: loggingCallback,
+  preHandlerCallback: loggingCallback,
+  onSendCallback: loggingCallback,
+  onResponseCallback: loggingCallback,
+  onRouteCallback: loggingCallback,
+  onCloseCallback: loggingCallback,
+  onReadyCallback: loggingCallback
 })
 
 function loggingCallback (ce) {
@@ -46,3 +52,5 @@ fastify.ready(() => {
   const routes = fastify.printRoutes()
   console.log(`Available Routes:\n${routes}`)
 })
+
+// TODO: check if implement 'fastify.close()' to see related hook in the plugin ... wip
