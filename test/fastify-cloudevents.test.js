@@ -24,7 +24,7 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(4)
   const fastify = Fastify()
-  fastify.register(require('../plugin')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()

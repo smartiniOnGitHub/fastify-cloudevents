@@ -21,7 +21,7 @@ const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
-    baseNamespace = 'org.fastify.plugins.cloudevents',
+    baseNamespace = 'com.github.fastify.plugins.fastify-cloudevents',
     onRequestCallback = null,
     preHandlerCallback = null,
     onSendCallback = null,
@@ -62,7 +62,7 @@ function fastifyCloudEvents (fastify, options, next) {
   fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
 
   // check/finish to setup cloudEventOptions
-  const { version } = require('./package.json') // get plugin version
+  const { version } = require('../package.json') // get plugin version
   // then set as eventTypeVersion if not already specified, could be useful
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = version
@@ -132,6 +132,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
+      // TODO: add hook-specific http method and url, and test it later ... wip
       // TODO: add hook-specific id and data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onRoute`,
@@ -144,6 +145,7 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   if (onCloseCallback !== null) {
+    // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
       // TODO: add hook-specific id and data, and test it later ... wip
       const ce = new fastify.CloudEvent('id',
@@ -159,6 +161,7 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   if (onReadyCallback !== null) {
+    // hook to plugin successful starup, not server
     // TODO: add hook-specific id and data, and test it later ... wip
     const ce = new fastify.CloudEvent('id',
       `${baseNamespace}.ready`,

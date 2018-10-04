@@ -24,7 +24,7 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(10)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
@@ -61,7 +61,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
   t.plan(10)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
@@ -89,7 +89,7 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
   t.plan(12)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
@@ -131,7 +131,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
   t.plan(28)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
@@ -239,7 +239,7 @@ ceMapData.set('key-2', 'value 2')
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
   t.plan(16)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
@@ -287,7 +287,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
   t.plan(44)
   const fastify = Fastify()
-  fastify.register(require('../')) // configure this plugin with its default options
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
     fastify.server.unref()
