@@ -17,7 +17,7 @@
 
 const assert = require('assert')
 const fastify = require('fastify')()
-// const fastifyCloudeventsPluginConstructor = require('../src/constructor') // direct reference to the library
+const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to the library
 
 const k = {
   port: 3000,
@@ -26,7 +26,7 @@ const k = {
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
   cloudEventOptions: {}
 }
-assert(k !== null)
+// assert(k !== null)
 
 startServerScript()
 
@@ -43,22 +43,23 @@ fastify.register(require('../src/plugin'), {
 
 function startServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
-  /*
-  // TODO: need to reference a specific constructor exported by another source in the plugin ... wip
-  // TODO: create a specific CloudEvent, just to show the server script is starting ... wip
-  const ce = new fastifyCloudeventsPluginConstructor.CloudEvent('id', // TODO: use current timestamp as id ... wip
+  const ce = new CloudEventUtilityConstructor('id', // TODO: use current timestamp as id ... wip
     `${k.baseNamespace}.server-script.start`,
     null, // data
     k.cloudEventOptions
   )
-  // console.log(`DEBUG - server-script.start: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
-  loggingCallback(ce) // forward generated event to a callback before exiting ...
-   */
+  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
+  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
 }
 
 function loggingCallback (ce) {
   console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
 }
+
+function loggingCloseServerCallback () {
+  console.log(`console - server-script.stop - server instance closed at ${new Date()}`)
+}
+assert(loggingCloseServerCallback !== null)
 
 // TODO: add a fileCallback, to serialize CloudEvents to file ... wip
 
@@ -109,6 +110,7 @@ fastify.ready((err) => {
   //  `${k.baseNamespace}.ready`,
 })
 
-// TODO: implement 'fastify.close()' like 'fastify.ready' here ... wip
+// trigger the stop of the server, example
+// fastify.close(loggingCloseServerCallback())
 
 // TODO: last, enable the strict mode in events and ensure all run as before, then disable it ... wip
