@@ -22,7 +22,7 @@ const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(9)
+  t.plan(6)
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
@@ -42,14 +42,6 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-
-    // ensure cloudEventSerializeFast function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventSerializeFast'))
-    const ceSerializeFast = fastify.cloudEventSerializeFast
-    assert(ceSerializeFast !== null)
-    assert(typeof ceSerializeFast === 'function')
-    t.ok(ceSerializeFast)
-    t.strictEqual(typeof ceSerializeFast, 'function')
   })
 })
 
@@ -77,7 +69,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(42)
+  t.plan(41)
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
@@ -92,8 +84,6 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(ceValidate)
     const ceSerialize = CloudEvent.serializeEvent
     t.ok(ceSerialize)
-    const ceSerializeFast = fastify.cloudEventSerializeFast
-    t.ok(ceSerializeFast)
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
