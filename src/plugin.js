@@ -98,10 +98,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   // execute plugin code
   fastify.decorate('CloudEvent', cloudEventHandler)
-  // TODO: remove decorators for functions already exported by cloudEventHandler ... ok
-  // fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
-  // fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
-  // fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // check/finish to setup cloudEventOptions
