@@ -22,7 +22,7 @@ const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(10)
+  t.plan(7)
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
@@ -39,27 +39,19 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
 
-    // ensure cloudEventIsValid function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventIsValid'))
-    const ceIsValid = fastify.cloudEventIsValid
-    assert(ceIsValid !== null)
-    assert(typeof ceIsValid === 'function')
-    t.ok(ceIsValid)
-    t.strictEqual(typeof ceIsValid, 'function')
-
-    // ensure cloudEventValidate function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventValidate'))
-    const ceValidate = fastify.cloudEventValidate
-    assert(ceValidate !== null)
-    assert(typeof ceValidate === 'function')
-    t.ok(ceValidate)
-    t.strictEqual(typeof ceValidate, 'function')
+    // ensure cloudEventSerializeFast function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('cloudEventSerializeFast'))
+    const ceSerializeFast = fastify.cloudEventSerializeFast
+    assert(ceSerializeFast !== null)
+    assert(typeof ceSerializeFast === 'function')
+    t.ok(ceSerializeFast)
+    t.strictEqual(typeof ceSerializeFast, 'function')
   })
 })
 
 /** @test {CloudEvent} */
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
-  t.plan(10)
+  t.plan(11)
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
@@ -68,10 +60,14 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
+    const ceSerialize = CloudEvent.serializeEvent
+    t.ok(ceSerialize)
+    // const ceSerializeFast = fastify.cloudEventSerializeFast
+    // t.ok(ceSerializeFast)
 
     // undefined
     t.notOk()
@@ -96,9 +92,9 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
 
     // create an instance without mandatory arguments (but no strict mode): expected success ...
@@ -138,9 +134,9 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
     // t.notSame(ceIsValid, ceValidate)
     t.strictNotSame(ceIsValid, ceValidate)
@@ -246,9 +242,9 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
 
     // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
@@ -294,9 +290,9 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...

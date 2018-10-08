@@ -43,13 +43,13 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
 
-    // ensure cloudEventSerialize function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventSerialize'))
-    const ceSerialize = fastify.cloudEventSerialize
-    assert(ceSerialize !== null)
-    assert(typeof ceSerialize === 'function')
-    t.ok(ceSerialize)
-    t.strictEqual(typeof ceSerialize, 'function')
+    // ensure cloudEventSerializeFast function exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('cloudEventSerializeFast'))
+    const ceSerializeFast = fastify.cloudEventSerializeFast
+    assert(ceSerializeFast !== null)
+    assert(typeof ceSerializeFast === 'function')
+    t.ok(ceSerializeFast)
+    t.strictEqual(typeof ceSerializeFast, 'function')
   })
 })
 
@@ -77,7 +77,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(41)
+  t.plan(42)
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
@@ -86,12 +86,14 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
-    const ceIsValid = fastify.cloudEventIsValid
+    const ceIsValid = CloudEvent.isValidEvent
     t.ok(ceIsValid)
-    const ceValidate = fastify.cloudEventValidate
+    const ceValidate = CloudEvent.validateEvent
     t.ok(ceValidate)
-    const ceSerialize = fastify.cloudEventSerialize
+    const ceSerialize = CloudEvent.serializeEvent
     t.ok(ceSerialize)
+    const ceSerializeFast = fastify.cloudEventSerializeFast
+    t.ok(ceSerializeFast)
 
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...

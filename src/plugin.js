@@ -55,11 +55,54 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsFunction(onCloseCallback, 'onCloseCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
 
+  const fastJson = require('fast-json-stringify')
+  // define a schema for serializing a CloudEvent object to JSON
+  // note that unspecified properties will be ignored (in json output)
+  // if additionalProperties is false
+  const ceSchema = {
+    title: 'CloudEvent Schema with required fields',
+    type: 'object',
+    properties: {
+      cloudEventsVersion: { type: 'string' },
+      eventID: { type: 'string' },
+      eventType: { type: 'string' },
+      // data: { type: 'object' },
+      eventTypeVersion: { type: 'string' },
+      source: { type: 'string' },
+      eventTime: { type: 'string' },
+      // extensions: { type: 'object' },
+      contentType: { type: 'string' },
+      // TODO: use if/then/else on contantType ... wip
+      schemaURL: { type: 'string' }
+    },
+    required: ['cloudEventsVersion', 'eventID', 'eventType',
+      'source', 'contentType'
+    ],
+    additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
+  }
+  const stringify = fastJson(ceSchema)
+
+  /**
+   * Serialize the given CloudEvent in JSON format.
+   *
+   * @param {!object} event the CloudEvent to serialize
+   * @return {string} the serialized event, as a string
+   */
+  function serialize (event) {
+    // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
+    // TODO: handle contentType when serializing the data attribute ... wip
+    const serialized = stringify(event)
+    // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
+    return serialized
+  }
+
   // execute plugin code
   fastify.decorate('CloudEvent', cloudEventHandler)
-  fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
-  fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
-  fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
+  // TODO: remove decorators for functions already exported by cloudEventHandler ... ok
+  // fastify.decorate('cloudEventIsValid', cloudEventHandler.isValidEvent)
+  // fastify.decorate('cloudEventValidate', cloudEventHandler.validateEvent)
+  // fastify.decorate('cloudEventSerialize', cloudEventHandler.serializeEvent)
+  fastify.decorate('cloudEventSerializeFast', serialize)
 
   // check/finish to setup cloudEventOptions
   const { version } = require('../package.json') // get plugin version
