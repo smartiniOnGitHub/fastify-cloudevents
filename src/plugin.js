@@ -29,19 +29,6 @@ function fastifyCloudEvents (fastify, options, next) {
     onRouteCallback = null,
     onCloseCallback = null,
     onReadyCallback = null,
-    /*
-    // TODO: example default values; but then remove from here ... wip
-    cloudEventOptions: {
-      // cloudEventsVersion = '0.1', // it will be depretaced soon from here
-      eventTypeVersion, // ok
-      source = '/',
-      eventTime = new Date(),
-      extensions = null,
-      contentType = 'application/json',
-      schemaURL,  // TODO: handle this ...
-      strict = false
-    }
-     */
     cloudEventOptions = {}
   } = options
 
@@ -57,8 +44,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   const fastJson = require('fast-json-stringify')
   // define a schema for serializing a CloudEvent object to JSON
-  // note that unspecified properties will be ignored (in json output)
-  // if additionalProperties is false
+  // note that properties not in the schema will be ignored
+  // (in json output) if additionalProperties is false
   const ceSchema = {
     title: 'CloudEvent Schema with required fields',
     type: 'object',
@@ -72,7 +59,7 @@ function fastifyCloudEvents (fastify, options, next) {
       eventTime: { type: 'string' },
       // extensions: { type: 'object' },
       contentType: { type: 'string' },
-      // TODO: use if/then/else on contantType ... wip
+      // TODO: use if/then/else on contentType ... wip
       schemaURL: { type: 'string' }
     },
     required: ['cloudEventsVersion', 'eventID', 'eventType',

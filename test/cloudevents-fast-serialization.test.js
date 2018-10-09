@@ -225,4 +225,4 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
   })
 })
 
-// TODO: add other tests, from my old sources ... wip
+// TODO: add more test, like: with data (even nested properties), with additional fields to skip, etc ... wip
