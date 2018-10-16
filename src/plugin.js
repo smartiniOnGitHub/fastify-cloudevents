@@ -97,10 +97,12 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
-      // TODO: add hook-specific id and data, and test it later ... wip
+      // TODO: add hook-specific id ... get id from request (if any) or from a default generator (get current timestamp for example), or use a specific generator function (if specified in plugin options) ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onRequest`,
-        null, // data
+        // { ...req, ...res }, // data // TODO: temp ...
+        // { req.httpVersion, req.headers }, // data // TODO: temp ...
+        null, // data // TODO: temp ...
         cloudEventOptions
       )
       // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -112,11 +114,16 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   if (preHandlerCallback !== null) {
-    fastify.addHook('preHandler', (req, reply, next) => {
-      // TODO: add hook-specific id and data, and test it later ... wip
+    fastify.addHook('preHandler', (request, reply, next) => {
+      // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.preHandler`,
-        null, // data
+        // { ...request, ...reply }, // data // TODO: temp ...
+        // { request_id: request.id }, // data // TODO: temp ...
+        {
+          request: { id: request.id },
+          reply: { }
+        }, // data // TODO: add others (in request and in reply) ... wip
         cloudEventOptions
       )
       // console.log(`DEBUG - preHandler: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -128,10 +135,11 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (req, reply, payload, next) => {
-      // TODO: add hook-specific id and data, and test it later ... wip
+      // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onSend`,
-        null, // data
+        // { ...req, ...reply, ...payload }, // data // TODO: temp ...
+        null, // data // TODO: temp ...
         cloudEventOptions
       )
       // console.log(`DEBUG - onSend: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -143,10 +151,10 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (res, next) => {
-      // TODO: add hook-specific id and data, and test it later ... wip
+      // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onResponse`,
-        null, // data
+        null, // data // TODO: temp ...
         cloudEventOptions
       )
       // console.log(`DEBUG - onResponse: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -158,11 +166,10 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
-      // TODO: add hook-specific http method and url, and test it later ... wip
-      // TODO: add hook-specific id and data, and test it later ... wip
+      // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onRoute`,
-        null, // data
+        routeOptions, // data
         cloudEventOptions
       )
       // console.log(`DEBUG - onRoute: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -173,10 +180,10 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
-      // TODO: add hook-specific id and data, and test it later ... wip
+      // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.onClose`,
-        null, // data
+        { description: 'plugin shutdown' }, // data
         cloudEventOptions
       )
       // console.log(`DEBUG - onClose: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -187,11 +194,11 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   if (onReadyCallback !== null) {
-    // hook to plugin successful starup, not server
-    // TODO: add hook-specific id and data, and test it later ... wip
+    // hook to plugin successful startup, not server
+    // TODO: add hook-specific id ... wip
     const ce = new fastify.CloudEvent('id',
       `${baseNamespace}.ready`,
-      null, // data
+      { description: 'plugin startup successfully' }, // data
       cloudEventOptions
     )
     // console.log(`DEBUG - ready: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)

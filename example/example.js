@@ -45,7 +45,7 @@ function startServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
   const ce = new CloudEventUtilityConstructor('id', // TODO: use current timestamp as id ... wip
     `${k.baseNamespace}.server-script.start`,
-    null, // data
+    { description: 'server startup begin' }, // data
     k.cloudEventOptions
   )
   console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
@@ -87,7 +87,7 @@ fastify.listen(k.port, k.address, (err) => {
     throw err
   }
   console.log(`Server listening on ${fastify.server.address().port}`)
-  // TODO: forward this server event as a CloudEvent created here ... wip
+  // TODO: forward this server event as a CloudEvent created here ... in data, add a description field with details on address and port for the listening ... wip
   //  `${k.baseNamespace}.listen`,
 })
 
