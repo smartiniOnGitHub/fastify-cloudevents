@@ -127,7 +127,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceFullSerializedFast = ceSerializeFast(ceFull)
     t.ok(ceFullSerializedFast)
     // here the following tests are no more valid, because of different serialization handlers,
-    // even if both serialize in the same contentType ...
+    // (even if both serialize in the same contentType), but both serialized strings are similar, so it's ok ...
     // t.strictSame(ceFullSerializedFast, ceFullSerializedStatic)
     // t.strictSame(ceFullSerializedFast, ceFullSerialized)
 
@@ -172,7 +172,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
     t.ok(ceFullStrictSerializedFast)
     // here the following tests are no more valid, because of different serialization handlers,
-    // even if both serialize in the same contentType ...
+    // (even if both serialize in the same contentType), but both serialized strings are similar, so it's ok ...
     // t.strictSame(ceFullStrictSerializedFast, ceFullStrictSerializedStatic)
     // t.strictSame(ceFullStrictSerializedFast, ceFullStrictSerialized)
 
@@ -193,7 +193,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 // TODO: this is a limit if the current implementation, and will be resolved soon ... wip
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
-  t.plan(5)
+  t.plan(7)
 
   const fastify = Fastify()
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -216,11 +216,20 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
     assert(ceFullOtherContentType !== null)
     t.ok(ceFullOtherContentType)
     t.ok(ceFullOtherContentType.isValid())
-    // const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-    // t.ok(ceFullStrictSerialized)
+    // const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
+    // t.ok(ceFullOtherContentTypeSerialized)
     t.throws(function () {
-      const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-      assert(ceFullStrictSerialized === null) // never executed
+      const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+
+    const ceSerializeFast = fastify.cloudEventSerializeFast
+    t.ok(ceSerializeFast)
+    // const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType)
+    // t.ok(ceFullOtherContentTypeSerializedFast)
+    t.throws(function () {
+      const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType)
+      assert(ceFullOtherContentTypeSerializedFast === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
   })
 })

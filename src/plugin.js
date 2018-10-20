@@ -77,7 +77,12 @@ function fastifyCloudEvents (fastify, options, next) {
    */
   function serialize (event) {
     // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
-    // TODO: handle contentType when serializing the data attribute ... wip
+    // raise error if contentType is not the default one (for now), for consistency with CloudEvents library used ...
+    if (event.contentType !== 'application/json') {
+      throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
+    }
+
+    // TODO: handle even non default contentType when serializing the data attribute ... wip
     const serialized = stringify(event)
     // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
     return serialized
@@ -118,12 +123,10 @@ function fastifyCloudEvents (fastify, options, next) {
       // TODO: add hook-specific id ... wip
       const ce = new fastify.CloudEvent('id',
         `${baseNamespace}.preHandler`,
-        // { ...request, ...reply }, // data // TODO: temp ...
-        // { request_id: request.id }, // data // TODO: temp ...
         {
-          request: { id: request.id },
-          reply: { }
-        }, // data // TODO: add others (in request and in reply) ... wip
+          request: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
+          reply: { } // TODO: check in Fastify sources if at least I can get here code, statusCode or other read-only field here ... wip
+        }, // data
         cloudEventOptions
       )
       // console.log(`DEBUG - preHandler: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)

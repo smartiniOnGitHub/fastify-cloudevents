@@ -61,8 +61,6 @@ function loggingCloseServerCallback () {
 }
 assert(loggingCloseServerCallback !== null)
 
-// TODO: add a fileCallback, to serialize CloudEvents to file ... wip
-
 // example to handle a sample home request to serve a static page, optional here
 fastify.get('/', function (req, reply) {
   const path = require('path')
@@ -71,7 +69,7 @@ fastify.get('/', function (req, reply) {
   const stream = fs.createReadStream(path.join(scriptRelativeFolder, 'home.html'))
   reply.type('text/html').send(stream)
 })
-// TODO: add another route, like return current timestamp ... wip
+// TODO: add another route, like '/time', to return current timestamp ... wip
 
 fastify.listen(k.port, k.address, (err) => {
   if (err) {
