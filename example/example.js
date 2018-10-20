@@ -32,6 +32,7 @@ startServerScript()
 
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
+  // idGenerator: idMakerSample, // TODO: implement a sample idMakerSample, and enable ... wip
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
