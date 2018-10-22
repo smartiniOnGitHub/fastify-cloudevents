@@ -218,9 +218,9 @@ function ensureIsFunction (arg, name) {
   }
 }
 
+const hostname = require('os').hostname()
+const idPrefix = `fastify@${hostname}`
 function * idMaker () {
-  const hostname = require('os').hostname()
-  const idPrefix = `fastify@${hostname}`
   while (true) {
     const timestamp = Math.floor(Date.now())
     yield `${idPrefix}@${timestamp}`
