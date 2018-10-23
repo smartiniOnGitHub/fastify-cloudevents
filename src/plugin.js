@@ -95,10 +95,10 @@ function fastifyCloudEvents (fastify, options, next) {
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // check/finish to setup cloudEventOptions
-  const { version } = require('../package.json') // get plugin version
+  const pluginVersion = require('../package.json').version // get plugin version
   // then set as eventTypeVersion if not already specified, could be useful
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
-    cloudEventOptions.eventTypeVersion = version
+    cloudEventOptions.eventTypeVersion = pluginVersion
   }
 
   // handle hooks, only when related callback are defined
@@ -106,9 +106,12 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onRequest', (req, res, next) => {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onRequest`,
-        // { ...req, ...res }, // data // TODO: temp ...
-        // { req.httpVersion, req.headers }, // data // TODO: temp ...
-        null, // data // TODO: temp ...
+        {
+          // TODO: implement ... wip
+          // req: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
+          req: { },
+          res: { }
+        }, // data
         cloudEventOptions
       )
       // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -129,7 +132,6 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - preHandler: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       preHandlerCallback(ce)
 
       next()
@@ -140,11 +142,14 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (req, reply, payload, next) => {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onSend`,
-        // { ...req, ...reply, ...payload }, // data // TODO: temp ...
-        null, // data // TODO: temp ...
+        {
+          // TODO: implement ... wip
+          req: { },
+          reply: { },
+          payload: { }
+        }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onSend: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       onSendCallback(ce)
 
       next()
@@ -155,10 +160,12 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onResponse', (res, next) => {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onResponse`,
-        null, // data // TODO: temp ...
+        {
+          // TODO: implement ... wip
+          res: { }
+        }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onResponse: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       onResponseCallback(ce)
 
       next()
@@ -172,7 +179,6 @@ function fastifyCloudEvents (fastify, options, next) {
         routeOptions, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onRoute: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       onRouteCallback(ce)
     })
   }
@@ -185,7 +191,6 @@ function fastifyCloudEvents (fastify, options, next) {
         { description: 'plugin shutdown' }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onClose: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
       onCloseCallback(ce)
 
       done()
@@ -196,10 +201,12 @@ function fastifyCloudEvents (fastify, options, next) {
     // hook to plugin successful startup, not server
     const ce = new fastify.CloudEvent(idGenerator().next().value,
       `${baseNamespace}.ready`,
-      { description: 'plugin startup successfully' }, // data
+      {
+        description: 'plugin startup successfully',
+        version: pluginVersion
+      }, // data
       cloudEventOptions
     )
-    // console.log(`DEBUG - ready: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
     fastify.ready(onReadyCallback(ce))
   }
 
