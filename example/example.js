@@ -17,6 +17,7 @@
 
 const assert = require('assert')
 const fastify = require('fastify')()
+const fastifyVersion = require('fastify/package.json').version // get Fastify version
 const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to the library
 
 const k = {
@@ -30,9 +31,10 @@ const k = {
 
 startServerScript()
 
+// register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
-  // idGenerator: idMakerSample, // TODO: implement a sample idMakerSample, and enable ... wip
+  idGenerator: idMakerExample,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
@@ -46,7 +48,10 @@ function startServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
   const ce = new CloudEventUtilityConstructor('id', // TODO: use current timestamp as id ... wip
     `${k.baseNamespace}.server-script.start`,
-    { description: 'server startup begin' }, // data
+    {
+      description: 'Fastify server startup begin',
+      version: fastifyVersion
+    }, // data
     k.cloudEventOptions
   )
   console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
@@ -62,6 +67,15 @@ function loggingCloseServerCallback () {
 }
 assert(loggingCloseServerCallback !== null)
 
+const hostname = require('os').hostname()
+const idPrefix = `fastify-${fastifyVersion}@${hostname}`
+function * idMakerExample () {
+  while (true) {
+    const timestamp = Math.floor(Date.now())
+    yield `${idPrefix}@${timestamp}`
+  }
+}
+
 // example to handle a sample home request to serve a static page, optional here
 fastify.get('/', function (req, reply) {
   const path = require('path')
@@ -76,7 +90,7 @@ fastify.listen(k.port, k.address, (err) => {
   if (err) {
     // TODO: forward this server event as a CloudEvent created here ... if possible add even process id (pid) ... wip
     // TODO: add error-specific info, and test it later ... wip
-    const ce = new fastify.CloudEvent('id', // TODO: use current timestamp as id ... wip
+    const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
       {}, // data
       k.cloudEventOptions
@@ -94,7 +108,7 @@ fastify.ready((err) => {
   if (err) {
     // TODO: forward this server event as a CloudEvent created here ... if possible add even process id (pid) ... wip
     // TODO: add error-specific info, and test it later ... wip
-    const ce = new fastify.CloudEvent('id', // TODO: use current timestamp as id ... wip
+    const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
       null, // data
       k.cloudEventOptions
