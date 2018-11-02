@@ -49,6 +49,7 @@ function startServerScript () {
   const ce = new CloudEventUtilityConstructor('id', // TODO: use current timestamp as id ... wip
     `${k.baseNamespace}.server-script.start`,
     {
+      timestamp: Math.floor(Date.now()),
       description: 'Fastify server startup begin',
       version: fastifyVersion
     }, // data
@@ -92,7 +93,9 @@ fastify.listen(k.port, k.address, (err) => {
     // TODO: add error-specific info, and test it later ... wip
     const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
-      {}, // data
+      {
+        timestamp: Math.floor(Date.now())
+      }, // data
       k.cloudEventOptions
     )
     // console.log(`DEBUG - listen: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -110,7 +113,9 @@ fastify.ready((err) => {
     // TODO: add error-specific info, and test it later ... wip
     const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
-      null, // data
+      {
+        timestamp: Math.floor(Date.now())
+      }, // data
       k.cloudEventOptions
     )
     // console.log(`DEBUG - ready: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)

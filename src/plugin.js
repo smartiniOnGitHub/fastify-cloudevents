@@ -61,7 +61,6 @@ function fastifyCloudEvents (fastify, options, next) {
       eventTime: { type: 'string' },
       // extensions: { type: 'object' },
       contentType: { type: 'string' },
-      // TODO: use if/then/else on contentType ... wip
       schemaURL: { type: 'string' }
     },
     required: ['cloudEventsVersion', 'eventID', 'eventType',
@@ -107,9 +106,9 @@ function fastifyCloudEvents (fastify, options, next) {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onRequest`,
         {
-          // TODO: implement ... wip
-          // req: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
-          req: { },
+          id: req.id,
+          timestamp: Math.floor(Date.now()),
+          req: { httpVersion: req.httpVersion, id: req.id, headers: req.headers, method: req.method, originalUrl: req.originalUrl, upgrade: req.upgrade, url: req.url },
           res: { }
         }, // data
         cloudEventOptions
@@ -127,8 +126,10 @@ function fastifyCloudEvents (fastify, options, next) {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.preHandler`,
         {
+          id: request.id,
+          timestamp: Math.floor(Date.now()),
           request: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
-          reply: { } // TODO: check in Fastify sources if at least I can get here code, statusCode or other read-only field here ... wip
+          reply: { statusCode: reply.res.statusCode, statusMessage: reply.res.statusMessage, sent: reply.sent }
         }, // data
         cloudEventOptions
       )
@@ -139,13 +140,14 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   if (onSendCallback !== null) {
-    fastify.addHook('onSend', (req, reply, payload, next) => {
+    fastify.addHook('onSend', (request, reply, payload, next) => {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onSend`,
         {
-          // TODO: implement ... wip
-          req: { },
-          reply: { },
+          id: request.id,
+          timestamp: Math.floor(Date.now()),
+          request: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
+          reply: { statusCode: reply.res.statusCode, statusMessage: reply.res.statusMessage, sent: reply.sent },
           payload: { }
         }, // data
         cloudEventOptions
@@ -161,8 +163,9 @@ function fastifyCloudEvents (fastify, options, next) {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onResponse`,
         {
-          // TODO: implement ... wip
-          res: { }
+          // id: res.id, // not available
+          timestamp: Math.floor(Date.now()),
+          res: { statusCode: res.statusCode, statusMessage: res.statusMessage, finished: res.finished }
         }, // data
         cloudEventOptions
       )
@@ -188,7 +191,10 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onClose', (instance, done) => {
       const ce = new fastify.CloudEvent(idGenerator().next().value,
         `${baseNamespace}.onClose`,
-        { description: 'plugin shutdown' }, // data
+        {
+          timestamp: Math.floor(Date.now()),
+          description: 'plugin shutdown'
+        }, // data
         cloudEventOptions
       )
       onCloseCallback(ce)
@@ -202,6 +208,7 @@ function fastifyCloudEvents (fastify, options, next) {
     const ce = new fastify.CloudEvent(idGenerator().next().value,
       `${baseNamespace}.ready`,
       {
+        timestamp: Math.floor(Date.now()),
         description: 'plugin startup successfully',
         version: pluginVersion
       }, // data
