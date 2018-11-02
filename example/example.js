@@ -85,7 +85,10 @@ fastify.get('/', function (req, reply) {
   const stream = fs.createReadStream(path.join(scriptRelativeFolder, 'home.html'))
   reply.type('text/html').send(stream)
 })
-// TODO: add another route, like '/time', to return current timestamp ... wip
+// example route, to return current timestamp but in async way
+fastify.get('/time', async (req, reply) => {
+  return { timestamp: Math.floor(Date.now()) }
+})
 
 fastify.listen(k.port, k.address, (err) => {
   if (err) {
