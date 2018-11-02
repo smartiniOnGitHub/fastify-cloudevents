@@ -21,15 +21,28 @@ const fastifyVersion = require('fastify/package.json').version // get Fastify ve
 const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to the library
 
 const k = {
-  port: 3000,
+  protocol: 'http',
   address: '0.0.0.0',
-  serverUrl: `${this.address}:${this.port}`,
+  port: 3000,
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
   cloudEventOptions: {}
 }
+k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
+k.cloudEventOptions.source = k.serverUrl
 // assert(k !== null)
 
-startServerScript()
+// define a sample id generator here
+const hostname = require('os').hostname()
+const idPrefix = `fastify-${fastifyVersion}@${hostname}`
+function * idMakerExample () {
+  while (true) {
+    const timestamp = Math.floor(Date.now())
+    yield `${idPrefix}@${timestamp}`
+  }
+}
+
+// raise an event at server start, before loading the plugin, feasible but pay attention ...
+raiseEventAtStartServerScript()
 
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
@@ -41,23 +54,9 @@ fastify.register(require('../src/plugin'), {
   onResponseCallback: loggingCallback,
   onRouteCallback: loggingCallback,
   onCloseCallback: loggingCallback,
-  onReadyCallback: loggingCallback
+  onReadyCallback: loggingCallback,
+  cloudEventOptions: k.cloudEventOptions
 })
-
-function startServerScript () {
-  // example to get exposed functions of the plugin, before/without registering it ...
-  const ce = new CloudEventUtilityConstructor('id', // TODO: use current timestamp as id ... wip
-    `${k.baseNamespace}.server-script.start`,
-    {
-      timestamp: Math.floor(Date.now()),
-      description: 'Fastify server startup begin',
-      version: fastifyVersion
-    }, // data
-    k.cloudEventOptions
-  )
-  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
-  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
-}
 
 function loggingCallback (ce) {
   console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
@@ -68,13 +67,19 @@ function loggingCloseServerCallback () {
 }
 assert(loggingCloseServerCallback !== null)
 
-const hostname = require('os').hostname()
-const idPrefix = `fastify-${fastifyVersion}@${hostname}`
-function * idMakerExample () {
-  while (true) {
-    const timestamp = Math.floor(Date.now())
-    yield `${idPrefix}@${timestamp}`
-  }
+function raiseEventAtStartServerScript () {
+  // example to get exposed functions of the plugin, before/without registering it ...
+  const ce = new CloudEventUtilityConstructor(idMakerExample().next().value,
+    `${k.baseNamespace}.server-script.start`,
+    {
+      timestamp: Math.floor(Date.now()),
+      description: 'Fastify server startup begin',
+      version: fastifyVersion
+    }, // data
+    k.cloudEventOptions
+  )
+  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
+  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
 }
 
 // example to handle a sample home request to serve a static page, optional here

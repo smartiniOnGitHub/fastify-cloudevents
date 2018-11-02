@@ -99,6 +99,10 @@ function fastifyCloudEvents (fastify, options, next) {
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = pluginVersion
   }
+  // override source if not already specified
+  if (cloudEventOptions.source === null || typeof cloudEventOptions.source !== 'string') {
+    cloudEventOptions.source = serverUrl
+  }
 
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
@@ -108,7 +112,15 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           id: req.id,
           timestamp: Math.floor(Date.now()),
-          req: { httpVersion: req.httpVersion, id: req.id, headers: req.headers, method: req.method, originalUrl: req.originalUrl, upgrade: req.upgrade, url: req.url },
+          req: {
+            httpVersion: req.httpVersion,
+            id: req.id,
+            headers: req.headers,
+            method: req.method,
+            originalUrl: req.originalUrl,
+            upgrade: req.upgrade,
+            url: req.url
+          },
           res: { }
         }, // data
         cloudEventOptions
@@ -128,8 +140,20 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           id: request.id,
           timestamp: Math.floor(Date.now()),
-          request: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
-          reply: { statusCode: reply.res.statusCode, statusMessage: reply.res.statusMessage, sent: reply.sent }
+          request: {
+            id: request.id,
+            headers: request.headers,
+            params: request.params,
+            query: request.query,
+            body: request.body,
+            method: request.req.method,
+            url: request.req.url
+          },
+          reply: {
+            statusCode: reply.res.statusCode,
+            statusMessage: reply.res.statusMessage,
+            sent: reply.sent
+          }
         }, // data
         cloudEventOptions
       )
@@ -146,8 +170,20 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           id: request.id,
           timestamp: Math.floor(Date.now()),
-          request: { id: request.id, headers: request.headers, params: request.params, query: request.query, body: request.body },
-          reply: { statusCode: reply.res.statusCode, statusMessage: reply.res.statusMessage, sent: reply.sent },
+          request: {
+            id: request.id,
+            headers: request.headers,
+            params: request.params,
+            query: request.query,
+            body: request.body,
+            method: request.req.method,
+            url: request.req.url
+          },
+          reply: {
+            statusCode: reply.res.statusCode,
+            statusMessage: reply.res.statusMessage,
+            sent: reply.sent
+          },
           payload: { }
         }, // data
         cloudEventOptions
@@ -165,7 +201,11 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           // id: res.id, // not available
           timestamp: Math.floor(Date.now()),
-          res: { statusCode: res.statusCode, statusMessage: res.statusMessage, finished: res.finished }
+          res: {
+            statusCode: res.statusCode,
+            statusMessage: res.statusMessage,
+            finished: res.finished
+          }
         }, // data
         cloudEventOptions
       )
