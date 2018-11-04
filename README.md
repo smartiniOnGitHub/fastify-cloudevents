@@ -24,16 +24,25 @@ More features will follow in the plugin.
 ```js
 const fastify = require('fastify')()
 
+// define functions to use in plugin configuration:
+// idExample , callbackExample , etc ...
+
+// register the plugin with some options, for example:
 fastify.register(require('fastify-cloudevents'), {
-  // TODO: add plugin options ... wip
+  idGenerator: idExample,
+  onRequestCallback: callbackExample,
+  cloudEventOptions: { }
 })
 
-// TODO: ...
+// implementation ...
 
 fastify.listen(3000)
 ```
 
-In the [example](./example/) folder there are some simple server scripts that uses the plugin (inline but it's the same using it from npm registry).
+In the [example](./example/) folder there are some simple server scripts
+that uses the plugin (inline but it's the same using it from npm registry),
+`example` is a simple one, and `example-enhanced` is a more complex sample
+to show even how to raise own events (normal an errors).
 
 
 ## Requirements
@@ -44,14 +53,29 @@ Node.js 8.12.x or later.
 
 ## Note
 
-See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
+The plugin decorate Fastify and expose some functions:
+- `CloudEvent`, the CloudEvent implementation used here, could be useful
+- `cloudEventSerializeFast`, a serialize function implemented here, using `fast-json-stringify` and not standard JSON serialization functions
+
+Plugin options are:
+- `serverUrl`, the absolute URL of the current webapp, to use as a base `source` in generated CloudEvents
+- `baseNamespace`, a base namespace for the `eventType`, more speficic suffix will be added in any CloudEvent
+- `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
+- `onRequestCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRequest`
+- `preHandlerCallback`, callback who will handle the generated CloudEvents, in Fastify hook `preHandler`
+- `onSendCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onSend`
+- `onResponseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onResponse`
+- `onRouteCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRoute`
+- `onCloseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onClose`
+- `onReadyCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onReady`
+- `cloudEventOptions`, CloudEvent options commomn to all generated event instances; anyway objects are copied to not be shared between instances
+
+all plugin options are optional, and have a default value.
 
 
-## License
+For more info on the standard, see the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
-Licensed under [Apache-2.0](./LICENSE).
 
-----
 ## Contributing
 
 1. Fork it ( https://github.com/smartiniOnGitHub/fastify-cloudevents/fork )
@@ -59,3 +83,10 @@ Licensed under [Apache-2.0](./LICENSE).
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
 5. Create a new Pull Request
+
+
+## License
+
+Licensed under [Apache-2.0](./LICENSE).
+
+----

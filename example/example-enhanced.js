@@ -15,7 +15,10 @@
  */
 'use strict'
 
+const assert = require('assert')
 const fastify = require('fastify')()
+const fastifyVersion = require('fastify/package.json').version // get Fastify version
+const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to another script in the library
 
 const k = {
   protocol: 'http',
@@ -28,21 +31,26 @@ const k = {
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
 k.cloudEventOptions.source = k.serverUrl
+// assert(k !== null)
 
 // define a sample id generator here
 const hostname = require('os').hostname()
 const pid = require('process').pid
-let _counter = 0
-function * idCounterExample () {
+const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
+function * idMakerExample () {
   while (true) {
-    yield `${_counter++}`
+    const timestamp = Math.floor(Date.now())
+    yield `${idPrefix}@${timestamp}`
   }
 }
+
+// raise an event at server start, before loading the plugin, feasible but pay attention ...
+raiseEventAtStartServerScript()
 
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
-  idGenerator: idCounterExample,
+  idGenerator: idMakerExample,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
@@ -55,6 +63,29 @@ fastify.register(require('../src/plugin'), {
 
 function loggingCallback (ce) {
   console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+}
+
+function loggingCloseServerCallback () {
+  console.log(`console - server-script.stop - server instance closed at ${new Date()}`)
+}
+assert(loggingCloseServerCallback !== null)
+
+function raiseEventAtStartServerScript () {
+  // example to get exposed functions of the plugin, before/without registering it ...
+  const ce = new CloudEventUtilityConstructor(idMakerExample().next().value,
+    `${k.baseNamespace}.server-script.start`,
+    {
+      timestamp: Math.floor(Date.now()),
+      description: 'Fastify server startup begin',
+      version: fastifyVersion,
+      status: 'starting',
+      hostname: hostname,
+      pid: pid
+    }, // data
+    k.cloudEventOptions
+  )
+  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
+  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
 }
 
 // example to handle a sample home request to serve a static page, optional here
@@ -72,10 +103,24 @@ fastify.get('/time', async (req, reply) => {
 
 fastify.listen(k.port, k.address, (err) => {
   if (err) {
+    const ce = new fastify.CloudEvent(idMakerExample().next().value,
+      `${k.baseNamespace}.error`,
+      {
+        timestamp: Math.floor(Date.now()),
+        status: 'error',
+        hostname: hostname,
+        pid: pid,
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      }, // data
+      k.cloudEventOptions
+    )
+    loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
   }
   console.log(`Server listening on ${fastify.server.address().port}`)
-  const ce = new fastify.CloudEvent(idCounterExample().next().value,
+  const ce = new fastify.CloudEvent(idMakerExample().next().value,
     `${k.baseNamespace}.listen`,
     {
       timestamp: Math.floor(Date.now()),
@@ -90,11 +135,25 @@ fastify.listen(k.port, k.address, (err) => {
 
 fastify.ready((err) => {
   if (err) {
+    const ce = new fastify.CloudEvent(idMakerExample().next().value,
+      `${k.baseNamespace}.error`,
+      {
+        timestamp: Math.floor(Date.now()),
+        status: 'error',
+        hostname: hostname,
+        pid: pid,
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      }, // data
+      k.cloudEventOptions
+    )
+    loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
   }
   const routes = fastify.printRoutes()
   console.log(`Available Routes:\n${routes}`)
-  const ce = new fastify.CloudEvent(idCounterExample().next().value,
+  const ce = new fastify.CloudEvent(idMakerExample().next().value,
     `${k.baseNamespace}.ready`,
     {
       timestamp: Math.floor(Date.now()),
@@ -106,3 +165,6 @@ fastify.ready((err) => {
   )
   loggingCallback(ce)
 })
+
+// trigger the stop of the server, example
+// fastify.close(loggingCloseServerCallback())
