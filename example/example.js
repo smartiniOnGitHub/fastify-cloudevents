@@ -18,14 +18,16 @@
 const assert = require('assert')
 const fastify = require('fastify')()
 const fastifyVersion = require('fastify/package.json').version // get Fastify version
-const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to the library
+const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to another script in the library
 
 const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
-  cloudEventOptions: {}
+  cloudEventOptions: {
+    strict: true // enable strict mode in generated CloudEvents, optional
+  }
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
 k.cloudEventOptions.source = k.serverUrl
@@ -33,7 +35,8 @@ k.cloudEventOptions.source = k.serverUrl
 
 // define a sample id generator here
 const hostname = require('os').hostname()
-const idPrefix = `fastify-${fastifyVersion}@${hostname}`
+const pid = require('process').pid
+const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
 function * idMakerExample () {
   while (true) {
     const timestamp = Math.floor(Date.now())
@@ -74,7 +77,10 @@ function raiseEventAtStartServerScript () {
     {
       timestamp: Math.floor(Date.now()),
       description: 'Fastify server startup begin',
-      version: fastifyVersion
+      version: fastifyVersion,
+      status: 'starting',
+      hostname: hostname,
+      pid: pid
     }, // data
     k.cloudEventOptions
   )
@@ -97,46 +103,68 @@ fastify.get('/time', async (req, reply) => {
 
 fastify.listen(k.port, k.address, (err) => {
   if (err) {
-    // TODO: forward this server event as a CloudEvent created here ... if possible add even process id (pid) ... wip
-    // TODO: add error-specific info, and test it later ... wip
     const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
       {
-        timestamp: Math.floor(Date.now())
+        timestamp: Math.floor(Date.now()),
+        status: 'error',
+        hostname: hostname,
+        pid: pid,
+        name: err.name,
+        message: err.message,
+        stack: err.stack
       }, // data
       k.cloudEventOptions
     )
-    // console.log(`DEBUG - listen: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
     loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
   }
   console.log(`Server listening on ${fastify.server.address().port}`)
-  // TODO: forward this server event as a CloudEvent created here ... in data, add a description field with details on address and port for the listening ... wip
-  //  `${k.baseNamespace}.listen`,
+  const ce = new fastify.CloudEvent(idMakerExample().next().value,
+    `${k.baseNamespace}.listen`,
+    {
+      timestamp: Math.floor(Date.now()),
+      status: 'listening',
+      hostname: hostname,
+      pid: pid
+    }, // data
+    k.cloudEventOptions
+  )
+  loggingCallback(ce)
 })
 
 fastify.ready((err) => {
   if (err) {
-    // TODO: forward this server event as a CloudEvent created here ... if possible add even process id (pid) ... wip
-    // TODO: add error-specific info, and test it later ... wip
     const ce = new fastify.CloudEvent(idMakerExample().next().value,
       `${k.baseNamespace}.error`,
       {
-        timestamp: Math.floor(Date.now())
+        timestamp: Math.floor(Date.now()),
+        status: 'error',
+        hostname: hostname,
+        pid: pid,
+        name: err.name,
+        message: err.message,
+        stack: err.stack
       }, // data
       k.cloudEventOptions
     )
-    // console.log(`DEBUG - ready: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
     loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
   }
   const routes = fastify.printRoutes()
   console.log(`Available Routes:\n${routes}`)
-  // TODO: forward this server event as a CloudEvent created here ... wip
-  //  `${k.baseNamespace}.ready`,
+  const ce = new fastify.CloudEvent(idMakerExample().next().value,
+    `${k.baseNamespace}.ready`,
+    {
+      timestamp: Math.floor(Date.now()),
+      status: 'ready',
+      hostname: hostname,
+      pid: pid
+    }, // data
+    k.cloudEventOptions
+  )
+  loggingCallback(ce)
 })
 
 // trigger the stop of the server, example
 // fastify.close(loggingCloseServerCallback())
-
-// TODO: last, enable the strict mode in events and ensure all run as before, then disable it ... wip
