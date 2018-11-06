@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.1](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.1) (2018-11-06)
+Summary Changelog:
+- Maintenance release to fix the usage of generator functions (as ID generator), both in the plugin and in all examples
+
 ## [0.1.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.0) (2018-11-05)
 Summary Changelog:
 - First release compliant with current CloudEvent Spec (0.1.0), with basic features implemented; more to follow in next releases

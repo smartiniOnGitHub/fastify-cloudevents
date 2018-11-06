@@ -32,17 +32,20 @@ k.cloudEventOptions.source = k.serverUrl
 // define a sample id generator here
 const hostname = require('os').hostname()
 const pid = require('process').pid
-let _counter = 0
 function * idCounterExample () {
+  let counter = 0
   while (true) {
-    yield `${_counter++}`
+    yield `${counter++}`
   }
 }
+
+// define a generator, to use everywhere here
+const gen = idCounterExample()
 
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
-  idGenerator: idCounterExample,
+  idGenerator: gen,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
@@ -75,7 +78,7 @@ fastify.listen(k.port, k.address, (err) => {
     throw err
   }
   console.log(`Server listening on ${fastify.server.address().port}`)
-  const ce = new fastify.CloudEvent(idCounterExample().next().value,
+  const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.listen`,
     {
       timestamp: Math.floor(Date.now()),
@@ -94,7 +97,7 @@ fastify.ready((err) => {
   }
   const routes = fastify.printRoutes()
   console.log(`Available Routes:\n${routes}`)
-  const ce = new fastify.CloudEvent(idCounterExample().next().value,
+  const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.ready`,
     {
       timestamp: Math.floor(Date.now()),

@@ -36,13 +36,16 @@ k.cloudEventOptions.source = k.serverUrl
 // define a sample id generator here
 const hostname = require('os').hostname()
 const pid = require('process').pid
-const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
 function * idMakerExample () {
+  const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
   while (true) {
     const timestamp = Math.floor(Date.now())
     yield `${idPrefix}@${timestamp}`
   }
 }
+
+// define a generator, to use everywhere here
+const gen = idMakerExample()
 
 // raise an event at server start, before loading the plugin, feasible but pay attention ...
 raiseEventAtStartServerScript()
@@ -50,7 +53,7 @@ raiseEventAtStartServerScript()
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
-  idGenerator: idMakerExample,
+  idGenerator: gen,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
@@ -72,7 +75,7 @@ assert(loggingCloseServerCallback !== null)
 
 function raiseEventAtStartServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
-  const ce = new CloudEventUtilityConstructor(idMakerExample().next().value,
+  const ce = new CloudEventUtilityConstructor(gen.next().value,
     `${k.baseNamespace}.server-script.start`,
     {
       timestamp: Math.floor(Date.now()),
@@ -103,7 +106,7 @@ fastify.get('/time', async (req, reply) => {
 
 fastify.listen(k.port, k.address, (err) => {
   if (err) {
-    const ce = new fastify.CloudEvent(idMakerExample().next().value,
+    const ce = new fastify.CloudEvent(gen.next().value,
       `${k.baseNamespace}.error`,
       {
         timestamp: Math.floor(Date.now()),
@@ -120,7 +123,7 @@ fastify.listen(k.port, k.address, (err) => {
     throw err
   }
   console.log(`Server listening on ${fastify.server.address().port}`)
-  const ce = new fastify.CloudEvent(idMakerExample().next().value,
+  const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.listen`,
     {
       timestamp: Math.floor(Date.now()),
@@ -135,7 +138,7 @@ fastify.listen(k.port, k.address, (err) => {
 
 fastify.ready((err) => {
   if (err) {
-    const ce = new fastify.CloudEvent(idMakerExample().next().value,
+    const ce = new fastify.CloudEvent(gen.next().value,
       `${k.baseNamespace}.error`,
       {
         timestamp: Math.floor(Date.now()),
@@ -153,7 +156,7 @@ fastify.ready((err) => {
   }
   const routes = fastify.printRoutes()
   console.log(`Available Routes:\n${routes}`)
-  const ce = new fastify.CloudEvent(idMakerExample().next().value,
+  const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.ready`,
     {
       timestamp: Math.floor(Date.now()),

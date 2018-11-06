@@ -22,7 +22,7 @@ function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
     baseNamespace = 'com.github.fastify.plugins.fastify-cloudevents',
-    idGenerator = idMaker,
+    idGenerator = idMaker(),
     onRequestCallback = null,
     preHandlerCallback = null,
     onSendCallback = null,
@@ -35,7 +35,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   ensureIsString(serverUrl, 'serverUrl')
   ensureIsString(baseNamespace, 'baseNamespace')
-  ensureIsFunction(idGenerator, 'idGenerator')
+  ensureIsObject(idGenerator, 'idGenerator')
   ensureIsFunction(onRequestCallback, 'onRequestCallback')
   ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
   ensureIsFunction(onSendCallback, 'onSendCallback')
@@ -107,7 +107,7 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         {
           id: req.id,
@@ -135,7 +135,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         {
           id: request.id,
@@ -165,7 +165,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         {
           id: request.id,
@@ -196,7 +196,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (res, next) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
         {
           // id: res.id, // not available
@@ -217,7 +217,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRoute`,
         routeOptions, // data
         cloudEventOptions
@@ -229,7 +229,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
-      const ce = new fastify.CloudEvent(idGenerator().next().value,
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
         {
           timestamp: Math.floor(Date.now()),
@@ -245,7 +245,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
-    const ce = new fastify.CloudEvent(idGenerator().next().value,
+    const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
       {
         timestamp: Math.floor(Date.now()),
@@ -263,6 +263,12 @@ function fastifyCloudEvents (fastify, options, next) {
 function ensureIsString (arg, name) {
   if (arg !== null && typeof arg !== 'string') {
     throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
+  }
+}
+
+function ensureIsObject (arg, name) {
+  if (arg !== null && typeof arg !== 'object') {
+    throw new TypeError(`The argument '${name}' must be a object, instead got a '${typeof arg}'`)
   }
 }
 
