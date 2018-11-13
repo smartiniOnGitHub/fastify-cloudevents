@@ -47,7 +47,7 @@ to show even how to raise own events (normal an errors).
 
 ## Requirements
 
-Fastify 0.43.0 or later.
+Fastify 1.x .
 Node.js 8.12.x or later.
 
 
