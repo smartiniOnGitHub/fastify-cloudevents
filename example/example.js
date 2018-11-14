@@ -66,18 +66,18 @@ fastify.get('/', function (req, reply) {
   const scriptRelativeFolder = path.join(__dirname, path.sep)
   const fs = require('fs')
   const stream = fs.createReadStream(path.join(scriptRelativeFolder, 'home.html'))
-  reply.type('text/html').send(stream)
+  reply.type('text/html; charset=utf-8').send(stream)
 })
 // example route, to return current timestamp but in async way
 fastify.get('/time', async (req, reply) => {
   return { timestamp: Math.floor(Date.now()) }
 })
 
-fastify.listen(k.port, k.address, (err) => {
+fastify.listen(k.port, k.address, (err, address) => {
   if (err) {
     throw err
   }
-  console.log(`Server listening on ${fastify.server.address().port}`)
+  console.log(`Server listening on ${address}`)
   const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.listen`,
     {
