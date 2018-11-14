@@ -23,6 +23,7 @@ function fastifyCloudEvents (fastify, options, next) {
     serverUrl = '/',
     baseNamespace = 'com.github.fastify.plugins.fastify-cloudevents',
     idGenerator = idMaker(),
+    includeHeaders = false,
     onRequestCallback = null,
     preHandlerCallback = null,
     onSendCallback = null,
@@ -36,6 +37,7 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsString(serverUrl, 'serverUrl')
   ensureIsString(baseNamespace, 'baseNamespace')
   ensureIsObject(idGenerator, 'idGenerator')
+  ensureIsBoolean(includeHeaders, 'includeHeaders')
   ensureIsFunction(onRequestCallback, 'onRequestCallback')
   ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
   ensureIsFunction(onSendCallback, 'onSendCallback')
@@ -107,6 +109,7 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
+      const headers = (includeHeaders === null || includeHeaders === true) ? req.headers : null
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         {
@@ -115,7 +118,7 @@ function fastifyCloudEvents (fastify, options, next) {
           req: {
             httpVersion: req.httpVersion,
             id: req.id,
-            headers: req.headers,
+            headers: headers,
             method: req.method,
             originalUrl: req.originalUrl,
             upgrade: req.upgrade,
@@ -135,6 +138,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
+      const headers = (includeHeaders === null || includeHeaders === true) ? request.headers : null
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         {
@@ -142,7 +146,7 @@ function fastifyCloudEvents (fastify, options, next) {
           timestamp: Math.floor(Date.now()),
           request: {
             id: request.id,
-            headers: request.headers,
+            headers: headers,
             params: request.params,
             query: request.query,
             body: request.body,
@@ -165,6 +169,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
+      const headers = (includeHeaders === null || includeHeaders === true) ? request.headers : null
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         {
@@ -172,7 +177,7 @@ function fastifyCloudEvents (fastify, options, next) {
           timestamp: Math.floor(Date.now()),
           request: {
             id: request.id,
-            headers: request.headers,
+            headers: headers,
             params: request.params,
             query: request.query,
             body: request.body,
@@ -263,6 +268,12 @@ function fastifyCloudEvents (fastify, options, next) {
 function ensureIsString (arg, name) {
   if (arg !== null && typeof arg !== 'string') {
     throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
+  }
+}
+
+function ensureIsBoolean (arg, name) {
+  if (arg !== null && typeof arg !== 'boolean') {
+    throw new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
   }
 }
 

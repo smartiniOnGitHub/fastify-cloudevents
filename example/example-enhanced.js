@@ -25,6 +25,7 @@ const k = {
   address: '0.0.0.0',
   port: 3000,
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
+  includeHeaders: true,
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   }
@@ -54,6 +55,7 @@ raiseEventAtStartServerScript()
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
   idGenerator: gen,
+  includeHeaders: k.includeHeaders,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
   onSendCallback: loggingCallback,
