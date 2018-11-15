@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.4](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.4) (2018-11-15)
+Summary Changelog:
+- Tweak implementation for the plugin configuration option `includeHeaders` and update examples
+
 ## [0.1.3](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.3) (2018-11-14)
 Summary Changelog:
 - Add the plugin configuration option `includeHeaders` so that when `true` all request headers will be put in generated CloudEvents (but by default is `false`)

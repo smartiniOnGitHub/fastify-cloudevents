@@ -109,7 +109,7 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
-      const headers = (includeHeaders === null || includeHeaders === true) ? req.headers : null
+      const headers = (includeHeaders === null || includeHeaders === false) ? null : req.headers
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         {
@@ -138,7 +138,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      const headers = (includeHeaders === null || includeHeaders === true) ? request.headers : null
+      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         {
@@ -169,7 +169,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
-      const headers = (includeHeaders === null || includeHeaders === true) ? request.headers : null
+      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         {

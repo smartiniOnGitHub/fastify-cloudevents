@@ -25,7 +25,7 @@ const k = {
   address: '0.0.0.0',
   port: 3000,
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
-  includeHeaders: true,
+  includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   }
