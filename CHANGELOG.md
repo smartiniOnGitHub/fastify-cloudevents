@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.0) (unreleased)
+Summary Changelog:
+- Update [loudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/) to '0.2.0', with some breaking changes inside
+- Update Fastify dependencies to '1.1.0' or higher (but on 1.x)
+
 ## [0.1.4](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.4) (2018-11-15)
 Summary Changelog:
 - Tweak implementation for the plugin configuration option `includeHeaders` and update examples

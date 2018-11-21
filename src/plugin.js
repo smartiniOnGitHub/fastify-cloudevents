@@ -299,6 +299,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '1.x',
+  fastify: '^1.1.0',
   name: 'fastify-cloudevents'
 })
