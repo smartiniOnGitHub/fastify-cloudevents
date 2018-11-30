@@ -1,8 +1,9 @@
 # mac files
 .DS_Store
 
-# dotenv environment variables file
+# environment variables file
 .env
+.envrc
 
 # IDE/editors
 .vscode
