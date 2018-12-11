@@ -29,6 +29,7 @@ const fastify = require('fastify')()
 
 // register the plugin with some options, for example:
 fastify.register(require('fastify-cloudevents'), {
+  serverUrl: 'http://0.0.0.0:3000/',
   idGenerator: idExample,
   onRequestCallback: callbackExample,
   cloudEventOptions: { }
@@ -58,8 +59,8 @@ The plugin decorate Fastify and expose some functions:
 - `cloudEventSerializeFast`, a serialize function implemented here, using `fast-json-stringify` and not standard JSON serialization functions
 
 Plugin options are:
-- `serverUrl`, the absolute URL of the current webapp, to use as a base `source` in generated CloudEvents
-- `baseNamespace`, a base namespace for the `eventType`, more speficic suffix will be added in any CloudEvent
+- `serverUrl`, the URL (absolute, or relative) of the current webapp, to use as a base `source` in generated CloudEvents
+- `baseNamespace`, a base namespace for the `eventType`, more specific suffix will be added in any CloudEvent
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag that when `true` tells that request headers will be put in generated CloudEvents (but by default is `false`)
 - `onRequestCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRequest`
