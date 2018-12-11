@@ -101,17 +101,15 @@ function fastifyCloudEvents (fastify, options, next) {
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = pluginVersion
   }
-  // override source if not already specified
-  if (cloudEventOptions.source === null || typeof cloudEventOptions.source !== 'string') {
-    cloudEventOptions.source = serverUrl
-  }
 
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : req.headers
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
+        sourceUrl,
         {
           id: req.id,
           timestamp: Math.floor(Date.now()),
@@ -139,8 +137,10 @@ function fastifyCloudEvents (fastify, options, next) {
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
+        sourceUrl,
         {
           id: request.id,
           timestamp: Math.floor(Date.now()),
@@ -170,8 +170,10 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
+        sourceUrl,
         {
           id: request.id,
           timestamp: Math.floor(Date.now()),
@@ -201,8 +203,10 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (res, next) => {
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
+        sourceUrl,
         {
           // id: res.id, // not available
           timestamp: Math.floor(Date.now()),
@@ -222,8 +226,10 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRoute`,
+        sourceUrl,
         routeOptions, // data
         cloudEventOptions
       )
@@ -234,8 +240,10 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
+      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
+        sourceUrl,
         {
           timestamp: Math.floor(Date.now()),
           description: 'plugin shutdown'
@@ -250,8 +258,10 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
+    const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
     const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
+      sourceUrl,
       {
         timestamp: Math.floor(Date.now()),
         description: 'plugin startup successfully',

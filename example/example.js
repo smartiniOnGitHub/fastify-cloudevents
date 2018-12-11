@@ -27,7 +27,7 @@ const k = {
   }
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
-k.cloudEventOptions.source = k.serverUrl
+k.source = k.serverUrl
 
 // define a sample id generator here
 const hostname = require('os').hostname()
@@ -80,6 +80,7 @@ fastify.listen(k.port, k.address, (err, address) => {
   console.log(`Server listening on ${address}`)
   const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.listen`,
+    k.source,
     {
       timestamp: Math.floor(Date.now()),
       status: 'listening',
@@ -99,6 +100,7 @@ fastify.ready((err) => {
   console.log(`Available Routes:\n${routes}`)
   const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.ready`,
+    k.source,
     {
       timestamp: Math.floor(Date.now()),
       status: 'ready',

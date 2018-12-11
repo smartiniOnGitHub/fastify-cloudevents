@@ -24,14 +24,14 @@ const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
-  baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example',
+  baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example-enhanced',
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   }
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
-k.cloudEventOptions.source = k.serverUrl
+k.source = k.serverUrl
 // assert(k !== null)
 
 // define a sample id generator here
@@ -79,6 +79,7 @@ function raiseEventAtStartServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
   const ce = new CloudEventUtilityConstructor(gen.next().value,
     `${k.baseNamespace}.server-script.start`,
+    k.source,
     {
       timestamp: Math.floor(Date.now()),
       description: 'Fastify server startup begin',
@@ -110,6 +111,7 @@ fastify.listen(k.port, k.address, (err, address) => {
   if (err) {
     const ce = new fastify.CloudEvent(gen.next().value,
       `${k.baseNamespace}.error`,
+      k.source,
       {
         timestamp: Math.floor(Date.now()),
         status: 'error',
@@ -127,6 +129,7 @@ fastify.listen(k.port, k.address, (err, address) => {
   console.log(`Server listening on ${address}`)
   const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.listen`,
+    k.source,
     {
       timestamp: Math.floor(Date.now()),
       status: 'listening',
@@ -142,6 +145,7 @@ fastify.ready((err) => {
   if (err) {
     const ce = new fastify.CloudEvent(gen.next().value,
       `${k.baseNamespace}.error`,
+      k.source,
       {
         timestamp: Math.floor(Date.now()),
         status: 'error',
@@ -160,6 +164,7 @@ fastify.ready((err) => {
   console.log(`Available Routes:\n${routes}`)
   const ce = new fastify.CloudEvent(gen.next().value,
     `${k.baseNamespace}.ready`,
+    k.source,
     {
       timestamp: Math.floor(Date.now()),
       status: 'ready',
