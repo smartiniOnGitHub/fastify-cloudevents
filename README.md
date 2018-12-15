@@ -60,6 +60,9 @@ The plugin decorate Fastify and expose some functions:
 
 Plugin options are:
 - `serverUrl`, the URL (absolute, or relative) of the current webapp, to use as a base `source` in generated CloudEvents
+- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents:
+  - null, (default value) use only the given `serverUrl`
+  - 'pluginServerUrl', same as default but in this case it will be aded to the extension attribute
 - `baseNamespace`, a base namespace for the `eventType`, more specific suffix will be added in any CloudEvent
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag that when `true` tells that request headers will be put in generated CloudEvents (but by default is `false`)

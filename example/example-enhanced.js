@@ -24,6 +24,7 @@ const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
+  serverUrlMode: 'pluginServerUrl', // same behavior as default value, but in this way set in CloudEvent extension object
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example-enhanced',
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
@@ -54,6 +55,7 @@ raiseEventAtStartServerScript()
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
+  serverUrlMode: k.serverUrlMode,
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
   onRequestCallback: loggingCallback,

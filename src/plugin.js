@@ -21,6 +21,7 @@ const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
+    serverUrlMode = null,
     baseNamespace = 'com.github.fastify.plugins.fastify-cloudevents',
     idGenerator = idMaker(),
     includeHeaders = false,
@@ -35,6 +36,7 @@ function fastifyCloudEvents (fastify, options, next) {
   } = options
 
   ensureIsString(serverUrl, 'serverUrl')
+  ensureIsString(serverUrlMode, 'serverUrlMode')
   ensureIsString(baseNamespace, 'baseNamespace')
   ensureIsObject(idGenerator, 'idGenerator')
   ensureIsBoolean(includeHeaders, 'includeHeaders')
@@ -86,9 +88,37 @@ function fastifyCloudEvents (fastify, options, next) {
     }
 
     // TODO: handle even non default contentType when serializing the data attribute ... wip
+    // TODO: for example add an optional argument in the method for already serialized data, then merge it in a new object in the stringify call ... wip
     const serialized = stringify(event)
     // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
     return serialized
+  }
+
+  /**
+   * Build the value for the source field of the CloudEvent,
+   * depending on the plugin configuration of options
+   * `serverUrlMode`, `serverUrl`,
+   * and the uri part of the current request.
+   * Note that this is mainly for usage inside the plugin,
+   * but in some cases could be useful even outside.
+   *
+   * @param {string} url the uri part of the current request
+   * @return {string} the source value to use, as a string
+   */
+  function buildSourceUrl (url = '') {
+    if (serverUrlMode === null || serverUrlMode === 'pluginServerUrl') {
+      return serverUrl
+    } else if (serverUrlMode === 'pluginAndRequestUrl') {
+      // TODO: handle this case ... wip
+      // let sourceUrl = serverUrl + url
+      // return sourceUrl
+    } else if (serverUrlMode === 'requestUrl') {
+      // TODO: handle this case ... wip
+      // let sourceUrl = url
+      // return sourceUrl
+    } else {
+      throw new Error(`Illegal value for serverUrlMode: '${serverUrlMode}'`)
+    }
   }
 
   // execute plugin code
@@ -101,12 +131,17 @@ function fastifyCloudEvents (fastify, options, next) {
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = pluginVersion
   }
+  // add to extensions the serverUrlMode defined, if set
+  if (serverUrlMode !== null) {
+    cloudEventOptions.extensions = cloudEventOptions.extensions || {}
+    cloudEventOptions.extensions.serverUrlMode = serverUrlMode
+  }
 
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (req, res, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : req.headers
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl(req.url)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         sourceUrl,
@@ -137,7 +172,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl(request.req.url)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         sourceUrl,
@@ -170,7 +205,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl(request.req.url)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         sourceUrl,
@@ -203,7 +238,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (res, next) => {
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
         sourceUrl,
@@ -226,7 +261,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRoute`,
         sourceUrl,
@@ -240,7 +275,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
-      const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
         sourceUrl,
@@ -258,7 +293,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
-    const sourceUrl = serverUrl // TODO: source: use a specific constant and related private function to get its value to use ... wip
+    const sourceUrl = buildSourceUrl()
     const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
       sourceUrl,

@@ -2,8 +2,15 @@
 
 ## [0.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.0) (unreleased)
 Summary Changelog:
-- Update [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/) to '0.2.0', with some breaking changes inside
+- Update [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/) to '0.2.0', 
+  with some breaking changes inside (like the source parameter moved outside its options, etc)
+- Change dependency from [cloudevent.js](https://www.npmjs.com/package/cloudevent.js) to the new name
+  [cloudevent](https://www.npmjs.com/package/cloudevent) more searchable (the old name is deprecated)
 - Update Fastify dependencies to '1.1.0' or higher (but on 1.x)
+- Add plugin option `serverUrlMode` (by default null) to specify in which mode source 
+  must be constructed in generated CloudEvent instances; see in the README for related values to use.
+  As a sample, add in the `example-enhanced` with a value to have the same behavior of its default,
+  but that way it will be put in CloudEvent extension object.
 
 ## [0.1.4](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.1.4) (2018-11-15)
 Summary Changelog:
