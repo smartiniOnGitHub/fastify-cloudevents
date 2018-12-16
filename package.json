@@ -13,7 +13,7 @@
   "dependencies": {
     "fastify-plugin": "^1.3.0",
     "fast-json-stringify": "^1.9.2",
-    "cloudevent.js": "^0.2.0"
+    "cloudevent": "^0.2.0"
   },
   "devDependencies": {
     "fastify": "^1.13.2",

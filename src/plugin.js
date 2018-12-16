@@ -16,7 +16,7 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const cloudEventHandler = require('cloudevent.js') // get CloudEvent definition and related utilities
+const cloudEventHandler = require('cloudevent') // get CloudEvent definition and related utilities
 
 function fastifyCloudEvents (fastify, options, next) {
   const {
