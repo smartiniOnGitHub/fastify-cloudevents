@@ -26,7 +26,7 @@ const k = {
     strict: true // enable strict mode in generated CloudEvents, optional
   }
 }
-k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
+k.serverUrl = `${k.protocol}://${k.address}:${k.port}`
 k.source = k.serverUrl
 
 // define a sample id generator here

@@ -106,16 +106,19 @@ function fastifyCloudEvents (fastify, options, next) {
    * @return {string} the source value to use, as a string
    */
   function buildSourceUrl (url = '') {
-    if (serverUrlMode === null || serverUrlMode === 'pluginServerUrl') {
+    if (serverUrlMode === null || serverUrlMode === 'pluginAndRequestUrl') {
+      let sourceUrl
+      if (serverUrl.endsWith('/') && url.startsWith('/')) {
+        sourceUrl = serverUrl.slice(0, serverUrl.length - 1)
+      } else {
+        sourceUrl = serverUrl
+      }
+      sourceUrl = sourceUrl + url
+      return sourceUrl
+    } else if (serverUrlMode === 'pluginServerUrl') {
       return serverUrl
-    } else if (serverUrlMode === 'pluginAndRequestUrl') {
-      // TODO: handle this case ... wip
-      // let sourceUrl = serverUrl + url
-      // return sourceUrl
     } else if (serverUrlMode === 'requestUrl') {
-      // TODO: handle this case ... wip
-      // let sourceUrl = url
-      // return sourceUrl
+      return url
     } else {
       throw new Error(`Illegal value for serverUrlMode: '${serverUrlMode}'`)
     }

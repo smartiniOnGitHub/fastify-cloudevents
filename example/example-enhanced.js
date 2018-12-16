@@ -24,14 +24,14 @@ const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
-  serverUrlMode: 'pluginServerUrl', // same behavior as default value, but in this way set in CloudEvent extension object
+  serverUrlMode: 'pluginAndRequestUrl', // same behavior as default value, but in this way set in CloudEvent extension object
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example-enhanced',
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   }
 }
-k.serverUrl = `${k.protocol}://${k.address}:${k.port}/`
+k.serverUrl = `${k.protocol}://${k.address}:${k.port}`
 k.source = k.serverUrl
 // assert(k !== null)
 
