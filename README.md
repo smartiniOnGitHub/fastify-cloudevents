@@ -29,7 +29,7 @@ const fastify = require('fastify')()
 
 // register the plugin with some options, for example:
 fastify.register(require('fastify-cloudevents'), {
-  serverUrl: 'http://0.0.0.0:3000/',
+  serverUrl: 'http://0.0.0.0:3000',
   idGenerator: idExample,
   onRequestCallback: callbackExample,
   cloudEventOptions: { }
