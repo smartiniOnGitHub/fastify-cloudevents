@@ -107,14 +107,7 @@ function fastifyCloudEvents (fastify, options, next) {
    */
   function buildSourceUrl (url = '') {
     if (serverUrlMode === null || serverUrlMode === 'pluginAndRequestUrl') {
-      let sourceUrl
-      if (serverUrl.endsWith('/') && url.startsWith('/')) {
-        sourceUrl = serverUrl.slice(0, serverUrl.length - 1)
-      } else {
-        sourceUrl = serverUrl
-      }
-      sourceUrl = sourceUrl + url
-      return sourceUrl
+      return serverUrl + url
     } else if (serverUrlMode === 'pluginServerUrl') {
       return serverUrl
     } else if (serverUrlMode === 'requestUrl') {
