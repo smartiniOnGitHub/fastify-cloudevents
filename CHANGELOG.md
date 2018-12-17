@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.0) (unreleased)
+## [0.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.0) (2018-12-17)
 Summary Changelog:
 - Update [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/) to '0.2.0', 
   with some breaking changes inside (like the source parameter moved outside its options, etc)
