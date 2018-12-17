@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.2.1](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.1) (unreleased)
+Summary Changelog:
+- Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.2.1', 
+  to remove JSON schema from here and use that exposed by that library
+- Other small fixes
+
 ## [0.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.0) (2018-12-17)
 Summary Changelog:
 - Update [cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/) to '0.2.0', 
