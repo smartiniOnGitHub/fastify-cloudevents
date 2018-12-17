@@ -205,7 +205,6 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
 /** create some common options, for better reuse in tests */
 const ceCommonOptions = {
-  cloudEventsVersion: '0.0.0',
   eventTypeVersion: '1.0.0',
   eventTime: new Date(),
   extensions: { 'exampleExtension': 'value' },

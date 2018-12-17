@@ -20,7 +20,7 @@ const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
 
-/** @test {CloudEvent} */
+/** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(4)
   const fastify = Fastify()
@@ -38,8 +38,6 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     assert(typeof CloudEvent === 'function')
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
-
-    // TODO: add tests on hooks ...
   })
 })
 
@@ -47,5 +45,3 @@ function loggingCallback (ce) {
   console.log(`loggingCallback - CloudEvent dump ${Fastify().CloudEvent.dumpObject(ce, 'ce')}`)
 }
 assert(loggingCallback !== null)
-
-// TODO: add more tests ...

@@ -22,7 +22,7 @@ const Fastify = require('fastify')
 
 // use 'fast-json-stringify' in all tests here
 
-/** @test {CloudEvent} */
+/** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(9)
   const fastify = Fastify()
@@ -58,7 +58,6 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
-  cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   eventTime: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
@@ -78,7 +77,7 @@ const ceMapData = new Map() // empty Map
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 
-/** @test {CloudEvent} */
+/** @test {fastifyCloudEvents} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   t.plan(31)
   const fastify = Fastify()
@@ -162,7 +161,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 })
 
 // TODO: this is a limit if the current implementation, and will be resolved soon ... wip
-/** @test {CloudEvent} */
+/** @test {fastifyCloudEvents} */
 test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
   t.plan(6)
 

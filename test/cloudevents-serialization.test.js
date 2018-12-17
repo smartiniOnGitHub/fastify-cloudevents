@@ -48,7 +48,6 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
-  cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   eventTime: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
