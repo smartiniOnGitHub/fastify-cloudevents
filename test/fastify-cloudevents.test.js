@@ -19,12 +19,13 @@ const assert = require('assert')
 const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
+const fastifyCloudevents = require('../src/plugin')
 
 /** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(4)
   const fastify = Fastify()
-  fastify.register(require('../src/plugin')) // configure this plugin with its default options
+  fastify.register(fastifyCloudevents) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
     fastify.server.unref()
