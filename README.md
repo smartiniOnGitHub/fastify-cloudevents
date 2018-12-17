@@ -4,6 +4,7 @@
   [![NPM Downloads](https://img.shields.io/npm/dm/fastify-cloudevents.svg?style=flat)](https://npmjs.org/package/fastify-cloudevents/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/fastify-cloudevents/?branch=master)
+  [![Dependencies](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents.svg)
 
 Fastify Plugin to serialize events in the CloudEvents standard format.
 
