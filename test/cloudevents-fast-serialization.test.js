@@ -199,4 +199,45 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
   })
 })
 
-// TODO: add more test, like: with data (even nested properties), with additional fields to skip, etc ... wip
+/** @test {fastifyCloudEvents} */
+test('ensure the JSON Schema for a CloudEvent (static and for a normal instance) is available', (t) => {
+  t.plan(10)
+
+  const fastify = Fastify()
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
+
+  fastify.listen(0, (err, address) => {
+    fastify.server.unref()
+    t.error(err)
+    const CloudEvent = require('../../cloudevent.js/src/') // temp, reference the library via a local relative path ...
+    // const CloudEvent = fastify.CloudEvent // TODO: remove the previous line and uncomment this ... wip
+    t.ok(CloudEvent)
+
+    // get JSON Schema from a static method
+    const jsonSchemaStatic = CloudEvent.getJSONSchema()
+    assert(jsonSchemaStatic !== null)
+    t.ok(jsonSchemaStatic)
+    t.strictEqual(typeof jsonSchemaStatic, 'object')
+
+    const ceSerializeFast = fastify.cloudEventSerializeFast
+    t.ok(ceSerializeFast)
+    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
+      ceServerUrl,
+      ceCommonData, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullStrict !== null)
+    t.ok(ceFullStrict)
+    // get JSON Schema from that instance
+    const jsonSchema = ceFullStrict.schema
+    assert(jsonSchema !== null)
+    t.ok(jsonSchema)
+    t.strictEqual(typeof jsonSchema, 'object')
+
+    const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
+    t.ok(ceFullStrictSerializedFast)
+    // ensure schema is always the same
+    t.strictSame(jsonSchemaStatic, jsonSchema)
+  })
+})

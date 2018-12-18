@@ -49,29 +49,11 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
 
   const fastJson = require('fast-json-stringify')
-  // define a schema for serializing a CloudEvent object to JSON
+  // get a schema for serializing a CloudEvent object to JSON
   // note that properties not in the schema will be ignored
   // (in json output) if additionalProperties is false
-  const ceSchema = {
-    title: 'CloudEvent Schema with required fields',
-    type: 'object',
-    properties: {
-      cloudEventsVersion: { type: 'string' },
-      eventID: { type: 'string' },
-      eventType: { type: 'string' },
-      // data: { type: 'object' },
-      eventTypeVersion: { type: 'string' },
-      source: { type: 'string' },
-      eventTime: { type: 'string' },
-      // extensions: { type: 'object' },
-      contentType: { type: 'string' },
-      schemaURL: { type: 'string' }
-    },
-    required: ['cloudEventsVersion', 'eventID', 'eventType',
-      'source', 'contentType'
-    ],
-    additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
-  }
+  const ceSchema = require('../../cloudevent.js/src/').getJSONSchema() // temp, reference the library via a local relative path ...
+  // const ceSchema = cloudEventHandler.getJSONSchema() // TODO: remove the previous line and uncomment this ... wip
   const stringify = fastJson(ceSchema)
 
   /**
