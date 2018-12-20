@@ -209,8 +209,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   fastify.listen(0, (err, address) => {
     fastify.server.unref()
     t.error(err)
-    const CloudEvent = require('../../cloudevent.js/src/') // temp, reference the library via a local relative path ...
-    // const CloudEvent = fastify.CloudEvent // TODO: remove the previous line and uncomment this ... wip
+    const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
 
     // get JSON Schema from a static method
