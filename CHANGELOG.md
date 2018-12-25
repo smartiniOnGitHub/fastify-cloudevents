@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.2.2](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.2) (2018-12-25)
+Summary Changelog:
+- Updated dependencies to latest release
+- Add client IP address in a custom attribute inside the data section of generated CloudEvent instances
+
 ## [0.2.1](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.1) (2018-12-20)
 Summary Changelog:
 - Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.2.1', 
