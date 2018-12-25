@@ -98,6 +98,21 @@ function fastifyCloudEvents (fastify, options, next) {
     }
   }
 
+  /**
+   * Extract and build the value for the client IP address,
+   * useful to add into the CloudEvent in a custom attribute inside data.
+   *
+   * @param {!object} req the request
+   * @return {string} the IP address, as a string
+   */
+  function buildClientIP (req) {
+    if (req === undefined || req === null) {
+      throw new Error('Illegal value for request: undefined or null')
+    }
+    const ip = req.connection.remoteAddress
+    return ip
+  }
+
   // execute plugin code
   fastify.decorate('CloudEvent', cloudEventHandler)
   fastify.decorate('cloudEventSerializeFast', serialize)
@@ -119,6 +134,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onRequest', (req, res, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : req.headers
       const sourceUrl = buildSourceUrl(req.url)
+      const clientIp = buildClientIP(req)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         sourceUrl,
@@ -132,7 +148,8 @@ function fastifyCloudEvents (fastify, options, next) {
             method: req.method,
             originalUrl: req.originalUrl,
             upgrade: req.upgrade,
-            url: req.url
+            url: req.url,
+            clientIp: clientIp
           },
           res: { }
         }, // data
@@ -150,6 +167,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('preHandler', (request, reply, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
       const sourceUrl = buildSourceUrl(request.req.url)
+      const clientIp = buildClientIP(request.req)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         sourceUrl,
@@ -163,7 +181,8 @@ function fastifyCloudEvents (fastify, options, next) {
             query: request.query,
             body: request.body,
             method: request.req.method,
-            url: request.req.url
+            url: request.req.url,
+            clientIp: clientIp
           },
           reply: {
             statusCode: reply.res.statusCode,
@@ -183,6 +202,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
       const sourceUrl = buildSourceUrl(request.req.url)
+      const clientIp = buildClientIP(request.req)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         sourceUrl,
@@ -196,7 +216,8 @@ function fastifyCloudEvents (fastify, options, next) {
             query: request.query,
             body: request.body,
             method: request.req.method,
-            url: request.req.url
+            url: request.req.url,
+            clientIp: clientIp
           },
           reply: {
             statusCode: reply.res.statusCode,
