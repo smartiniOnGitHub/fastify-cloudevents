@@ -20,7 +20,13 @@ src/
 test/
 # example/
 
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
 .env
+.envrc
 .babelrc
 .eslintignore
 .eslintrc*
