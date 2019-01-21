@@ -20,7 +20,7 @@
     "fastify": "^1.13.4",
     "simple-get": "^3.0.3",
     "standard": "^12.0.1",
-    "tap": "^12.1.1"
+    "tap": "^12.1.2"
   },
   "peerDependencies": {},
   "engines": {
