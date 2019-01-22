@@ -60,11 +60,11 @@ function fastifyCloudEvents (fastify, options, next) {
    *
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
-   *        encoder (function, default null) a function that takes data and returns encoded data,
-   *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
+   *        encoder (function, no default) a function that takes data and returns encoded data,
+   *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  function serialize (event, { encoder = null, encodedData = null } = {}) {
+  function serialize (event, { encoder, encodedData } = {}) {
     ensureIsObject(event, 'event')
 
     if (event.contentType === 'application/json') {
@@ -85,8 +85,6 @@ function fastifyCloudEvents (fastify, options, next) {
     if (typeof encodedData !== 'string') {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    // TODO: check if update even json schema (or a copy defined here) ... wip
-    console.log(`DEBUG - serialize: serialized = '${stringify({ ...event, data: encodedData })}'`)
     return stringify({ ...event, data: encodedData })
   }
 

@@ -1,11 +1,13 @@
 # Change Log
 
-## [0.2.3](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.3) (unreleased)
+## [0.2.3](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.2.3) (2019-01-22)
 Summary Changelog:
 - Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.2.2', 
   with the ability to get CloudEvent data (payload), 
   and the ability to serialize even with a non default contentType
 - Updated dependencies to latest release
+- Updated README with serialization options, and a reference to the new package name 
+  of the underlying library
 - Add npm custom command to run Tap unit tests with nodejs debugger breaks enabled (inspector)
 - Other small fixes
 

@@ -9,16 +9,19 @@
 
 Fastify Plugin to serialize events in the CloudEvents standard format.
 
-The purpose of this plugin is to let Fastify web applications create instances of CloudEvents in a simple way (with some useful defaults), or in a full way (all attributes).
-Optionally, it's possible to validate created instances to be sure they are compliant with the standard.
+The purpose of this plugin is to let Fastify web applications create instances of CloudEvents 
+in a simple way (with some useful defaults), or in a full way (all attributes).
+Optionally, it's possible to validate created instances to be sure they are compliant 
+with the standard.
 Then, created instances can be serialized, for example to be sent (or saved/stored) somewhere.
 
-Other features of the plugin: enable forwarding of Fastify events to given callbacks, and wrapping the original event in a specific CloudEvent instance.
+Other features of the plugin: enable forwarding of Fastify events to given callbacks, 
+and wrapping the original event in a specific CloudEvent instance.
 
 
-Note that all CloudEvents features exposed here, by using the library [cloudevent.js](https://npmjs.org/package/cloudevent.js/).
+Note that all CloudEvents features exposed here, by using the library [cloudevent](https://npmjs.org/package/cloudevent/).
 
-More features will follow in the plugin.
+More features will follow.
 
 
 ## Usage
@@ -57,10 +60,13 @@ Fastify ^1.1.0 , Node.js 8.15.x or later.
 
 The plugin decorate Fastify and expose some functions:
 - `CloudEvent`, the CloudEvent implementation used here, could be useful
-- `cloudEventSerializeFast`, a serialize function implemented here, using `fast-json-stringify` and not standard JSON serialization functions
+- `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
+  and not standard JSON serialization functions; note that similar features of the underlying library 
+  has been implemented here (like serialization options)
 
 Plugin options are:
-- `serverUrl`, the URL (absolute, or relative) of the current webapp, to use as a base `source` in generated CloudEvents
+- `serverUrl`, the URL (absolute, or relative) of the current webapp, 
+  to use as a base `source` in generated CloudEvents
 - `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents 
   (any non null value will cause this setting to be aded to the extension attribute):
   - null, (default value) same as 'pluginAndRequestUrl'
@@ -68,9 +74,11 @@ Plugin options are:
   - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
   - 'requestUrl', use only the request url
   - anything other, will raise an `Error`
-- `baseNamespace`, a base namespace for the `eventType`, more specific suffix will be added in any CloudEvent
+- `baseNamespace`, a base namespace for the `eventType`; more specific suffix 
+  should be added to it in any CloudEvent
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
-- `includeHeaders`, a boolean flag that when `true` tells that request headers will be put in generated CloudEvents (but by default is `false`)
+- `includeHeaders`, a boolean flag that when `true` tells that request headers will be put 
+  in generated CloudEvents (but by default is `false`)
 - `onRequestCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRequest`
 - `preHandlerCallback`, callback who will handle the generated CloudEvents, in Fastify hook `preHandler`
 - `onSendCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onSend`
@@ -78,7 +86,8 @@ Plugin options are:
 - `onRouteCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRoute`
 - `onCloseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onClose`
 - `onReadyCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onReady`
-- `cloudEventOptions`, CloudEvent options commomn to all generated event instances; anyway objects are copied to not be shared between instances
+- `cloudEventOptions`, CloudEvent options commomn to all generated event instances; 
+  anyway objects are copied to not be shared between instances
 
 all plugin options are optional, and have a default value.
 
