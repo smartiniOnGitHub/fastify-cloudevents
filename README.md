@@ -86,7 +86,7 @@ Plugin options are:
 - `onRouteCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRoute`
 - `onCloseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onClose`
 - `onReadyCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onReady`
-- `cloudEventOptions`, CloudEvent options commomn to all generated event instances; 
+- `cloudEventOptions`, CloudEvent options common to all generated event instances; 
   anyway objects are copied to not be shared between instances
 
 all plugin options are optional, and have a default value.
