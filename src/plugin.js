@@ -59,20 +59,35 @@ function fastifyCloudEvents (fastify, options, next) {
    * Serialize the given CloudEvent in JSON format.
    *
    * @param {!object} event the CloudEvent to serialize
+   * @param {object} options optional serialization attributes:
+   *        encoder (function, default null) a function that takes data and returns encoded data,
+   *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  function serialize (event) {
-    // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
-    // raise error if contentType is not the default one (for now), for consistency with CloudEvents library used ...
-    if (event.contentType !== 'application/json') {
-      throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
-    }
+  function serialize (event, { encoder = null, encodedData = null } = {}) {
+    ensureIsObject(event, 'event')
 
-    // TODO: handle even non default contentType when serializing the data attribute ... wip
-    // TODO: for example add an optional argument in the method for already serialized data, then merge it in a new object in the stringify call ... wip
-    const serialized = stringify(event)
-    // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
-    return serialized
+    if (event.contentType === 'application/json') {
+      return stringify(event)
+    }
+    // else
+    if (encoder !== undefined && encoder !== null) {
+      if (typeof encoder !== 'function') {
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contentType}'.`)
+      }
+      encodedData = encoder(event.payload)
+    } else {
+      // encoder not defined, check encodedData
+      if (encodedData === undefined || encodedData === null) {
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contentType}'.`)
+      }
+    }
+    if (typeof encodedData !== 'string') {
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
+    }
+    // TODO: check if update even json schema (or a copy defined here) ... wip
+    console.log(`DEBUG - serialize: serialized = '${stringify({ ...event, data: encodedData })}'`)
+    return stringify({ ...event, data: encodedData })
   }
 
   /**
