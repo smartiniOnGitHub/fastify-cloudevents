@@ -5,6 +5,9 @@ Summary Changelog:
 - Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.2.2', 
   with the ability to get CloudEvent data (payload), 
   and the ability to serialize even with a non default contentType
+- Update plugin exposed function for fast serialization ('cloudEventSerializeFast') 
+  to accept serialization options (like in 'cloudevent') to be able to serialize 
+  even with a non default contentType
 - Updated dependencies to latest release
 - Updated README with serialization options, and a reference to the new package name 
   of the underlying library
