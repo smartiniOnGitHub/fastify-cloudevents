@@ -1,6 +1,6 @@
 {
   "name": "fastify-cloudevents",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Fastify Plugin to serialize events in the CloudEvents standard format",
   "main": "src/plugin",
   "scripts": {
