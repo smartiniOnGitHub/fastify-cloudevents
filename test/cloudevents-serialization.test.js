@@ -24,10 +24,10 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(6)
   const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
-    fastify.server.unref()
     t.error(err)
 
     // ensure CloudEvent class exist in Fastify decorators ...
@@ -71,10 +71,10 @@ ceMapData.set('key-2', 'value 2')
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   t.plan(41)
   const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
-    fastify.server.unref()
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -170,10 +170,10 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
   t.plan(5)
 
   const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
-    fastify.server.unref()
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)

@@ -25,10 +25,10 @@ const fastifyCloudevents = require('../src/plugin')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(4)
   const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
-    fastify.server.unref()
     t.error(err)
 
     // ensure CloudEvent constructor function exist in Fastify decorators ...
