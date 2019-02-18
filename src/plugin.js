@@ -16,7 +16,7 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const cloudEventHandler = require('cloudevent') // get CloudEvent definition and related utilities
+const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
 
 function fastifyCloudEvents (fastify, options, next) {
   const {
@@ -52,7 +52,7 @@ function fastifyCloudEvents (fastify, options, next) {
   // get a schema for serializing a CloudEvent object to JSON
   // note that properties not in the schema will be ignored
   // (in json output) if additionalProperties is false
-  const ceSchema = cloudEventHandler.getJSONSchema()
+  const ceSchema = CloudEvent.getJSONSchema()
   const stringify = fastJson(ceSchema)
 
   /**
@@ -63,6 +63,7 @@ function fastifyCloudEvents (fastify, options, next) {
    *        encoder (function, no default) a function that takes data and returns encoded data,
    *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
+   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
   function serialize (event, { encoder, encodedData } = {}) {
     ensureIsObject(event, 'event')
@@ -127,7 +128,8 @@ function fastifyCloudEvents (fastify, options, next) {
   }
 
   // execute plugin code
-  fastify.decorate('CloudEvent', cloudEventHandler)
+  fastify.decorate('CloudEvent', CloudEvent)
+  fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // check/finish to setup cloudEventOptions
@@ -168,7 +170,7 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+      // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
 

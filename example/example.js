@@ -57,7 +57,7 @@ fastify.register(require('../src/plugin'), {
 })
 
 function loggingCallback (ce) {
-  console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+  console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEventTransformer.dumpObject(ce, 'ce')}`)
 }
 
 // example to handle a sample home request to serve a static page, optional here
