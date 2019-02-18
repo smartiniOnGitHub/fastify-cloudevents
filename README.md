@@ -7,21 +7,20 @@
   [![dependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents)
   [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents?type=dev)
 
-Fastify Plugin to serialize events in the CloudEvents standard format.
+Fastify Plugin to transform events in/from the CloudEvents standard format.
 
 The purpose of this plugin is to let Fastify web applications create instances of CloudEvents 
 in a simple way (with some useful defaults), or in a full way (all attributes).
 Optionally, it's possible to validate created instances to be sure they are compliant 
 with the standard.
 Then, created instances can be serialized, for example to be sent (or saved/stored) somewhere.
+It's possible even to deserialize (parse) a string into a CloudEvent instance.
 
-Other features of the plugin: enable forwarding of Fastify events to given callbacks, 
-and wrapping the original event in a specific CloudEvent instance.
+Other features of the plugin: enable forwarding of Fastify events to given callbacks (using hooks), 
+and wrapping main data of the original event in a specific CloudEvent instance.
 
 
 Note that all CloudEvents features exposed here, by using the library [cloudevent](https://npmjs.org/package/cloudevent/).
-
-More features will follow.
 
 
 ## Usage
@@ -59,7 +58,8 @@ Fastify ^1.1.0 , Node.js 8.15.x or later.
 ## Note
 
 The plugin decorate Fastify and expose some functions:
-- `CloudEvent`, the CloudEvent implementation used here, could be useful
+- `CloudEvent`, the CloudEvent implementation, as a class
+- `CloudEventTransformer`, the CloudEventTransformer utility class
 - `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
   and not standard JSON serialization functions; note that similar features of the underlying library 
   has been implemented here (like serialization options)
@@ -90,6 +90,9 @@ Plugin options are:
   anyway objects are copied to not be shared between instances
 
 all plugin options are optional, and have a default value.
+
+Note that all callbacks given to hooks accepts only a single argument: the generated CloudEvent instance, 
+and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
 
 
 For more info on the standard, see the CloudEvents Specification [here](https://github.com/cloudevents/spec).
