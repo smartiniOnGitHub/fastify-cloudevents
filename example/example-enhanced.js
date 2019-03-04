@@ -69,7 +69,7 @@ fastify.register(require('../src/plugin'), {
 })
 
 function loggingCallback (ce) {
-  console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEvent.dumpObject(ce, 'ce')}`)
+  console.log(`loggingCallback - CloudEvent dump ${fastify.CloudEventTransformer.dumpObject(ce, 'ce')}`)
 }
 
 function loggingCloseServerCallback () {
@@ -79,7 +79,7 @@ assert(loggingCloseServerCallback !== null)
 
 function raiseEventAtStartServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
-  const ce = new CloudEventUtilityConstructor(gen.next().value,
+  const ce = new CloudEventUtilityConstructor.CloudEvent(gen.next().value,
     `${k.baseNamespace}.server-script.start`,
     k.source,
     {
@@ -92,7 +92,7 @@ function raiseEventAtStartServerScript () {
     }, // data
     k.cloudEventOptions
   )
-  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.dumpObject(ce, 'ce')}`)
+  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.CloudEventTransformer.dumpObject(ce, 'ce')}`)
   // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
 }
 
@@ -108,20 +108,51 @@ fastify.get('/', function (req, reply) {
 fastify.get('/time', async (req, reply) => {
   return { timestamp: Math.floor(Date.now()) }
 })
+// example route, to always generate an error
+fastify.get('/error', async (req, reply) => {
+  reply.code(404)
+  const err = new Error()
+  err.message = 'Error Message'
+  err.statusCode = reply.code
+  err.description = 'Verbose Error description...'
+
+  // as a sample, wrap this error into a CloudEvent ...
+  const path = '/error' // hardcode it, as a simple way to extract
+  const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
+  const errorAsData = fastify.CloudEventTransformer.errorToData(err, {
+    includeStackTrace: true,
+    addStatus: true,
+    addTimestamp: true
+  })
+  const ce = new fastify.CloudEvent(gen.next().value,
+    `${k.baseNamespace}.routes.error`,
+    k.source + path,
+    {
+      ...errorAsData,
+      ...processInfoAsData
+    }, // data
+    k.cloudEventOptions
+  )
+  loggingCallback(ce) // forward generated event to a callback before exiting ...
+
+  return err
+})
 
 fastify.listen(k.port, k.address, (err, address) => {
+  const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
   if (err) {
+    const errorAsData = fastify.CloudEventTransformer.errorToData(err, {
+      includeStackTrace: true,
+      addStatus: true,
+      addTimestamp: true
+    })
     const ce = new fastify.CloudEvent(gen.next().value,
-      `${k.baseNamespace}.error`,
+      `${k.baseNamespace}.listen.error`,
       k.source,
       {
-        timestamp: Math.floor(Date.now()),
-        status: 'error',
-        hostname: hostname,
-        pid: pid,
-        name: err.name,
-        message: err.message,
-        stack: err.stack
+        ...errorAsData,
+        ...processInfoAsData,
+        port: address
       }, // data
       k.cloudEventOptions
     )
@@ -135,8 +166,8 @@ fastify.listen(k.port, k.address, (err, address) => {
     {
       timestamp: Math.floor(Date.now()),
       status: 'listening',
-      hostname: hostname,
-      pid: pid
+      ...processInfoAsData,
+      port: address
     }, // data
     k.cloudEventOptions
   )
@@ -144,18 +175,19 @@ fastify.listen(k.port, k.address, (err, address) => {
 })
 
 fastify.ready((err) => {
+  const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
   if (err) {
+    const errorAsData = fastify.CloudEventTransformer.errorToData(err, {
+      includeStackTrace: true,
+      addStatus: true,
+      addTimestamp: true
+    })
     const ce = new fastify.CloudEvent(gen.next().value,
-      `${k.baseNamespace}.error`,
+      `${k.baseNamespace}.ready.error`,
       k.source,
       {
-        timestamp: Math.floor(Date.now()),
-        status: 'error',
-        hostname: hostname,
-        pid: pid,
-        name: err.name,
-        message: err.message,
-        stack: err.stack
+        ...errorAsData,
+        ...processInfoAsData
       }, // data
       k.cloudEventOptions
     )
@@ -170,8 +202,7 @@ fastify.ready((err) => {
     {
       timestamp: Math.floor(Date.now()),
       status: 'ready',
-      hostname: hostname,
-      pid: pid
+      ...processInfoAsData
     }, // data
     k.cloudEventOptions
   )
