@@ -23,7 +23,7 @@ const fastifyCloudevents = require('../src/plugin')
 
 /** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(4)
+  t.plan(8)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
@@ -31,14 +31,31 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   fastify.listen(0, (err, address) => {
     t.error(err)
 
-    // ensure CloudEvent constructor function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('CloudEvent'))
-    const CloudEvent = fastify.CloudEvent
-    // optional, add some assertions with standard Node.js assert statements, as a sample
-    assert(CloudEvent !== null)
-    assert(typeof CloudEvent === 'function')
-    t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
+    {
+      // ensure CloudEvent class exist in Fastify decorators ...
+      t.ok(fastify.hasDecorator('CloudEvent'))
+      const CloudEvent = fastify.CloudEvent
+      // optional, add some assertions with standard Node.js assert statements, as a sample
+      assert(CloudEvent !== null)
+      assert(typeof CloudEvent === 'function')
+      t.ok(CloudEvent)
+      t.strictEqual(typeof CloudEvent, 'function')
+    }
+
+    {
+      // ensure CloudEventTransformer class exist in Fastify decorators ...
+      t.ok(fastify.hasDecorator('CloudEventTransformer'))
+      const CloudEventTransformer = fastify.CloudEventTransformer
+      assert(CloudEventTransformer !== null)
+      assert(typeof CloudEventTransformer === 'function')
+      t.ok(CloudEventTransformer)
+      t.strictEqual(typeof CloudEventTransformer, 'function')
+    }
+
+    {
+      const ceSerializeFast = fastify.cloudEventSerializeFast
+      t.ok(ceSerializeFast)
+    }
   })
 })
 
