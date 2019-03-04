@@ -1,9 +1,10 @@
 # Change Log
 
-## [0.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.3.0) (unreleased)
+## [0.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.3.0) (2019-03-04)
 Summary Changelog:
 - Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.3.0', 
-  with some breaking changes (as usual use something like "cloudevent": "^0.3.0")
+  with some breaking changes (as usual for dependency use "cloudevent": "^0.3.0")
+- Update docs and examples to show the usage of plugin features
 - Update all dependencies to latest release
 - Update tests
 

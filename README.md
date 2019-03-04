@@ -44,10 +44,11 @@ fastify.register(require('fastify-cloudevents'), {
 fastify.listen(3000)
 ```
 
-In the [example](./example/) folder there are some simple server scripts
-that uses the plugin (inline but it's the same using it from npm registry),
-`example` is a simple one, and `example-enhanced` is a more complex sample
-to show even how to raise own events (normal an errors).
+In the [example](./example/) folder there are some simple server scripts 
+that uses the plugin (inline but it's the same using it from npm registry): 
+- `example` is a simple one
+- `example-enhanced` is a more complex sample 
+  to show even how to raise own events (normal an errors)
 
 
 ## Requirements
