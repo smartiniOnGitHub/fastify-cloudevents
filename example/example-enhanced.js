@@ -24,7 +24,7 @@ const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
-  serverUrlMode: 'pluginAndRequestUrl', // same behavior as default value, but in this way set in CloudEvent extension object
+  serverUrlMode: 'pluginAndRequestSimplified', // same behavior as default value, but in this way set in CloudEvent extension object
   baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example-enhanced',
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
@@ -106,7 +106,12 @@ fastify.get('/', function (req, reply) {
 })
 // example route, to return current timestamp but in async way
 fastify.get('/time', async (req, reply) => {
-  return { timestamp: Math.floor(Date.now()) }
+  const now = new Date()
+  const timestamp = now.getTime()
+  return {
+    timestamp,
+    time: now.toISOString()
+  }
 })
 // example route, to always generate an error
 fastify.get('/error', async (req, reply) => {

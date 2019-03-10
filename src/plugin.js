@@ -101,7 +101,9 @@ function fastifyCloudEvents (fastify, options, next) {
    * @return {string} the source value to use, as a string
    */
   function buildSourceUrl (url = '') {
-    if (serverUrlMode === null || serverUrlMode === 'pluginAndRequestUrl') {
+    if (serverUrlMode === null || serverUrlMode === 'pluginAndRequestSimplified') {
+      return serverUrl + url.split('?')[0]
+    } else if (serverUrlMode === 'pluginAndRequestUrl') {
       return serverUrl + url
     } else if (serverUrlMode === 'pluginServerUrl') {
       return serverUrl

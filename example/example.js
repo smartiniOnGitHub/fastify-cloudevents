@@ -70,7 +70,12 @@ fastify.get('/', function (req, reply) {
 })
 // example route, to return current timestamp but in async way
 fastify.get('/time', async (req, reply) => {
-  return { timestamp: Math.floor(Date.now()) }
+  const now = new Date()
+  const timestamp = now.getTime()
+  return {
+    timestamp,
+    time: now.toISOString()
+  }
 })
 
 fastify.listen(k.port, k.address, (err, address) => {
