@@ -72,9 +72,11 @@ Plugin options are:
   to use as a base `source` in generated CloudEvents
 - `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents 
   (any non null value will cause this setting to be aded to the extension attribute):
-  - null, (default value) same as 'pluginAndRequestUrl'
+  - null, (default value) same as 'pluginAndRequestSimplified'
   - 'pluginServerUrl', use only the given `serverUrl`
   - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
+  - 'pluginAndRequestSimplified', use the given `serverUrl` and add the current request url, 
+    but without arguments (if any)
   - 'requestUrl', use only the request url
   - anything other, will raise an `Error`
 - `baseNamespace`, a base namespace for the `eventType`; more specific suffix 

@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.4.0) (unreleased)
+Summary Changelog:
+- Update docs and examples to show the usage of new plugin features
+- Update all dependencies to latest release, but stay on Fastify v1 for now
+- Update tests
+- In plugin option `serverUrlMode` add a new value (default choice now) 'pluginAndRequestSimplified' 
+  to simplify (remove URL arguments) when building the value for the 'sourceURL' attribute
+- Other small improvements to go towards plugin '1.0.0'
+
 ## [0.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.3.0) (2019-03-04)
 Summary Changelog:
 - Update [cloudevent](https://www.npmjs.com/package/cloudevent) to '0.3.0', 
