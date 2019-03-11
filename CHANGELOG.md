@@ -7,6 +7,8 @@ Summary Changelog:
 - Update tests
 - In plugin option `serverUrlMode` add a new value (default choice now) 'pluginAndRequestSimplified' 
   to simplify (remove URL arguments) when building the value for the 'sourceURL' attribute
+- In serialize function, add a boolean option 'onlyValid' (by default false) to serialize 
+  only a valid CloudEvent instance
 - Other small improvements to go towards plugin '1.0.0'
 
 ## [0.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.3.0) (2019-03-04)

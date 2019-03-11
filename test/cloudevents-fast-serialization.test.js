@@ -164,7 +164,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
 /** @test {fastifyCloudEvents} */
 test('serialize a CloudEvent instance with a non default contentType and empty serialization options, expect error', (t) => {
-  t.plan(10)
+  t.plan(12)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -196,6 +196,10 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
         const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType)
         assert(ceFullOtherContentTypeSerializedFast === null) // never executed
       }, Error, 'Expected exception when serializing the current CloudEvent instance')
+      t.throws(function () {
+        const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType, { onlyValid: true })
+        assert(ceFullOtherContentTypeSerializedFast === null) // never executed
+      }, Error, 'Expected exception when serializing the current CloudEvent instance')
     }
 
     {
@@ -223,6 +227,14 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
         })
         assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
       }, Error, 'Expected exception when serializing the current CloudEvent instance')
+      t.throws(function () {
+        const ceFullOtherContentTypeStrictSerialized = ceSerializeFast(ceFullOtherContentTypeStrict, {
+          encoder: null,
+          encodedData: null,
+          onlyValid: true
+        })
+        assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
+      }, Error, 'Expected exception when serializing the current CloudEvent instance')
     }
   })
 })
@@ -235,7 +247,7 @@ function encoderSample () {
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType and right serialization options, expect success', (t) => {
-  t.plan(13)
+  t.plan(17)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -282,6 +294,21 @@ test('serialize a CloudEvent instance with a non default contentType and right s
         encodedData: constEncodedData
       })
       t.ok(cceFullOtherContentTypeSerialized3)
+      const cceFullOtherContentTypeSerialized4 = ceSerializeFast(ceFullOtherContentType, {
+        encoder: encoderSample,
+        encodedData: constEncodedData,
+        onlyValid: false
+      })
+      t.ok(cceFullOtherContentTypeSerialized4)
+      /*
+      const cceFullOtherContentTypeSerialized5 = ceSerializeFast(ceFullOtherContentType, {
+        encoder: encoderSample,
+        encodedData: constEncodedData,
+        onlyValid: true
+      })
+      t.ok(cceFullOtherContentTypeSerialized5)
+       */
+      t.ok(cceFullOtherContentTypeSerialized4) // TODO: temp ... wip
     }
 
     {
@@ -317,6 +344,21 @@ test('serialize a CloudEvent instance with a non default contentType and right s
         encodedData: constEncodedData
       })
       t.ok(ceFullOtherContentTypeStrictSerialized3)
+      const ceFullOtherContentTypeStrictSerialized4 = ceSerializeFast(ceFullOtherContentTypeStrict, {
+        encoder: encoderSample,
+        encodedData: constEncodedData,
+        onlyValid: false
+      })
+      t.ok(ceFullOtherContentTypeStrictSerialized4)
+      /*
+      const ceFullOtherContentTypeStrictSerialized5 = ceSerializeFast(ceFullOtherContentTypeStrict, {
+        encoder: encoderSample,
+        encodedData: constEncodedData,
+        onlyValid: true
+      })
+      t.ok(ceFullOtherContentTypeStrictSerialized5)
+       */
+      t.ok(ceFullOtherContentTypeStrictSerialized4) // TODO: temp ... wip
     }
   })
 })
@@ -379,7 +421,7 @@ const ceCommonNestedData = {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
-  t.plan(39)
+  t.plan(43)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -432,6 +474,11 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.notEqual(dataShallowClone, ceFull.data)
       t.strictNotSame(dataShallowClone, ceFull.data)
       t.notEqual(dataShallowClone, ceFull.payload)
+
+      const ceFullSerializedOnlyValidFalse = ceSerializeFast(ceFull, { onlyValid: false })
+      t.ok(ceFullSerializedOnlyValidFalse)
+      const ceFullSerializedOnlyValidTrue = ceSerializeFast(ceFull, { onlyValid: true })
+      t.ok(ceFullSerializedOnlyValidTrue)
     }
 
     {
@@ -475,6 +522,11 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
       t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
       t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+
+      const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { onlyValid: false })
+      t.ok(ceFullStrictSerializedOnlyValidFalse)
+      const ceFullStrictSerializedOnlyValidTrue = ceSerializeFast(ceFullStrict, { onlyValid: true })
+      t.ok(ceFullStrictSerializedOnlyValidTrue)
     }
   })
 })
