@@ -247,7 +247,7 @@ function encoderSample () {
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType and right serialization options, expect success', (t) => {
-  t.plan(17)
+  t.plan(29)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -275,16 +275,19 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       assert(ceFullOtherContentType !== null)
       t.ok(ceFullOtherContentType)
       t.ok(ceFullOtherContentType.isValid())
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       // test different combinations of serialization options
       // note that if given, encoder function has priority over encoded data
       const cceFullOtherContentTypeSerialized1 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample
       })
       t.ok(cceFullOtherContentTypeSerialized1)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const cceFullOtherContentTypeSerialized2 = ceSerializeFast(ceFullOtherContentType, {
         encodedData: `<data "hello"="world" "year"="2018" />`
       })
       t.ok(cceFullOtherContentTypeSerialized2)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const constEncodedData = `<data "constant"="encoded" />`
       const cceFullOtherContentTypeSerialized3 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
@@ -294,21 +297,21 @@ test('serialize a CloudEvent instance with a non default contentType and right s
         encodedData: constEncodedData
       })
       t.ok(cceFullOtherContentTypeSerialized3)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const cceFullOtherContentTypeSerialized4 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
         encodedData: constEncodedData,
         onlyValid: false
       })
       t.ok(cceFullOtherContentTypeSerialized4)
-      /*
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const cceFullOtherContentTypeSerialized5 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
         encodedData: constEncodedData,
         onlyValid: true
       })
       t.ok(cceFullOtherContentTypeSerialized5)
-       */
-      t.ok(cceFullOtherContentTypeSerialized4) // TODO: temp ... wip
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     }
 
     {
@@ -325,16 +328,19 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       assert(ceFullOtherContentTypeStrict !== null)
       t.ok(ceFullOtherContentTypeStrict)
       t.ok(ceFullOtherContentTypeStrict.isValid())
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       // test different combinations of serialization options
       // note that if given, encoder function has priority over encoded data
       const ceFullOtherContentTypeStrictSerialized1 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample
       })
       t.ok(ceFullOtherContentTypeStrictSerialized1)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       const ceFullOtherContentTypeStrictSerialized2 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encodedData: `<data "hello"="world" "year"="2018" />`
       })
       t.ok(ceFullOtherContentTypeStrictSerialized2)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       const constEncodedData = `<data "constant"="encoded" />`
       const ceFullOtherContentTypeStrictSerialized3 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
@@ -344,13 +350,16 @@ test('serialize a CloudEvent instance with a non default contentType and right s
         encodedData: constEncodedData
       })
       t.ok(ceFullOtherContentTypeStrictSerialized3)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       const ceFullOtherContentTypeStrictSerialized4 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
         onlyValid: false
       })
       t.ok(ceFullOtherContentTypeStrictSerialized4)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       /*
+      // TODO: temporarily disabled until a fix in loudEvent library will fix this behavior ... wip
       const ceFullOtherContentTypeStrictSerialized5 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
@@ -358,7 +367,8 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       })
       t.ok(ceFullOtherContentTypeStrictSerialized5)
        */
-      t.ok(ceFullOtherContentTypeStrictSerialized4) // TODO: temp ... wip
+      t.ok(ceFullOtherContentTypeStrictSerialized4) // TODO: temporarily enabled, but to remove later ... wip
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     }
   })
 })

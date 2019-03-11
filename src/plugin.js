@@ -92,7 +92,11 @@ function fastifyCloudEvents (fastify, options, next) {
     if (typeof encodedData !== 'string') {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    const newEvent = { ...event, data: encodedData }
+    const newEvent = {
+      ...event,
+      data: encodedData,
+      __proto__: CloudEvent.prototype // set the right prototype in the clone
+    }
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return stringify(newEvent)
     } else {
