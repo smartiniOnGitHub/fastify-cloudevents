@@ -17,7 +17,6 @@
 
 const assert = require('assert')
 const test = require('tap').test
-// const sget = require('simple-get').concat
 const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
@@ -166,9 +165,15 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   })
 })
 
+// sample decoding function, to use in tests here
+function decoderSample () {
+  // return { hello: 'world', year: 2018 }
+  return { decoded: 'Sample' }
+}
+
 /** @test {CloudEvent} */
-test('serialize a CloudEvent instance with a non default contentType, and ensure they are right', (t) => {
-  t.plan(9)
+test('serialize/deserialize a CloudEvent instance with a non default contentType, and ensure they are right', (t) => {
+  t.plan(23)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -179,46 +184,105 @@ test('serialize a CloudEvent instance with a non default contentType, and ensure
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
 
-    // create an instance with non default contentType (other options default): expected success ...
-    // but when I try to serialize it, expect to have an error raised ...
-    const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      {
-        contentType: 'application/xml'
-      }
-    )
-    assert(ceFullOtherContentType !== null)
-    t.ok(ceFullOtherContentType)
-    t.ok(ceFullOtherContentType.isValid())
-    t.throws(function () {
-      const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-      assert(ceFullStrictSerialized === null) // never executed
-    }, Error, 'Expected exception when serializing the current CloudEvent instance')
-
-    // the same but with strict mode enabled ...
-    const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      {
-        ...ceCommonOptionsStrict,
-        contentType: 'application/xml'
-      }
-    )
-    assert(ceFullOtherContentTypeStrict !== null)
-    t.ok(ceFullOtherContentTypeStrict)
-    t.ok(ceFullOtherContentTypeStrict.isValid())
     const fixedEncodedData = `<data "fixed"="encoded" />`
-    const ceFullOtherContentTypeStrictSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-      // encoder: encoderSample,
-      encodedData: fixedEncodedData,
-      onlyValid: true
-    })
-    t.ok(ceFullOtherContentTypeStrictSerialized5)
-    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
+    const fixedDecodedData = { fixed: 'encoded' }
+
+    {
+      // serialization tests
+      // create an instance with non default contentType (other options default): expected success ...
+      const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        {
+          contentType: 'application/xml'
+        }
+      )
+      assert(ceFullOtherContentType !== null)
+      t.ok(ceFullOtherContentType)
+      t.ok(ceFullOtherContentType.isValid())
+      t.ok(!ceFullOtherContentType.isValid({ strict: true }))
+      // when I try to serialize it (without serialization options), expect to have an error raised ...
+      t.throws(function () {
+        const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
+        assert(ceFullOtherContentTypeSerialized === null) // never executed
+      }, Error, 'Expected exception when serializing the current CloudEvent instance')
+      // when I try to serialize it (with right serialization options), expect success ...
+      const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize({
+        // encoder: encoderSample,
+        encodedData: fixedEncodedData,
+        onlyValid: true
+      })
+      assert(ceFullOtherContentTypeSerialized !== null)
+      t.ok(ceFullOtherContentTypeSerialized)
+
+      // deserialization tests
+      const serialized = ceFullOtherContentTypeSerialized
+      // when I try to deserialize it (without deserialization options), expect to have an error raised ...
+      t.throws(function () {
+        const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized)
+        assert(ceFullOtherContentTypeDeserialized1 === null) // never executed
+      }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      // when I try to serialize it (with right serialization options), expect success ...
+      const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
+        decodedData: { hello: 'world', year: 2018 }
+      })
+      t.ok(ceFullOtherContentTypeDeserialized2)
+      const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
+        decoder: decoderSample,
+        decodedData: fixedDecodedData,
+        onlyValid: true
+      })
+      t.ok(ceFullOtherContentTypeDeserialized5)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: false }))
+      t.ok(!CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: true }))
+      t.ok(CloudEvent.isCloudEvent(ceFullOtherContentTypeDeserialized5))
+    }
+
+    {
+      // the same but with strict mode enabled ...
+      // serialization tests
+      const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        {
+          ...ceCommonOptionsStrict,
+          contentType: 'application/xml'
+        }
+      )
+      assert(ceFullOtherContentTypeStrict !== null)
+      t.ok(ceFullOtherContentTypeStrict)
+      t.ok(ceFullOtherContentTypeStrict.isValid())
+      t.ok(ceFullOtherContentTypeStrict.isValid({ strict: true }))
+      const ceFullOtherContentTypeStrictSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+        // encoder: encoderSample,
+        encodedData: fixedEncodedData,
+        onlyValid: true
+      })
+      t.ok(ceFullOtherContentTypeStrictSerialized5)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
+
+      // deserialization tests
+      const serialized = ceFullOtherContentTypeStrictSerialized5
+      // when I try to deserialize it (without deserialization options), expect to have an error raised ...
+      t.throws(function () {
+        const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized)
+        assert(ceFullOtherContentTypeDeserialized1 === null) // never executed
+      }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      // when I try to serialize it (with right serialization options), expect success ...
+      const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
+        decodedData: { hello: 'world', year: 2018 }
+      })
+      t.ok(ceFullOtherContentTypeDeserialized2)
+      const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
+        decoder: decoderSample,
+        decodedData: fixedDecodedData,
+        onlyValid: true
+      })
+      t.ok(ceFullOtherContentTypeDeserialized5)
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: true }))
+      t.ok(CloudEvent.isCloudEvent(ceFullOtherContentTypeDeserialized5))
+    }
   })
 })
-
-// TODO: add similar tests but for deserialize ... wip
