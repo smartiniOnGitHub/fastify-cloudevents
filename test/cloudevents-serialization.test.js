@@ -70,7 +70,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(41)
+  t.plan(45)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -86,82 +86,105 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     const ceSerialize = CloudEvent.serializeEvent
     t.ok(ceSerialize)
 
-    // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
-    // note that null values are not handled by default values, only undefined values ...
-    const ceFull = new CloudEvent('1/full/sample-data/no-strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptions
-    )
-    assert(ceFull !== null)
-    t.ok(ceFull)
-    t.ok(ceFull.isValid())
-    t.ok(ceFull.validate().length === 0)
-    t.ok(ceFull.validate({ strict: false }).length === 0)
-    t.ok(ceFull.validate({ strict: true }).length === 0)
-    t.ok(CloudEvent.isValidEvent(ceFull))
-    t.ok(CloudEvent.validateEvent(ceFull).length === 0)
-    t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-    t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+    {
+      // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
+      // note that null values are not handled by default values, only undefined values ...
+      const ceFull = new CloudEvent('1/full/sample-data/no-strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        ceCommonOptions
+      )
+      assert(ceFull !== null)
+      t.ok(ceFull)
+      t.ok(ceFull.isValid())
+      t.ok(ceFull.validate().length === 0)
+      t.ok(ceFull.validate({ strict: false }).length === 0)
+      t.ok(ceFull.validate({ strict: true }).length === 0)
+      t.ok(CloudEvent.isValidEvent(ceFull))
+      t.ok(CloudEvent.validateEvent(ceFull).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
 
-    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-    t.ok(ceFullSerializedStatic)
-    const ceFullSerialized = ceFull.serialize()
-    t.ok(ceFullSerialized)
-    assert(ceFullSerializedStatic === ceFullSerialized)
-    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
-    // const ceSerialize = CloudEvent.serializeEvent
-    assert(ceSerialize !== null)
-    t.ok(ceSerialize)
-    const ceFullSerializedFunction = ceSerialize(ceFull)
-    t.ok(ceFullSerializedFunction)
-    t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
-    t.strictSame(ceFullSerializedFunction, ceFullSerialized)
+      const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+      t.ok(ceFullSerializedStatic)
+      const ceFullSerialized = ceFull.serialize()
+      t.ok(ceFullSerialized)
+      assert(ceFullSerializedStatic === ceFullSerialized)
+      t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+      // const ceSerialize = CloudEvent.serializeEvent
+      assert(ceSerialize !== null)
+      t.ok(ceSerialize)
+      const ceFullSerializedFunction = ceSerialize(ceFull)
+      t.ok(ceFullSerializedFunction)
+      t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
+      t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-    const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullSerialized, ceFullSerializedComparison)
-    const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-    ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-    t.same(ceFull, ceFullDeserialized)
+      const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+      t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+      const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+      ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      t.same(ceFull, ceFullDeserialized)
+    }
 
-    // the same but with strict mode enabled ...
-    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptionsStrict
-    )
-    assert(ceFullStrict !== null)
-    t.ok(ceFullStrict)
-    t.ok(ceFullStrict.isValid())
-    t.ok(ceFullStrict.validate().length === 0)
-    t.ok(ceFullStrict.validate({ strict: true }).length === 0)
-    t.ok(ceFullStrict.validate({ strict: false }).length === 0)
-    t.ok(CloudEvent.isValidEvent(ceFullStrict))
-    t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
-    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+    {
+      // the same but with strict mode enabled ...
+      const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        ceCommonOptionsStrict
+      )
+      assert(ceFullStrict !== null)
+      t.ok(ceFullStrict)
+      t.ok(ceFullStrict.isValid())
+      t.ok(ceFullStrict.validate().length === 0)
+      t.ok(ceFullStrict.validate({ strict: true }).length === 0)
+      t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+      t.ok(CloudEvent.isValidEvent(ceFullStrict))
+      t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 
-    const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
-    t.ok(ceFullStrictSerializedStatic)
-    const ceFullStrictSerialized = ceFullStrict.serialize()
-    t.ok(ceFullStrictSerialized)
-    assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
-    t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
-    // const ceSerialize = CloudEvent.serializeEvent
-    assert(ceSerialize !== null)
-    t.ok(ceSerialize)
-    const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
-    t.ok(ceFullStrictSerializedFunction)
-    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
-    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
+      const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+      t.ok(ceFullStrictSerializedStatic)
+      const ceFullStrictSerialized = ceFullStrict.serialize()
+      t.ok(ceFullStrictSerialized)
+      assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
+      t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
+      // const ceSerialize = CloudEvent.serializeEvent
+      assert(ceSerialize !== null)
+      t.ok(ceSerialize)
+      const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
+      t.ok(ceFullStrictSerializedFunction)
+      t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
+      t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-    const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
-    t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
-    const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-    ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-    t.same(ceFullStrict, ceFullStrictDeserialized)
+      const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+      t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+      const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+      ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      t.same(ceFullStrict, ceFullStrictDeserialized)
+    }
+
+    {
+      // additional tests, with bad objects ...
+      const ceFullBad = new CloudEvent(null,
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        ceCommonOptions
+      )
+      assert(ceFullBad !== null)
+      t.ok(ceFullBad)
+      t.ok(!ceFullBad.isValid())
+      const ceFullBadSerializedOnlyValidFalse = ceSerialize(ceFullBad, { onlyValid: false })
+      t.ok(ceFullBadSerializedOnlyValidFalse)
+      t.throws(function () {
+        const ceFullBadSerializedOnlyValidTrue = ceSerialize(ceFullBad, { onlyValid: true })
+        assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
+      }, Error, 'Expected exception when serializing a bad CloudEvent instance')
+    }
   })
 })
 
