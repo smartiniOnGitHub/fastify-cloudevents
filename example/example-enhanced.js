@@ -41,7 +41,7 @@ const pid = require('process').pid
 function * idMakerExample () {
   const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
   while (true) {
-    const timestamp = Math.floor(Date.now())
+    const timestamp = Date.now()
     yield `${idPrefix}@${timestamp}`
   }
 }
@@ -122,7 +122,7 @@ fastify.get('/error', async (req, reply) => {
   err.description = 'Verbose Error description...'
 
   // as a sample, wrap this error into a CloudEvent ...
-  const path = '/error' // hardcode it, as a simple way to extract
+  const path = '/error' // hardcode current url path, as a simple way to have it
   const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
   const errorAsData = fastify.CloudEventTransformer.errorToData(err, {
     includeStackTrace: true,
