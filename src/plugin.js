@@ -92,8 +92,8 @@ function fastifyCloudEvents (fastify, options, next) {
     if (typeof encodedData !== 'string') {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    const newEvent = fastify.CloudEventTransformer.mergeObjects(event, { data: encodedData })
-    // console.log(`DEBUG - new event details: ${fastify.CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
+    const newEvent = CloudEventTransformer.mergeObjects(event, { data: encodedData })
+    // console.log(`DEBUG - new event details: ${CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return stringify(newEvent)
     } else {
@@ -114,7 +114,7 @@ function fastifyCloudEvents (fastify, options, next) {
    */
   function buildSourceUrl (url = '') {
     if (serverUrlMode === null || serverUrlMode === 'pluginAndRequestSimplified') {
-      return serverUrl + url.split('?')[0]
+      return serverUrl + CloudEventTransformer.uriStripArguments(url)
     } else if (serverUrlMode === 'pluginAndRequestUrl') {
       return serverUrl + url
     } else if (serverUrlMode === 'pluginServerUrl') {
@@ -169,7 +169,7 @@ function fastifyCloudEvents (fastify, options, next) {
         sourceUrl,
         {
           id: req.id,
-          timestamp: Math.floor(Date.now()),
+          timestamp: CloudEventTransformer.timestampToNumber(),
           req: {
             httpVersion: req.httpVersion,
             id: req.id,
@@ -184,7 +184,7 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
-      // console.log(`DEBUG - onRequest: created CloudEvent ${fastify.CloudEventTransformer.dumpObject(ce, 'ce')}`)
+      // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
 
@@ -202,7 +202,7 @@ function fastifyCloudEvents (fastify, options, next) {
         sourceUrl,
         {
           id: request.id,
-          timestamp: Math.floor(Date.now()),
+          timestamp: CloudEventTransformer.timestampToNumber(),
           request: {
             id: request.id,
             headers: headers,
@@ -237,7 +237,7 @@ function fastifyCloudEvents (fastify, options, next) {
         sourceUrl,
         {
           id: request.id,
-          timestamp: Math.floor(Date.now()),
+          timestamp: CloudEventTransformer.timestampToNumber(),
           request: {
             id: request.id,
             headers: headers,
@@ -271,7 +271,7 @@ function fastifyCloudEvents (fastify, options, next) {
         sourceUrl,
         {
           // id: res.id, // not available
-          timestamp: Math.floor(Date.now()),
+          timestamp: CloudEventTransformer.timestampToNumber(),
           res: {
             statusCode: res.statusCode,
             statusMessage: res.statusMessage,
@@ -307,7 +307,7 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onClose`,
         sourceUrl,
         {
-          timestamp: Math.floor(Date.now()),
+          timestamp: CloudEventTransformer.timestampToNumber(),
           description: 'plugin shutdown'
         }, // data
         cloudEventOptions
@@ -325,7 +325,7 @@ function fastifyCloudEvents (fastify, options, next) {
       `${baseNamespace}.ready`,
       sourceUrl,
       {
-        timestamp: Math.floor(Date.now()),
+        timestamp: CloudEventTransformer.timestampToNumber(),
         description: 'plugin startup successfully',
         version: pluginVersion
       }, // data
@@ -365,7 +365,7 @@ const hostname = require('os').hostname()
 const idPrefix = `fastify@${hostname}`
 function * idMaker () {
   while (true) {
-    const timestamp = Math.floor(Date.now())
+    const timestamp = CloudEventTransformer.timestampToNumber()
     yield `${idPrefix}@${timestamp}`
   }
 }
