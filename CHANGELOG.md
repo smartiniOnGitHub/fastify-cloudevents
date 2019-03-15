@@ -1,15 +1,17 @@
 # Change Log
 
-## [0.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.4.0) (unreleased)
+## [0.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.4.0) (2019-03-16)
 Summary Changelog:
 - Update docs and examples to show the usage of new plugin features
 - Update all dependencies to latest release, but stay on Fastify v1 for now
-- Update tests
 - In plugin option `serverUrlMode` add a new value (default choice now) 'pluginAndRequestSimplified' 
   to simplify (remove URL arguments) when building the value for the 'sourceURL' attribute
 - In serialize function, add a boolean option 'onlyValid' (by default false) to serialize 
   only a valid CloudEvent instance
+- Remove some inline logic and instead use methods exposed by Transformer (from the CloudEvent library)
 - Other small improvements to go towards plugin '1.0.0'
+- Update tests due to some behavior (for edge cases) was fixed in the CloudEvent library
+- Improve (a little) test code coverage for functions exposed by the plugin
 
 ## [0.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.3.0) (2019-03-04)
 Summary Changelog:
