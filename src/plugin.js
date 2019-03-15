@@ -70,11 +70,11 @@ function fastifyCloudEvents (fastify, options, next) {
   function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
     ensureIsObject(event, 'event')
 
-    if (event.contentType === 'application/json') {
+    if (event.contentType === CloudEvent.contentTypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return stringify(event)
       } else {
-        throw new Error(`Unable to serialize a not valid CloudDvent.`)
+        throw new Error(`Unable to serialize a not valid CloudEvent.`)
       }
     }
     // else
@@ -92,6 +92,7 @@ function fastifyCloudEvents (fastify, options, next) {
     if (typeof encodedData !== 'string') {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
+    // TODO: change with the new method in Transformer ... wip
     const newEvent = {
       ...event,
       data: encodedData,
@@ -100,7 +101,7 @@ function fastifyCloudEvents (fastify, options, next) {
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return stringify(newEvent)
     } else {
-      throw new Error(`Unable to serialize a not valid CloudDvent.`)
+      throw new Error(`Unable to serialize a not valid CloudEvent.`)
     }
   }
 

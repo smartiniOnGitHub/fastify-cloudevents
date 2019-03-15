@@ -359,7 +359,7 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       t.ok(ceFullOtherContentTypeStrictSerialized4)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       /*
-      // TODO: temporarily disabled until a fix in loudEvent library will fix this behavior ... wip
+      // TODO: temporarily disabled until a fix in CloudEvent library will fix this behavior ... wip
       const ceFullOtherContentTypeStrictSerialized5 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
