@@ -57,6 +57,8 @@ const ceCommonOptions = {
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create a sample namespace for events here, for better reuse in tests */
+const ceNamespace = 'com.github.smartiniOnGitHub.fastify-cloudevents.testevent'
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
@@ -88,7 +90,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
     const ceFull = new CloudEvent('1/full/sample-data/no-strict',
-      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
+      ceNamespace,
       ceServerUrl,
       ceCommonData, // data
       ceCommonOptions
@@ -124,9 +126,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
 
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
+      ceNamespace,
       ceServerUrl,
       ceCommonData, // data
       ceCommonOptionsStrict
@@ -164,10 +166,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   })
 })
 
-// TODO: this is a limit if the current implementation, and will be resolved soon ... wip
 /** @test {CloudEvent} */
-test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
-  t.plan(5)
+test('serialize a CloudEvent instance with a non default contentType, and ensure they are right', (t) => {
+  t.plan(9)
 
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
@@ -181,7 +182,7 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
     // create an instance with non default contentType (other options default): expected success ...
     // but when I try to serialize it, expect to have an error raised ...
     const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
-      'com.github.smartiniOnGitHub.fastify-cloudevents.testevent',
+      ceNamespace,
       ceServerUrl,
       ceCommonData, // data
       {
@@ -191,11 +192,33 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
     assert(ceFullOtherContentType !== null)
     t.ok(ceFullOtherContentType)
     t.ok(ceFullOtherContentType.isValid())
-    // const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-    // t.ok(ceFullStrictSerialized)
     t.throws(function () {
       const ceFullStrictSerialized = ceFullOtherContentType.serialize()
       assert(ceFullStrictSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
+
+    // the same but with strict mode enabled ...
+    const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData, // data
+      {
+        ...ceCommonOptionsStrict,
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentTypeStrict !== null)
+    t.ok(ceFullOtherContentTypeStrict)
+    t.ok(ceFullOtherContentTypeStrict.isValid())
+    const fixedEncodedData = `<data "fixed"="encoded" />`
+    const ceFullOtherContentTypeStrictSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+      // encoder: encoderSample,
+      encodedData: fixedEncodedData,
+      onlyValid: true
+    })
+    t.ok(ceFullOtherContentTypeStrictSerialized5)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
   })
 })
+
+// TODO: add similar tests but for deserialize ... wip

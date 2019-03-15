@@ -130,7 +130,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     ceFullDeserializedFast.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
     t.same(ceFull, ceFullDeserializedFast)
 
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -203,7 +203,7 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
     }
 
     {
-      // the same with with strict mode enabled ...
+      // the same but with strict mode enabled ...
       const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
         ceNamespace,
         ceServerUrl,
@@ -315,7 +315,7 @@ test('serialize a CloudEvent instance with a non default contentType and right s
     }
 
     {
-      // the same with with strict mode enabled ...
+      // the same but with strict mode enabled ...
       const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
         ceNamespace,
         ceServerUrl,
@@ -358,16 +358,12 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       })
       t.ok(ceFullOtherContentTypeStrictSerialized4)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-      /*
-      // TODO: temporarily disabled until a fix in CloudEvent library will fix this behavior ... wip
       const ceFullOtherContentTypeStrictSerialized5 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
         onlyValid: true
       })
       t.ok(ceFullOtherContentTypeStrictSerialized5)
-       */
-      t.ok(ceFullOtherContentTypeStrictSerialized4) // TODO: temporarily enabled, but to remove later ... wip
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     }
   })
@@ -492,7 +488,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     }
 
     {
-      // the same with with strict mode enabled ...
+      // the same but with strict mode enabled ...
       const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
         ceNamespace,
         ceServerUrl,

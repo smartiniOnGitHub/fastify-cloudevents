@@ -304,7 +304,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceIsValid(ceFullDataUndefined, { strict: false }))
     t.strictSame(ceValidate(ceFullDataUndefined), [])
     t.strictSame(ceValidate(ceFullDataUndefined, { strict: false }).length, 0)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceServerUrl,
@@ -332,7 +332,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceIsValid(ceFullDataNull, { strict: false }))
     t.strictSame(ceValidate(ceFullDataNull), [])
     t.strictSame(ceValidate(ceFullDataNull, { strict: false }).length, 0)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceServerUrl,
@@ -360,7 +360,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceIsValid(ceFullDataString, { strict: false }))
     t.strictSame(ceValidate(ceFullDataString), [])
     t.strictSame(ceValidate(ceFullDataString, { strict: false }).length, 0)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceServerUrl,
@@ -389,7 +389,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceIsValid(ceFullDataMap, { strict: false }))
     t.strictSame(ceValidate(ceFullDataMap), []) // data type errors handled only in strict mode currently ...
     t.strictSame(ceValidate(ceFullDataMap, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
       'org.fastify.plugins.cloudevents.testevent',
       ceServerUrl,

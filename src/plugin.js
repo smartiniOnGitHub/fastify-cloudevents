@@ -92,12 +92,8 @@ function fastifyCloudEvents (fastify, options, next) {
     if (typeof encodedData !== 'string') {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    // TODO: change with the new method in Transformer ... wip
-    const newEvent = {
-      ...event,
-      data: encodedData,
-      __proto__: CloudEvent.prototype // set the right prototype in the clone
-    }
+    const newEvent = fastify.CloudEventTransformer.mergeObjects(event, { data: encodedData })
+    // console.log(`DEBUG - new event details: ${fastify.CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return stringify(newEvent)
     } else {
