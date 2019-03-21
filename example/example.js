@@ -87,7 +87,7 @@ fastify.listen(k.port, k.address, (err, address) => {
     `${k.baseNamespace}.listen`,
     k.source,
     {
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       status: 'listening',
       hostname: hostname,
       pid: pid
@@ -107,7 +107,7 @@ fastify.ready((err) => {
     `${k.baseNamespace}.ready`,
     k.source,
     {
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       status: 'ready',
       hostname: hostname,
       pid: pid

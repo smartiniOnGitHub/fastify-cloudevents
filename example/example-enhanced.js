@@ -83,7 +83,7 @@ function raiseEventAtStartServerScript () {
     `${k.baseNamespace}.server-script.start`,
     k.source,
     {
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       description: 'Fastify server startup begin',
       version: fastifyVersion,
       status: 'starting',
@@ -169,7 +169,7 @@ fastify.listen(k.port, k.address, (err, address) => {
     `${k.baseNamespace}.listen`,
     k.source,
     {
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       status: 'listening',
       ...processInfoAsData,
       port: address
@@ -205,7 +205,7 @@ fastify.ready((err) => {
     `${k.baseNamespace}.ready`,
     k.source,
     {
-      timestamp: Math.floor(Date.now()),
+      timestamp: Date.now(),
       status: 'ready',
       ...processInfoAsData
     }, // data
