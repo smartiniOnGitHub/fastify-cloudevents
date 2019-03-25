@@ -23,6 +23,9 @@
 # Yarn Integrity file
 .yarn-integrity
 
+# Clinic analysis/results
+.clinic
+
 # Logs
 logs
 *.log
