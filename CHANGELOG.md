@@ -10,6 +10,7 @@ Summary Changelog:
   [autocannon](https://www.npmjs.com/package/autocannon), 
   to ensure that there aren't memory leaks, slowness, or other problems
 - Small updates in code and examples
+- Pin dependency on cloudevent to '0.4.x'
 
 ## [0.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.4.0) (2019-03-16)
 Summary Changelog:
