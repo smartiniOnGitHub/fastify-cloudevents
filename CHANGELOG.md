@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/1.0.0) (2019-03-26)
+Summary Changelog:
+- Updated all dependencies
+- Note that this release number means that the plugin is stable, 
+  and for Fastify v1
+- Test example server scripts under load, using 
+  [clinic](https://www.npmjs.com/package/clinic) and 
+  [autocannon](https://www.npmjs.com/package/autocannon), 
+  to ensure that there aren't memory leaks, slowness, or other problems
+- Small updates in code and examples
+
 ## [0.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/0.4.0) (2019-03-16)
 Summary Changelog:
 - Update docs and examples to show the usage of new plugin features
