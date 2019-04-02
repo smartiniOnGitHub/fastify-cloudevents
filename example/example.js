@@ -47,11 +47,17 @@ fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
   idGenerator: gen,
   onRequestCallback: loggingCallback,
+  // TODO: once all works, remove some not-so-common callbacks from this example (and keep only in the enhanced example) ... wip
+  preParsingCallback: loggingCallback, // to remove
+  preValidationCallback: loggingCallback, // to remove
   preHandlerCallback: loggingCallback,
-  onSendCallback: loggingCallback,
+  preSerializationCallback: loggingCallback, // to remove
+  onErrorCallback: loggingCallback,
+  onSendCallback: loggingCallback, // to remove
   onResponseCallback: loggingCallback,
-  onRouteCallback: loggingCallback,
   onCloseCallback: loggingCallback,
+  onRouteCallback: loggingCallback, // to remove
+  onRegisterCallback: loggingCallback, // to remove
   onReadyCallback: loggingCallback,
   cloudEventOptions: k.cloudEventOptions
 })

@@ -53,9 +53,8 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^1.1.0 , Node.js 8.15.x or later.
-Note that plugin releases 0.x and 1.x are for Fastify 1.x, 
-plugin releases 2.x are for Fastify 2.x, etc.
+Fastify ^2.1.0 , Node.js 8.15.x or later.
+Note that plugin releases 2.x are for Fastify 2.x, etc.
 
 
 ## Note
@@ -84,13 +83,19 @@ Plugin options are:
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag that when `true` tells that request headers will be put 
   in generated CloudEvents (but by default is `false`)
-- `onRequestCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRequest`
-- `preHandlerCallback`, callback who will handle the generated CloudEvents, in Fastify hook `preHandler`
-- `onSendCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onSend`
-- `onResponseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onResponse`
-- `onRouteCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRoute`
-- `onCloseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onClose`
-- `onReadyCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onReady`
+- `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
+- `preParsingCallback`, callback to handle generated CloudEvents in Fastify hook `preParsing`
+- `preValidationCallback`, callback to handle generated CloudEvents in Fastify hook `preValidation`
+- `preHandlerCallback`, callback to handle generated CloudEvents in Fastify hook `preHandler`
+- `preSerializationCallback`, callback to handle generated CloudEvents in Fastify hook `preSerialization`
+- `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
+- `onSendCallback`, callback to handle generated CloudEvents in Fastify hook `onSend`
+- `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
+- `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`
+- `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`
+- `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
+- `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready` 
+  (when all plugins have been loaded)
 - `cloudEventOptions`, CloudEvent options common to all generated event instances; 
   anyway objects are copied to not be shared between instances
 

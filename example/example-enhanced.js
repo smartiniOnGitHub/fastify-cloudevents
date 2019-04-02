@@ -59,11 +59,16 @@ fastify.register(require('../src/plugin'), {
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
   onRequestCallback: loggingCallback,
+  preParsingCallback: loggingCallback,
+  preValidationCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
+  preSerializationCallback: loggingCallback,
+  onErrorCallback: loggingCallback,
   onSendCallback: loggingCallback,
   onResponseCallback: loggingCallback,
-  onRouteCallback: loggingCallback,
   onCloseCallback: loggingCallback,
+  onRouteCallback: loggingCallback,
+  onRegisterCallback: loggingCallback,
   onReadyCallback: loggingCallback,
   cloudEventOptions: k.cloudEventOptions
 })
