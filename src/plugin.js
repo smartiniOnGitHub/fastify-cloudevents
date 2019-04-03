@@ -111,8 +111,14 @@ function fastifyCloudEvents (fastify, options, next) {
     }
   }
 
+  // check/finish to setup cloudEventOptions
+  const pluginName = require('../package.json').name // get plugin name
+  const pluginVersion = require('../package.json').version // get plugin version
+
   // references builders, configured with some plugin options
   const builders = require('./builder')({
+    pluginName,
+    pluginVersion,
     serverUrl,
     serverUrlMode,
     // baseNamespace,
@@ -125,9 +131,6 @@ function fastifyCloudEvents (fastify, options, next) {
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
-  // check/finish to setup cloudEventOptions
-  const pluginName = require('../package.json').name // get plugin name
-  const pluginVersion = require('../package.json').version // get plugin version
   // then set as eventTypeVersion if not already specified, could be useful
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = pluginVersion
@@ -236,7 +239,7 @@ function fastifyCloudEvents (fastify, options, next) {
       )
       onErrorCallback(ce)
 
-      next()
+      next() // do not pass the error to the next callback here
     })
   }
 
@@ -289,13 +292,7 @@ function fastifyCloudEvents (fastify, options, next) {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
         builders.buildSourceUrl(),
-        // TODO: refactor into buildPluginDataForCE('description') ... wip
-        {
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          description: 'plugin shutdown',
-          name: pluginName,
-          version: pluginVersion
-        }, // data
+        builders.buildPluginDataForCE('plugin shutdown'), // data
         cloudEventOptions
       )
       onCloseCallback(ce)
@@ -316,19 +313,13 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  // TODO: check the name of the plugin to register, if it's visibe here ... or if it's only for the current plugin (as I think); check by registering another plugin for example (temp) ... wip
+  // TODO: check the name of the plugin to register, if it's visibe here (and how) ... wip
   if (onRegisterCallback !== null) {
     fastify.addHook('onRegister', (instance) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRegister`,
         builders.buildSourceUrl(),
-        // TODO: refactor into buildPluginDataForCE('description') ... wip
-        {
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          description: 'plugin registration',
-          name: pluginName,
-          version: pluginVersion
-        }, // data
+        builders.buildPluginDataForCE('plugin registration'), // data
         cloudEventOptions
       )
       onRegisterCallback(ce)
@@ -340,13 +331,7 @@ function fastifyCloudEvents (fastify, options, next) {
     const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
       builders.buildSourceUrl(),
-      // TODO: refactor into buildPluginDataForCE('description') ... wip
-      {
-        timestamp: CloudEventTransformer.timestampToNumber(),
-        description: 'plugin startup successfully',
-        name: pluginName,
-        version: pluginVersion
-      }, // data
+      builders.buildPluginDataForCE('plugin startup successfully'), // data
       cloudEventOptions
     )
     fastify.ready(onReadyCallback(ce))
