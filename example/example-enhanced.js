@@ -126,6 +126,7 @@ fastify.get('/error', async (req, reply) => {
   err.statusCode = reply.code
   err.description = 'Verbose Error description...'
 
+  // TODO: check if this is still needed, with Fastify v2 new onError hook ... wip
   // as a sample, wrap this error into a CloudEvent ...
   const path = '/error' // hardcode current url path, as a simple way to have it
   const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()

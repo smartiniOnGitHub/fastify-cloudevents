@@ -111,53 +111,14 @@ function fastifyCloudEvents (fastify, options, next) {
     }
   }
 
-  /**
-   * Build the value for the source field of the CloudEvent,
-   * depending on the plugin configuration of options
-   * `serverUrlMode`, `serverUrl`,
-   * and the uri part of the current request.
-   * Note that this is mainly for usage inside the plugin,
-   * but in some cases could be useful even outside.
-   *
-   * @param {string} url the uri part of the current request
-   * @return {string} the source value to use, as a string
-   */
-  function buildSourceUrl (url = '') {
-    let sourceUrl
-    switch (serverUrlMode) {
-      case null:
-      case 'pluginAndRequestSimplified':
-        sourceUrl = serverUrl + CloudEventTransformer.uriStripArguments(url)
-        break
-      case 'pluginAndRequestUrl':
-        sourceUrl = serverUrl + url
-        break
-      case 'pluginServerUrl':
-        sourceUrl = serverUrl
-        break
-      case 'requestUrl':
-        sourceUrl = url
-        break
-      default:
-        throw new Error(`Illegal value for serverUrlMode: '${serverUrlMode}'`)
-    }
-    return sourceUrl
-  }
-
-  /**
-   * Extract and build the value for the client IP address,
-   * useful to add into the CloudEvent in a custom attribute inside data.
-   *
-   * @param {!object} req the request
-   * @return {string} the IP address, as a string
-   */
-  function buildClientIP (req) {
-    if (req === undefined || req === null) {
-      throw new Error('Illegal value for request: undefined or null')
-    }
-    const ip = req.connection.remoteAddress
-    return ip
-  }
+  // references builders, configured with some plugin options
+  const builders = require('./builder')({
+    serverUrl,
+    serverUrlMode,
+    // baseNamespace,
+    // idGenerator,
+    includeHeaders
+  })
 
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
@@ -165,6 +126,7 @@ function fastifyCloudEvents (fastify, options, next) {
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // check/finish to setup cloudEventOptions
+  const pluginName = require('../package.json').name // get plugin name
   const pluginVersion = require('../package.json').version // get plugin version
   // then set as eventTypeVersion if not already specified, could be useful
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
@@ -179,24 +141,29 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = buildSourceUrl(request.url)
-      const clientIp = buildClientIP(request)
+      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         sourceUrl,
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
+          // TODO: refactor into buildRequestDataForCE(request) ... wip
           request: {
-            httpVersion: request.httpVersion,
             id: request.id,
             headers,
-            method: request.method,
+            params: request.params,
+            query: request.query,
+            body: request.body,
+            method: request.req.method,
+            url: request.req.url,
+            clientIp,
+            // },
+            // request: {
+            // TODO: then add even those ... wip
+            httpVersion: request.httpVersion,
             originalUrl: request.originalUrl,
-            upgrade: request.upgrade,
-            url: request.url,
-            clientIp
+            upgrade: request.upgrade
           },
           reply: { }
         }, // data
@@ -222,9 +189,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = buildSourceUrl(request.req.url)
-      const clientIp = buildClientIP(request.req)
+      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         sourceUrl,
@@ -262,14 +227,51 @@ function fastifyCloudEvents (fastify, options, next) {
 
   // TODO: implement ... wip
   if (onErrorCallback !== null) {
-    // fastify.addHook('onError', (request, reply, error, next) => {
+    fastify.addHook('onError', (request, reply, error, next) => {
+      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
+      const processInfoAsData = CloudEventTransformer.processInfoToData()
+      const errorAsData = CloudEventTransformer.errorToData(error, {
+        includeStackTrace: true,
+        addStatus: true,
+        addTimestamp: true
+      })
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onError`,
+        sourceUrl,
+        {
+          id: request.id,
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          // TODO: refactor into buildRequestDataForCE(request) ... wip
+          request: {
+            id: request.id,
+            headers,
+            params: request.params,
+            query: request.query,
+            body: request.body,
+            method: request.req.method,
+            url: request.req.url,
+            clientIp
+          },
+          // TODO: refactor into buildReplyDataForCE(reply) ... wip
+          reply: {
+            statusCode: reply.res.statusCode,
+            statusMessage: reply.res.statusMessage,
+            sent: reply.sent
+          },
+          error: { ...errorAsData },
+          process: { ...processInfoAsData }
+        }, // data
+        cloudEventOptions
+      )
+      onErrorCallback(ce)
+
+      next()
+    })
   }
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = buildSourceUrl(request.req.url)
-      const clientIp = buildClientIP(request.req)
+      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         sourceUrl,
@@ -303,13 +305,13 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
-      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
-        sourceUrl,
+        builders.buildSourceUrl(),
         {
           id: reply.id, // TODO: should be available now, in reply or in request ... wip
           timestamp: CloudEventTransformer.timestampToNumber(),
+          // TODO: refactor into buildReplyDataForCE(reply) ... wip
           reply: {
             statusCode: reply.statusCode,
             statusMessage: reply.statusMessage,
@@ -327,13 +329,15 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
-      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
-        sourceUrl,
+        builders.buildSourceUrl(),
+        // TODO: refactor into buildPluginDataForCE('description') ... wip
         {
           timestamp: CloudEventTransformer.timestampToNumber(),
-          description: 'plugin shutdown'
+          description: 'plugin shutdown',
+          name: pluginName,
+          version: pluginVersion
         }, // data
         cloudEventOptions
       )
@@ -345,10 +349,9 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onRouteCallback !== null) {
     fastify.addHook('onRoute', (routeOptions) => {
-      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRoute`,
-        sourceUrl,
+        builders.buildSourceUrl(),
         routeOptions, // data
         cloudEventOptions
       )
@@ -356,26 +359,40 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  // TODO: implement ... wip
+  // TODO: check the name of the plugin to register, if it's visibe here ... or if it's only for the current plugin (as I think); check by registering another plugin for example (temp) ... wip
   if (onRegisterCallback !== null) {
-    // fastify.addHook('onRegister', (instance) => {
+    fastify.addHook('onRegister', (instance) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onRegister`,
+        builders.buildSourceUrl(),
+        // TODO: refactor into buildPluginDataForCE('description') ... wip
+        {
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          description: 'plugin registration',
+          name: pluginName,
+          version: pluginVersion
+        }, // data
+        cloudEventOptions
+      )
+      onRegisterCallback(ce)
+    })
   }
 
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
-    const sourceUrl = buildSourceUrl()
     const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
-      sourceUrl,
+      builders.buildSourceUrl(),
+      // TODO: refactor into buildPluginDataForCE('description') ... wip
       {
         timestamp: CloudEventTransformer.timestampToNumber(),
         description: 'plugin startup successfully',
+        name: pluginName,
         version: pluginVersion
       }, // data
       cloudEventOptions
     )
     fastify.ready(onReadyCallback(ce))
-    // TODO: update to 'fastify.ready((err) => {', and generate ce accordingly ... wip
   }
 
   next()
