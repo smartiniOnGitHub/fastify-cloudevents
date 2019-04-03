@@ -88,6 +88,24 @@ function builder (options = {}) {
     },
 
     /**
+     * Extract and build the value for the HTTP headers,
+     * useful to add into the CloudEvent in a custom attribute inside data.
+     * If related plugin flag 'includeHeaders' is enabled headers will be returned,
+     * otherwise null.
+     *
+     * @param {!object} request the request
+     * @return {string} HTTP request headers, as a string, or null
+     * @private
+     */
+    buildHeaders: function (request) {
+      if (request === undefined || request === null) {
+        throw new Error('Illegal value for request: undefined or null')
+      }
+      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
+      return headers
+    },
+
+    /**
      * Extract and build values from the given arguments,
      * and returns them inside a wrapper object.
      *
@@ -96,10 +114,49 @@ function builder (options = {}) {
      * @private
      */
     buildValues: function (request) {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = this.buildSourceUrl(request.url)
       const clientIp = this.buildClientIP(request)
-      return { headers, clientIp, sourceUrl }
+      const headers = this.buildHeaders(request.headers)
+      const sourceUrl = this.buildSourceUrl(request.url)
+      return { clientIp, headers, sourceUrl }
+    },
+
+    /**
+     * Extract some values from the given arguments,
+     * and returns them inside a wrapper object
+     * to be used in a CloudEvent data (sub-)property.
+     *
+     * @param {!object} request the request
+     * @return {object} an object containing extracted attributes
+     * @private
+     */
+    buildRequestDataForCE: function (request) {
+      return {
+        id: request.id,
+        // headers,
+        // clientIp,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+        method: request.req.method,
+        url: request.req.url
+      }
+    },
+
+    /**
+     * Extract some values from the given arguments,
+     * and returns them inside a wrapper object
+     * to be used in a CloudEvent data (sub-)property.
+     *
+     * @param {!object} reply the reply
+     * @return {object} an object containing extracted attributes
+     * @private
+     */
+    buildReplyDataForCE: function (reply) {
+      return {
+        statusCode: reply.statusCode,
+        statusMessage: reply.statusMessage,
+        finished: reply.finished
+      }
     }
   }
 }

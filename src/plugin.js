@@ -148,22 +148,14 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          // TODO: refactor into buildRequestDataForCE(request) ... wip
           request: {
-            id: request.id,
-            headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
+            ...builders.buildRequestDataForCE(request),
+            headers, // TODO: then return even headers, clientIp from the previous method and remove these ... wip
             clientIp,
-            // },
-            // request: {
-            // TODO: then add even those ... wip
-            httpVersion: request.httpVersion,
-            originalUrl: request.originalUrl,
-            upgrade: request.upgrade
+            // add even request specific data that makes sense only here
+            httpVersion: request.req.httpVersion,
+            originalUrl: request.req.originalUrl,
+            upgrade: request.req.upgrade
           },
           reply: { }
         }, // data
@@ -197,20 +189,11 @@ function fastifyCloudEvents (fastify, options, next) {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: {
-            id: request.id,
+            ...builders.buildRequestDataForCE(request),
             headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
             clientIp
           },
-          reply: {
-            statusCode: reply.res.statusCode,
-            statusMessage: reply.res.statusMessage,
-            sent: reply.sent
-          }
+          reply: builders.buildReplyDataForCE(reply)
         }, // data
         cloudEventOptions
       )
@@ -225,7 +208,6 @@ function fastifyCloudEvents (fastify, options, next) {
     // fastify.addHook('preSerialization', (request, reply, payload, next) => {
   }
 
-  // TODO: implement ... wip
   if (onErrorCallback !== null) {
     fastify.addHook('onError', (request, reply, error, next) => {
       const { headers, clientIp, sourceUrl } = builders.buildValues(request)
@@ -241,25 +223,14 @@ function fastifyCloudEvents (fastify, options, next) {
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          // TODO: refactor into buildRequestDataForCE(request) ... wip
           request: {
-            id: request.id,
+            ...builders.buildRequestDataForCE(request),
             headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
             clientIp
           },
-          // TODO: refactor into buildReplyDataForCE(reply) ... wip
-          reply: {
-            statusCode: reply.res.statusCode,
-            statusMessage: reply.res.statusMessage,
-            sent: reply.sent
-          },
-          error: { ...errorAsData },
-          process: { ...processInfoAsData }
+          reply: builders.buildReplyDataForCE(reply),
+          error: errorAsData,
+          process: processInfoAsData
         }, // data
         cloudEventOptions
       )
@@ -279,20 +250,11 @@ function fastifyCloudEvents (fastify, options, next) {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: {
-            id: request.id,
+            ...builders.buildRequestDataForCE(request),
             headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
             clientIp
           },
-          reply: {
-            statusCode: reply.res.statusCode,
-            statusMessage: reply.res.statusMessage,
-            sent: reply.sent
-          },
+          reply: builders.buildReplyDataForCE(reply),
           payload: { }
         }, // data
         cloudEventOptions
@@ -309,14 +271,9 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onResponse`,
         builders.buildSourceUrl(),
         {
-          id: reply.id, // TODO: should be available now, in reply or in request ... wip
+          id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          // TODO: refactor into buildReplyDataForCE(reply) ... wip
-          reply: {
-            statusCode: reply.statusCode,
-            statusMessage: reply.statusMessage,
-            finished: reply.finished
-          }
+          reply: builders.buildReplyDataForCE(reply)
         }, // data
         cloudEventOptions
       )
