@@ -30,6 +30,8 @@ const { CloudEventTransformer } = require('cloudevent') // get CloudEvent defini
 
 function builder (options = {}) {
   const {
+    pluginName,
+    pluginVersion,
     serverUrl,
     serverUrlMode,
     // baseNamespace,
@@ -50,7 +52,7 @@ function builder (options = {}) {
      * @return {string} the source value to use, as a string
      * @private
      */
-    buildSourceUrl: function (url = '') {
+    buildSourceUrl (url = '') {
       let sourceUrl
       switch (serverUrlMode) {
         case null:
@@ -80,7 +82,7 @@ function builder (options = {}) {
      * @return {string} the IP address, as a string
      * @private
      */
-    buildClientIP: function (request) {
+    buildClientIP (request) {
       if (request === undefined || request === null) {
         throw new Error('Illegal value for request: undefined or null')
       }
@@ -97,7 +99,7 @@ function builder (options = {}) {
      * @return {string} HTTP request headers, as a string, or null
      * @private
      */
-    buildHeaders: function (request) {
+    buildHeaders (request) {
       if (request === undefined || request === null) {
         throw new Error('Illegal value for request: undefined or null')
       }
@@ -113,7 +115,7 @@ function builder (options = {}) {
      * @return {object} an object containing headers, source URL, the IP address
      * @private
      */
-    buildValues: function (request) {
+    buildValues (request) {
       const clientIp = this.buildClientIP(request)
       const headers = this.buildHeaders(request.headers)
       const sourceUrl = this.buildSourceUrl(request.url)
@@ -129,7 +131,7 @@ function builder (options = {}) {
      * @return {object} an object containing extracted attributes
      * @private
      */
-    buildRequestDataForCE: function (request) {
+    buildRequestDataForCE (request) {
       return {
         id: request.id,
         // headers,
@@ -151,11 +153,29 @@ function builder (options = {}) {
      * @return {object} an object containing extracted attributes
      * @private
      */
-    buildReplyDataForCE: function (reply) {
+    buildReplyDataForCE (reply) {
       return {
-        statusCode: reply.statusCode,
-        statusMessage: reply.statusMessage,
-        finished: reply.finished
+        statusCode: reply.res.statusCode,
+        statusMessage: reply.res.statusMessage,
+        finished: reply.res.finished
+      }
+    },
+
+    /**
+     * Extract some values from the given arguments,
+     * and returns them inside a wrapper object
+     * to be used in a CloudEvent data (sub-)property.
+     *
+     * @param {!object} reply the reply
+     * @return {object} an object containing extracted attributes
+     * @private
+     */
+    buildPluginDataForCE (description = '') {
+      return {
+        timestamp: CloudEventTransformer.timestampToNumber(),
+        description: description,
+        name: pluginName,
+        version: pluginVersion
       }
     }
   }
