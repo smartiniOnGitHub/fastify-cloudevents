@@ -144,23 +144,20 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, next) => {
-      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
-        sourceUrl,
+        builders.buildSourceUrl(request.url),
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: {
             ...builders.buildRequestDataForCE(request),
-            headers, // TODO: then return even headers, clientIp from the previous method and remove these ... wip
-            clientIp,
-            // add even request specific data that makes sense only here
+            // add more attributes here, could be useful to have
             httpVersion: request.req.httpVersion,
             originalUrl: request.req.originalUrl,
             upgrade: request.req.upgrade
           },
-          reply: { }
+          reply: (reply !== null) ? { } : null
         }, // data
         cloudEventOptions
       )
@@ -184,18 +181,13 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
-        sourceUrl,
+        builders.buildSourceUrl(request.url),
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            ...builders.buildRequestDataForCE(request),
-            headers,
-            clientIp
-          },
+          request: builders.buildRequestDataForCE(request),
           reply: builders.buildReplyDataForCE(reply)
         }, // data
         cloudEventOptions
@@ -213,7 +205,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onErrorCallback !== null) {
     fastify.addHook('onError', (request, reply, error, next) => {
-      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const processInfoAsData = CloudEventTransformer.processInfoToData()
       const errorAsData = CloudEventTransformer.errorToData(error, {
         includeStackTrace: true,
@@ -222,15 +213,11 @@ function fastifyCloudEvents (fastify, options, next) {
       })
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onError`,
-        sourceUrl,
+        builders.buildSourceUrl(request.url),
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            ...builders.buildRequestDataForCE(request),
-            headers,
-            clientIp
-          },
+          request: builders.buildRequestDataForCE(request),
           reply: builders.buildReplyDataForCE(reply),
           error: errorAsData,
           process: processInfoAsData
@@ -245,20 +232,15 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
-      const { headers, clientIp, sourceUrl } = builders.buildValues(request)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
-        sourceUrl,
+        builders.buildSourceUrl(request.url),
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            ...builders.buildRequestDataForCE(request),
-            headers,
-            clientIp
-          },
+          request: builders.buildRequestDataForCE(request),
           reply: builders.buildReplyDataForCE(reply),
-          payload: { }
+          payload: (payload !== null) ? {} : null
         }, // data
         cloudEventOptions
       )

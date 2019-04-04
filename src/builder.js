@@ -79,14 +79,14 @@ function builder (options = {}) {
      * useful to add into the CloudEvent in a custom attribute inside data.
      *
      * @param {!object} request the request
-     * @return {string} the IP address, as a string
+     * @return {string} the IP address, as a string or null
      * @private
      */
     buildClientIP (request) {
       if (request === undefined || request === null) {
         throw new Error('Illegal value for request: undefined or null')
       }
-      return request.ip
+      return request.ip || null
     },
 
     /**
@@ -117,7 +117,7 @@ function builder (options = {}) {
      */
     buildValues (request) {
       const clientIp = this.buildClientIP(request)
-      const headers = this.buildHeaders(request.headers)
+      const headers = this.buildHeaders(request)
       const sourceUrl = this.buildSourceUrl(request.url)
       return { clientIp, headers, sourceUrl }
     },
@@ -134,8 +134,8 @@ function builder (options = {}) {
     buildRequestDataForCE (request) {
       return {
         id: request.id,
-        // headers,
-        // clientIp,
+        headers: this.buildHeaders(request),
+        clientIp: this.buildClientIP(request),
         params: request.params,
         query: request.query,
         body: request.body,
