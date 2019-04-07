@@ -145,26 +145,6 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, next) => {
-      // TODO: try to use the usual builder function even here, but them merge additional values ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onRequest`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            ...builders.buildRequestDataForCE(request),
-            // add more attributes here, could be useful to have
-            httpVersion: request.req.httpVersion,
-            originalUrl: request.req.originalUrl,
-            upgrade: request.req.upgrade
-          },
-          reply: (reply !== undefined && reply !== null) ? {} : undefined
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('onRequest', request, reply)
       // add more attributes to data, could be useful to have
       ce.data.request.httpVersion = request.req.httpVersion
@@ -253,19 +233,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
-      // TODO: try to use the usual builder function even here, but them merge additional values ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onResponse`,
-        builders.buildSourceUrl(),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          reply: builders.buildReplyDataForCE(reply)
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
       // remove the request attribute from data, for less verbose data
       delete ce.data.request
