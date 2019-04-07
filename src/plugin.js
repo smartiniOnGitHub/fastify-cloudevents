@@ -172,20 +172,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preParsingCallback !== null) {
     fastify.addHook('preParsing', (request, reply, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.preParsing`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply)
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('preParsing', request, reply)
       preParsingCallback(ce)
 
@@ -195,20 +181,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preValidationCallback !== null) {
     fastify.addHook('preValidation', (request, reply, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.preValidation`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply)
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('preValidation', request, reply)
       preValidationCallback(ce)
 
@@ -218,20 +190,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.preHandler`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply)
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('preHandler', request, reply)
       preHandlerCallback(ce)
 
@@ -241,21 +199,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preSerializationCallback !== null) {
     fastify.addHook('preSerialization', (request, reply, payload, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.preSerialization`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply),
-          payload: (payload !== undefined && payload !== null) ? {} : undefined
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
       preSerializationCallback(ce)
 
@@ -292,21 +235,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
-      /*
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onSend`,
-        builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply),
-          payload: (payload !== undefined && payload !== null) ? {} : undefined
-        }, // data
-        cloudEventOptions
-      )
-       */
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
 
@@ -316,7 +244,6 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
-      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok, but not here because I skip the request in the genereated ce (for less verbosity)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
         builders.buildSourceUrl(),
