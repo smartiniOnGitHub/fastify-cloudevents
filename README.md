@@ -20,7 +20,7 @@ Other features of the plugin: enable forwarding of Fastify events to given callb
 and wrapping main data of the original event in a specific CloudEvent instance.
 
 
-Note that all CloudEvents features exposed here, by using the library [cloudevent](https://npmjs.org/package/cloudevent/).
+Note that all CloudEvents features exposed here are in the the library [cloudevent](https://npmjs.org/package/cloudevent/).
 
 
 ## Usage
@@ -29,13 +29,15 @@ Note that all CloudEvents features exposed here, by using the library [cloudeven
 const fastify = require('fastify')()
 
 // define functions to use in plugin configuration:
-// idExample , callbackExample , etc ...
+// idExample generator, callbackExample(ce) , etc ...
 
 // register the plugin with some options, for example:
 fastify.register(require('fastify-cloudevents'), {
   serverUrl: 'http://0.0.0.0:3000',
   idGenerator: idExample,
   onRequestCallback: callbackExample,
+  onErrorCallback: callbackExample,
+  onResponseCallback: callbackExample,
   cloudEventOptions: { }
 })
 
@@ -91,11 +93,11 @@ Plugin options are:
 - `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
 - `onSendCallback`, callback to handle generated CloudEvents in Fastify hook `onSend`
 - `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
-- `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`
+- `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`, for the plugin
 - `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`
 - `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
-- `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready` 
-  (when all plugins have been loaded)
+- `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready`, 
+  for the plugin (when the plugin has been loaded)
 - `cloudEventOptions`, CloudEvent options common to all generated event instances; 
   anyway objects are copied to not be shared between instances
 
@@ -105,7 +107,7 @@ Note that all callbacks given to hooks accepts only a single argument: the gener
 and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
 
 
-For more info on the standard, see the CloudEvents Specification [here](https://github.com/cloudevents/spec).
+For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 
 
 ## Contributing
