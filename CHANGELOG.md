@@ -5,6 +5,10 @@
 Summary Changelog:
 - Update requirements to Fastify v2
 - Update all dependencies
+- Add new Hooks (available since Fastify v2) and remove old ones
+- Improve data set into CloudEvent instances; 
+  make data more consistent using the same builder functions
+- Update documentation and examples
 
 ## [1.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/1.0.0) (2019-03-26)
 Summary Changelog:
