@@ -115,17 +115,6 @@ function fastifyCloudEvents (fastify, options, next) {
   const pluginName = require('../package.json').name // get plugin name
   const pluginVersion = require('../package.json').version // get plugin version
 
-  // references builders, configured with some plugin options
-  const builders = require('./builder')({
-    pluginName,
-    pluginVersion,
-    serverUrl,
-    serverUrlMode,
-    // baseNamespace,
-    // idGenerator,
-    includeHeaders
-  })
-
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
@@ -140,6 +129,18 @@ function fastifyCloudEvents (fastify, options, next) {
     cloudEventOptions.extensions = cloudEventOptions.extensions || {}
     cloudEventOptions.extensions.serverUrlMode = serverUrlMode
   }
+
+  // references builders, configured with some plugin options
+  const builders = require('./builder')({
+    pluginName,
+    pluginVersion,
+    serverUrl,
+    serverUrlMode,
+    baseNamespace,
+    idGenerator,
+    includeHeaders,
+    cloudEventOptions
+  })
 
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
@@ -157,7 +158,7 @@ function fastifyCloudEvents (fastify, options, next) {
             originalUrl: request.req.originalUrl,
             upgrade: request.req.upgrade
           },
-          reply: (reply !== null) ? { } : null
+          reply: (reply !== undefined && reply !== null) ? {} : undefined
         }, // data
         cloudEventOptions
       )
@@ -171,6 +172,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preParsingCallback !== null) {
     fastify.addHook('preParsing', (request, reply, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preParsing`,
         builders.buildSourceUrl(request.url),
@@ -182,6 +185,8 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('preParsing', request, reply)
       preParsingCallback(ce)
 
       next()
@@ -190,6 +195,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preValidationCallback !== null) {
     fastify.addHook('preValidation', (request, reply, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preValidation`,
         builders.buildSourceUrl(request.url),
@@ -201,6 +208,8 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('preValidation', request, reply)
       preValidationCallback(ce)
 
       next()
@@ -209,6 +218,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preHandler`,
         builders.buildSourceUrl(request.url),
@@ -220,6 +231,8 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('preHandler', request, reply)
       preHandlerCallback(ce)
 
       next()
@@ -228,6 +241,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (preSerializationCallback !== null) {
     fastify.addHook('preSerialization', (request, reply, payload, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.preSerialization`,
         builders.buildSourceUrl(request.url),
@@ -236,10 +251,12 @@ function fastifyCloudEvents (fastify, options, next) {
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: builders.buildRequestDataForCE(request),
           reply: builders.buildReplyDataForCE(reply),
-          payload: (payload !== null) ? {} : null
+          payload: (payload !== undefined && payload !== null) ? {} : undefined
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
       preSerializationCallback(ce)
 
       next()
@@ -275,6 +292,8 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onSendCallback !== null) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onSend`,
         builders.buildSourceUrl(request.url),
@@ -283,10 +302,12 @@ function fastifyCloudEvents (fastify, options, next) {
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: builders.buildRequestDataForCE(request),
           reply: builders.buildReplyDataForCE(reply),
-          payload: (payload !== null) ? {} : null
+          payload: (payload !== undefined && payload !== null) ? {} : undefined
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
 
       next()
@@ -295,6 +316,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
+      // TODO refactor in builders.buildCloudEventFromRequestReply() ... ok, but not here because I skip the request in the genereated ce (for less verbosity)
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
         builders.buildSourceUrl(),

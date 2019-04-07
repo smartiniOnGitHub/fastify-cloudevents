@@ -26,7 +26,7 @@
  * @private
  */
 
-const { CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
 
 function builder (options = {}) {
   const {
@@ -34,9 +34,10 @@ function builder (options = {}) {
     pluginVersion,
     serverUrl,
     serverUrlMode,
-    // baseNamespace,
-    // idGenerator,
-    includeHeaders
+    baseNamespace,
+    idGenerator,
+    includeHeaders,
+    cloudEventOptions
   } = options
 
   return {
@@ -95,6 +96,7 @@ function builder (options = {}) {
      * useful to add into the CloudEvent in a custom attribute inside data.
      * If related plugin flag 'includeHeaders' is enabled headers will be returned,
      * otherwise nothing.
+     * Note that some config options for builders are used here.
      *
      * @param {!object} request the request
      * @return {string} HTTP request headers, as a string, or undefined
@@ -166,8 +168,9 @@ function builder (options = {}) {
      * Extract some values from the given arguments,
      * and returns them inside a wrapper object
      * to be used in a CloudEvent data (sub-)property.
+     * Note that some config options for builders are used here.
      *
-     * @param {!object} reply the reply
+     * @param {object} description the description (maybe related to the event)
      * @return {object} an object containing extracted attributes
      * @private
      */
@@ -178,6 +181,37 @@ function builder (options = {}) {
         name: pluginName,
         version: pluginVersion
       }
+    },
+
+    /**
+     * Build a CloudEvent instance from the given arguments,
+     * useful for simplify plugin hooks.
+     * Note that some config options for builders are used here.
+     *
+     * @param {!string} hookName the name of the hook
+     * @param {!object} request the request
+     * @param {!object} reply the reply
+     * @param {object} payload the payload
+     * @return {object} the CloudEvent instance
+     * @private
+     */
+    buildCloudEventForHook (hookName, request, reply, payload) {
+      if (!hookName || !request || !reply) {
+        throw new Error('Illegal arguments: mandatory argument undefined or null')
+      }
+      const ce = new CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.${hookName}`,
+        this.buildSourceUrl(request.url),
+        {
+          id: request.id,
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          request: this.buildRequestDataForCE(request),
+          reply: this.buildReplyDataForCE(reply),
+          payload: (payload !== undefined && payload !== null) ? {} : undefined
+        }, // data
+        cloudEventOptions
+      )
+      return ce
     }
   }
 }
