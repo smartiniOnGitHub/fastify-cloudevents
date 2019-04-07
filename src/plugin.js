@@ -145,6 +145,8 @@ function fastifyCloudEvents (fastify, options, next) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, next) => {
+      // TODO: try to use the usual builder function even here, but them merge additional values ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRequest`,
         builders.buildSourceUrl(request.url),
@@ -162,6 +164,14 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('onRequest', request, reply)
+      // add more attributes to data, could be useful to have
+      ce.data.request.httpVersion = request.req.httpVersion
+      ce.data.request.originalUrl = request.req.originalUrl
+      ce.data.request.upgrade = request.req.upgrade
+      // remove the reply attribute from data, for less verbose data
+      delete ce.data.reply
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
@@ -237,13 +247,14 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
-
       next()
     })
   }
 
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
+      // TODO: try to use the usual builder function even here, but them merge additional values ... ok
+      /*
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onResponse`,
         builders.buildSourceUrl(),
@@ -254,6 +265,10 @@ function fastifyCloudEvents (fastify, options, next) {
         }, // data
         cloudEventOptions
       )
+       */
+      const ce = builders.buildCloudEventForHook('onResponse', request, reply)
+      // remove the request attribute from data, for less verbose data
+      delete ce.data.request
       onResponseCallback(ce)
 
       next()
