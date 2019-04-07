@@ -169,14 +169,42 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  // TODO: implement ... wip
   if (preParsingCallback !== null) {
-    // fastify.addHook('preParsing', (request, reply, next) => {
+    fastify.addHook('preParsing', (request, reply, next) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.preParsing`,
+        builders.buildSourceUrl(request.url),
+        {
+          id: request.id,
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          request: builders.buildRequestDataForCE(request),
+          reply: builders.buildReplyDataForCE(reply)
+        }, // data
+        cloudEventOptions
+      )
+      preParsingCallback(ce)
+
+      next()
+    })
   }
 
-  // TODO: implement ... wip
   if (preValidationCallback !== null) {
-    // fastify.addHook('preValidation', (request, reply, next) => {
+    fastify.addHook('preValidation', (request, reply, next) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.preValidation`,
+        builders.buildSourceUrl(request.url),
+        {
+          id: request.id,
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          request: builders.buildRequestDataForCE(request),
+          reply: builders.buildReplyDataForCE(reply)
+        }, // data
+        cloudEventOptions
+      )
+      preValidationCallback(ce)
+
+      next()
+    })
   }
 
   if (preHandlerCallback !== null) {
@@ -198,9 +226,24 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  // TODO: implement ... wip
   if (preSerializationCallback !== null) {
-    // fastify.addHook('preSerialization', (request, reply, payload, next) => {
+    fastify.addHook('preSerialization', (request, reply, payload, next) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.preSerialization`,
+        builders.buildSourceUrl(request.url),
+        {
+          id: request.id,
+          timestamp: CloudEventTransformer.timestampToNumber(),
+          request: builders.buildRequestDataForCE(request),
+          reply: builders.buildReplyDataForCE(reply),
+          payload: (payload !== null) ? {} : null
+        }, // data
+        cloudEventOptions
+      )
+      preSerializationCallback(ce)
+
+      next()
+    })
   }
 
   if (onErrorCallback !== null) {
@@ -295,7 +338,6 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
-  // TODO: check the name of the plugin to register, if it's visibe here (and how) ... wip
   if (onRegisterCallback !== null) {
     fastify.addHook('onRegister', (instance) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
