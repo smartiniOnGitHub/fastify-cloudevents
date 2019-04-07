@@ -59,11 +59,16 @@ fastify.register(require('../src/plugin'), {
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
   onRequestCallback: loggingCallback,
+  preParsingCallback: loggingCallback,
+  preValidationCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
+  preSerializationCallback: loggingCallback,
+  onErrorCallback: loggingCallback,
   onSendCallback: loggingCallback,
   onResponseCallback: loggingCallback,
-  onRouteCallback: loggingCallback,
   onCloseCallback: loggingCallback,
+  onRouteCallback: loggingCallback,
+  onRegisterCallback: loggingCallback,
   onReadyCallback: loggingCallback,
   cloudEventOptions: k.cloudEventOptions
 })
@@ -115,30 +120,12 @@ fastify.get('/time', async (req, reply) => {
 })
 // example route, to always generate an error
 fastify.get('/error', async (req, reply) => {
-  reply.code(404)
   const err = new Error()
   err.message = 'Error Message'
   err.statusCode = reply.code
   err.description = 'Verbose Error description...'
-
-  // as a sample, wrap this error into a CloudEvent ...
-  const path = '/error' // hardcode current url path, as a simple way to have it
-  const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
-  const errorAsData = fastify.CloudEventTransformer.errorToData(err, {
-    includeStackTrace: true,
-    addStatus: true,
-    addTimestamp: true
-  })
-  const ce = new fastify.CloudEvent(gen.next().value,
-    `${k.baseNamespace}.routes.error`,
-    k.source + path,
-    {
-      ...errorAsData,
-      ...processInfoAsData
-    }, // data
-    k.cloudEventOptions
-  )
-  loggingCallback(ce) // forward generated event to a callback before exiting ...
+  err.code = 500
+  reply.code(err.code) // set the same error code in the reply
 
   return err
 })

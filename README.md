@@ -20,7 +20,7 @@ Other features of the plugin: enable forwarding of Fastify events to given callb
 and wrapping main data of the original event in a specific CloudEvent instance.
 
 
-Note that all CloudEvents features exposed here, by using the library [cloudevent](https://npmjs.org/package/cloudevent/).
+Note that all CloudEvents features exposed here are in the the library [cloudevent](https://npmjs.org/package/cloudevent/).
 
 
 ## Usage
@@ -29,13 +29,15 @@ Note that all CloudEvents features exposed here, by using the library [cloudeven
 const fastify = require('fastify')()
 
 // define functions to use in plugin configuration:
-// idExample , callbackExample , etc ...
+// idExample generator, callbackExample(ce) , etc ...
 
 // register the plugin with some options, for example:
 fastify.register(require('fastify-cloudevents'), {
   serverUrl: 'http://0.0.0.0:3000',
   idGenerator: idExample,
   onRequestCallback: callbackExample,
+  onErrorCallback: callbackExample,
+  onResponseCallback: callbackExample,
   cloudEventOptions: { }
 })
 
@@ -53,9 +55,8 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^1.1.0 , Node.js 8.15.x or later.
-Note that plugin releases 0.x and 1.x are for Fastify 1.x, 
-plugin releases 2.x are for Fastify 2.x, etc.
+Fastify ^2.1.0 , Node.js 8.15.x or later.
+Note that plugin releases 2.x are for Fastify 2.x, etc.
 
 
 ## Note
@@ -84,13 +85,19 @@ Plugin options are:
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag that when `true` tells that request headers will be put 
   in generated CloudEvents (but by default is `false`)
-- `onRequestCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRequest`
-- `preHandlerCallback`, callback who will handle the generated CloudEvents, in Fastify hook `preHandler`
-- `onSendCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onSend`
-- `onResponseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onResponse`
-- `onRouteCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onRoute`
-- `onCloseCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onClose`
-- `onReadyCallback`, callback who will handle the generated CloudEvents, in Fastify hook `onReady`
+- `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
+- `preParsingCallback`, callback to handle generated CloudEvents in Fastify hook `preParsing`
+- `preValidationCallback`, callback to handle generated CloudEvents in Fastify hook `preValidation`
+- `preHandlerCallback`, callback to handle generated CloudEvents in Fastify hook `preHandler`
+- `preSerializationCallback`, callback to handle generated CloudEvents in Fastify hook `preSerialization`
+- `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
+- `onSendCallback`, callback to handle generated CloudEvents in Fastify hook `onSend`
+- `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
+- `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`, for the plugin
+- `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`
+- `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
+- `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready`, 
+  for the plugin (when the plugin has been loaded)
 - `cloudEventOptions`, CloudEvent options common to all generated event instances; 
   anyway objects are copied to not be shared between instances
 
@@ -100,7 +107,7 @@ Note that all callbacks given to hooks accepts only a single argument: the gener
 and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
 
 
-For more info on the standard, see the CloudEvents Specification [here](https://github.com/cloudevents/spec).
+For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 
 
 ## Contributing

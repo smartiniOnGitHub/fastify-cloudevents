@@ -26,11 +26,16 @@ function fastifyCloudEvents (fastify, options, next) {
     idGenerator = idMaker(),
     includeHeaders = false,
     onRequestCallback = null,
+    preParsingCallback = null,
+    preValidationCallback = null,
     preHandlerCallback = null,
+    preSerializationCallback = null,
+    onErrorCallback = null,
     onSendCallback = null,
     onResponseCallback = null,
-    onRouteCallback = null,
     onCloseCallback = null,
+    onRouteCallback = null,
+    onRegisterCallback = null,
     onReadyCallback = null,
     cloudEventOptions = {}
   } = options
@@ -41,11 +46,16 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsObject(idGenerator, 'idGenerator')
   ensureIsBoolean(includeHeaders, 'includeHeaders')
   ensureIsFunction(onRequestCallback, 'onRequestCallback')
+  ensureIsFunction(preParsingCallback, 'preParsingCallback')
+  ensureIsFunction(preValidationCallback, 'preValidationCallback')
   ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
+  ensureIsFunction(preSerializationCallback, 'preSerializationCallback')
+  ensureIsFunction(onErrorCallback, 'onErrorCallback')
   ensureIsFunction(onSendCallback, 'onSendCallback')
   ensureIsFunction(onResponseCallback, 'onResponseCallback')
-  ensureIsFunction(onRouteCallback, 'onRouteCallback')
   ensureIsFunction(onCloseCallback, 'onCloseCallback')
+  ensureIsFunction(onRouteCallback, 'onRouteCallback')
+  ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
 
   const fastJson = require('fast-json-stringify')
@@ -101,61 +111,15 @@ function fastifyCloudEvents (fastify, options, next) {
     }
   }
 
-  /**
-   * Build the value for the source field of the CloudEvent,
-   * depending on the plugin configuration of options
-   * `serverUrlMode`, `serverUrl`,
-   * and the uri part of the current request.
-   * Note that this is mainly for usage inside the plugin,
-   * but in some cases could be useful even outside.
-   *
-   * @param {string} url the uri part of the current request
-   * @return {string} the source value to use, as a string
-   */
-  function buildSourceUrl (url = '') {
-    let sourceUrl
-    switch (serverUrlMode) {
-      case null:
-      case 'pluginAndRequestSimplified':
-        sourceUrl = serverUrl + CloudEventTransformer.uriStripArguments(url)
-        break
-      case 'pluginAndRequestUrl':
-        sourceUrl = serverUrl + url
-        break
-      case 'pluginServerUrl':
-        sourceUrl = serverUrl
-        break
-      case 'requestUrl':
-        sourceUrl = url
-        break
-      default:
-        throw new Error(`Illegal value for serverUrlMode: '${serverUrlMode}'`)
-    }
-    return sourceUrl
-  }
-
-  /**
-   * Extract and build the value for the client IP address,
-   * useful to add into the CloudEvent in a custom attribute inside data.
-   *
-   * @param {!object} req the request
-   * @return {string} the IP address, as a string
-   */
-  function buildClientIP (req) {
-    if (req === undefined || req === null) {
-      throw new Error('Illegal value for request: undefined or null')
-    }
-    const ip = req.connection.remoteAddress
-    return ip
-  }
+  // check/finish to setup cloudEventOptions
+  const pluginName = require('../package.json').name // get plugin name
+  const pluginVersion = require('../package.json').version // get plugin version
 
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
-  // check/finish to setup cloudEventOptions
-  const pluginVersion = require('../package.json').version // get plugin version
   // then set as eventTypeVersion if not already specified, could be useful
   if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
     cloudEventOptions.eventTypeVersion = pluginVersion
@@ -166,32 +130,28 @@ function fastifyCloudEvents (fastify, options, next) {
     cloudEventOptions.extensions.serverUrlMode = serverUrlMode
   }
 
+  // references builders, configured with some plugin options
+  const builders = require('./builder')({
+    pluginName,
+    pluginVersion,
+    serverUrl,
+    serverUrlMode,
+    baseNamespace,
+    idGenerator,
+    includeHeaders,
+    cloudEventOptions
+  })
+
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
-    fastify.addHook('onRequest', (req, res, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : req.headers
-      const sourceUrl = buildSourceUrl(req.url)
-      const clientIp = buildClientIP(req)
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onRequest`,
-        sourceUrl,
-        {
-          id: req.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          req: {
-            httpVersion: req.httpVersion,
-            id: req.id,
-            headers: headers,
-            method: req.method,
-            originalUrl: req.originalUrl,
-            upgrade: req.upgrade,
-            url: req.url,
-            clientIp: clientIp
-          },
-          res: { }
-        }, // data
-        cloudEventOptions
-      )
+    fastify.addHook('onRequest', (request, reply, next) => {
+      const ce = builders.buildCloudEventForHook('onRequest', request, reply)
+      // add more attributes to data, could be useful to have
+      ce.data.request.httpVersion = request.req.httpVersion
+      ce.data.request.originalUrl = request.req.originalUrl
+      ce.data.request.upgrade = request.req.upgrade
+      // remove the reply attribute from data, for less verbose data
+      delete ce.data.reply
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
@@ -200,124 +160,95 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
+  if (preParsingCallback !== null) {
+    fastify.addHook('preParsing', (request, reply, next) => {
+      const ce = builders.buildCloudEventForHook('preParsing', request, reply)
+      preParsingCallback(ce)
+
+      next()
+    })
+  }
+
+  if (preValidationCallback !== null) {
+    fastify.addHook('preValidation', (request, reply, next) => {
+      const ce = builders.buildCloudEventForHook('preValidation', request, reply)
+      preValidationCallback(ce)
+
+      next()
+    })
+  }
+
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', (request, reply, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = buildSourceUrl(request.req.url)
-      const clientIp = buildClientIP(request.req)
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.preHandler`,
-        sourceUrl,
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            id: request.id,
-            headers: headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
-            clientIp: clientIp
-          },
-          reply: {
-            statusCode: reply.res.statusCode,
-            statusMessage: reply.res.statusMessage,
-            sent: reply.sent
-          }
-        }, // data
-        cloudEventOptions
-      )
+      const ce = builders.buildCloudEventForHook('preHandler', request, reply)
       preHandlerCallback(ce)
 
       next()
     })
   }
 
-  if (onSendCallback !== null) {
-    fastify.addHook('onSend', (request, reply, payload, next) => {
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
-      const sourceUrl = buildSourceUrl(request.req.url)
-      const clientIp = buildClientIP(request.req)
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onSend`,
-        sourceUrl,
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: {
-            id: request.id,
-            headers: headers,
-            params: request.params,
-            query: request.query,
-            body: request.body,
-            method: request.req.method,
-            url: request.req.url,
-            clientIp: clientIp
-          },
-          reply: {
-            statusCode: reply.res.statusCode,
-            statusMessage: reply.res.statusMessage,
-            sent: reply.sent
-          },
-          payload: { }
-        }, // data
-        cloudEventOptions
-      )
-      onSendCallback(ce)
+  if (preSerializationCallback !== null) {
+    fastify.addHook('preSerialization', (request, reply, payload, next) => {
+      const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
+      preSerializationCallback(ce)
 
       next()
     })
   }
 
-  if (onResponseCallback !== null) {
-    fastify.addHook('onResponse', (res, next) => {
-      const sourceUrl = buildSourceUrl()
+  if (onErrorCallback !== null) {
+    fastify.addHook('onError', (request, reply, error, next) => {
+      const processInfoAsData = CloudEventTransformer.processInfoToData()
+      const errorAsData = CloudEventTransformer.errorToData(error, {
+        includeStackTrace: true,
+        addStatus: true,
+        addTimestamp: true
+      })
       const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onResponse`,
-        sourceUrl,
+        `${baseNamespace}.onError`,
+        builders.buildSourceUrl(request.url),
         {
-          // id: res.id, // not available
+          id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
-          res: {
-            statusCode: res.statusCode,
-            statusMessage: res.statusMessage,
-            finished: res.finished
-          }
+          request: builders.buildRequestDataForCE(request),
+          reply: builders.buildReplyDataForCE(reply),
+          error: errorAsData,
+          process: processInfoAsData
         }, // data
         cloudEventOptions
       )
+      onErrorCallback(ce)
+
+      next() // do not pass the error to the next callback here
+    })
+  }
+
+  if (onSendCallback !== null) {
+    fastify.addHook('onSend', (request, reply, payload, next) => {
+      const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
+      onSendCallback(ce)
+      next()
+    })
+  }
+
+  if (onResponseCallback !== null) {
+    fastify.addHook('onResponse', (request, reply, next) => {
+      const ce = builders.buildCloudEventForHook('onResponse', request, reply)
+      // remove the request attribute from data, for less verbose data
+      delete ce.data.request
       onResponseCallback(ce)
 
       next()
     })
   }
 
-  if (onRouteCallback !== null) {
-    fastify.addHook('onRoute', (routeOptions) => {
-      const sourceUrl = buildSourceUrl()
-      const ce = new fastify.CloudEvent(idGenerator.next().value,
-        `${baseNamespace}.onRoute`,
-        sourceUrl,
-        routeOptions, // data
-        cloudEventOptions
-      )
-      onRouteCallback(ce)
-    })
-  }
-
   if (onCloseCallback !== null) {
     // hook to plugin shutdown, not server
     fastify.addHook('onClose', (instance, done) => {
-      const sourceUrl = buildSourceUrl()
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
-        sourceUrl,
-        {
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          description: 'plugin shutdown'
-        }, // data
+        builders.buildSourceUrl(),
+        builders.buildPluginDataForCE('plugin shutdown'), // data
         cloudEventOptions
       )
       onCloseCallback(ce)
@@ -326,17 +257,36 @@ function fastifyCloudEvents (fastify, options, next) {
     })
   }
 
+  if (onRouteCallback !== null) {
+    fastify.addHook('onRoute', (routeOptions) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onRoute`,
+        builders.buildSourceUrl(),
+        routeOptions, // data
+        cloudEventOptions
+      )
+      onRouteCallback(ce)
+    })
+  }
+
+  if (onRegisterCallback !== null) {
+    fastify.addHook('onRegister', (instance) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onRegister`,
+        builders.buildSourceUrl(),
+        builders.buildPluginDataForCE('plugin registration'), // data
+        cloudEventOptions
+      )
+      onRegisterCallback(ce)
+    })
+  }
+
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
-    const sourceUrl = buildSourceUrl()
     const ce = new fastify.CloudEvent(idGenerator.next().value,
       `${baseNamespace}.ready`,
-      sourceUrl,
-      {
-        timestamp: CloudEventTransformer.timestampToNumber(),
-        description: 'plugin startup successfully',
-        version: pluginVersion
-      }, // data
+      builders.buildSourceUrl(),
+      builders.buildPluginDataForCE('plugin startup successfully'), // data
       cloudEventOptions
     )
     fastify.ready(onReadyCallback(ce))
@@ -379,6 +329,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^1.1.0',
+  fastify: '^2.1.0',
   name: 'fastify-cloudevents'
 })

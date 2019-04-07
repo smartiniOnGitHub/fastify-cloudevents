@@ -48,9 +48,8 @@ fastify.register(require('../src/plugin'), {
   idGenerator: gen,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,
-  onSendCallback: loggingCallback,
+  onErrorCallback: loggingCallback,
   onResponseCallback: loggingCallback,
-  onRouteCallback: loggingCallback,
   onCloseCallback: loggingCallback,
   onReadyCallback: loggingCallback,
   cloudEventOptions: k.cloudEventOptions
@@ -76,6 +75,17 @@ fastify.get('/time', async (req, reply) => {
     timestamp,
     time: now.toISOString()
   }
+})
+// example route, to always generate an error
+fastify.get('/error', async (req, reply) => {
+  const err = new Error()
+  err.message = 'Error Message'
+  err.statusCode = reply.code
+  err.description = 'Verbose Error description...'
+  err.code = 500
+  reply.code(err.code) // set the same error code in the reply
+
+  return err
 })
 
 fastify.listen(k.port, k.address, (err, address) => {
