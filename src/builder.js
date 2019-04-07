@@ -207,7 +207,7 @@ function builder (options = {}) {
           timestamp: CloudEventTransformer.timestampToNumber(),
           request: this.buildRequestDataForCE(request),
           reply: this.buildReplyDataForCE(reply),
-          payload: (payload !== undefined && payload !== null) ? {} : undefined
+          payload
         }, // data
         cloudEventOptions
       )
