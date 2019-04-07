@@ -76,34 +76,35 @@ function builder (options = {}) {
 
     /**
      * Extract and build the value for the client IP address,
-     * useful to add into the CloudEvent in a custom attribute inside data.
+     * useful to add into the CloudEvent in a custom attribute inside data,
+     * otherwise nothing.
      *
      * @param {!object} request the request
-     * @return {string} the IP address, as a string or null
+     * @return {string} the IP address, as a string or undefined
      * @private
      */
     buildClientIP (request) {
       if (request === undefined || request === null) {
         throw new Error('Illegal value for request: undefined or null')
       }
-      return request.ip || null
+      return request.ip || undefined
     },
 
     /**
      * Extract and build the value for the HTTP headers,
      * useful to add into the CloudEvent in a custom attribute inside data.
      * If related plugin flag 'includeHeaders' is enabled headers will be returned,
-     * otherwise null.
+     * otherwise nothing.
      *
      * @param {!object} request the request
-     * @return {string} HTTP request headers, as a string, or null
+     * @return {string} HTTP request headers, as a string, or undefined
      * @private
      */
     buildHeaders (request) {
       if (request === undefined || request === null) {
         throw new Error('Illegal value for request: undefined or null')
       }
-      const headers = (includeHeaders === null || includeHeaders === false) ? null : request.headers
+      const headers = (includeHeaders === null || includeHeaders === false) ? undefined : request.headers
       return headers
     },
 
