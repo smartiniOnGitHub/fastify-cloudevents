@@ -1,11 +1,12 @@
 # Change Log
 
-## [2.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.0.0) (unreleased)
+## [2.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.0.0) (2019-04-08)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/1.0.0...2.0.0)
 Summary Changelog:
 - Update requirements to Fastify v2
 - Update all dependencies
-- Add new Hooks (available since Fastify v2) and remove old ones
+- Breaking Change: add new Hooks (available since Fastify v2) and remove old ones; 
+  hook functions arguments has changed in v2, even for already existing hooks.
 - Improve data set into CloudEvent instances; 
   make data more consistent using the same builder functions
 - Update documentation and examples
