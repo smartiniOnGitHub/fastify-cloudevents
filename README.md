@@ -80,7 +80,7 @@ Plugin options are:
     but without arguments (if any)
   - 'requestUrl', use only the request url
   - anything other, will raise an `Error`
-- `baseNamespace`, a base namespace for the `eventType`; more specific suffix 
+- `baseNamespace`, a base namespace for the `type`; more specific suffix 
   should be added to it in any CloudEvent
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag that when `true` tells that request headers will be put 
@@ -105,6 +105,13 @@ all plugin options are optional, and have a default value.
 
 Note that all callbacks given to hooks accepts only a single argument: the generated CloudEvent instance, 
 and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
+
+Since v0.2 of the spec, there is no more a standard attribute to specify the version 
+of any specific event type, so the best if to follow their recommendations, 
+and for example add a version in the 'type' attribute 
+(for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
+or into the 'schemaurl' attribute but only its major version 
+(like '-v1' or '/v1/' at the end).
 
 
 For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).

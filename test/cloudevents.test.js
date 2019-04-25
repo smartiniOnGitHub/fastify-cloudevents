@@ -142,8 +142,8 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.strictNotSame(ceIsValid, ceValidate)
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CloudEvent('1', // eventID
-      'org.fastify.plugins.cloudevents.testevent', // eventType
+    const ceMinimal = new CloudEvent('1', // id
+      'org.fastify.plugins.cloudevents.testevent', // type
       '/test', // source
       {} // data (empty) // optional, but useful the same in this sample usage
     )
@@ -154,8 +154,8 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     // t.strictSame(ceValidate(ceEmpty), []) // temp, to see the error during development ...
     t.strictSame(ceValidate(ceMinimal).length, 0) // simplify comparison of results, check only the  number of expected errors ...
     // create another instance, similar
-    const ceMinimal2 = new CloudEvent('2', // eventID
-      'org.fastify.plugins.cloudevents.testevent', // eventType
+    const ceMinimal2 = new CloudEvent('2', // id
+      'org.fastify.plugins.cloudevents.testevent', // type
       '/test', // source
       {} // data (empty) // optional, but useful the same in this sample usage
     )
@@ -205,11 +205,10 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
 /** create some common options, for better reuse in tests */
 const ceCommonOptions = {
-  eventTypeVersion: '1.0.0',
-  eventTime: new Date(),
+  time: new Date(),
   extensions: { 'exampleExtension': 'value' },
-  contentType: 'application/json',
-  schemaURL: 'http://my-schema.localhost.localdomain',
+  contenttype: 'application/json',
+  schemaurl: 'http://my-schema.localhost.localdomain',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
@@ -217,7 +216,7 @@ const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
-const ceCommonData = { 'hello': 'world', 'year': 2018 }
+const ceCommonData = { 'hello': 'world', 'year': 2019 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])

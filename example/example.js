@@ -45,6 +45,7 @@ const gen = idCounterExample()
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
+  baseNamespace: k.baseNamespace,
   idGenerator: gen,
   onRequestCallback: loggingCallback,
   preHandlerCallback: loggingCallback,

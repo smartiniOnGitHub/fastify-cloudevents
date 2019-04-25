@@ -47,11 +47,10 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
-  eventTypeVersion: '1.0.0',
-  eventTime: commonEventTime,
+  time: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
-  contentType: 'application/json',
-  schemaURL: 'http://my-schema.localhost.localdomain',
+  contenttype: 'application/json',
+  schemaurl: 'http://my-schema.localhost.localdomain',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
@@ -61,7 +60,7 @@ const ceNamespace = 'com.github.smartiniOnGitHub.fastify-cloudevents.testevent'
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
-const ceCommonData = { 'hello': 'world', 'year': 2018 }
+const ceCommonData = { 'hello': 'world', 'year': 2019 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
@@ -120,10 +119,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
       t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.2","contenttype":"application/json","time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
       t.same(ceFull, ceFullDeserialized)
     }
 
@@ -160,10 +159,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.2","contenttype":"application/json","time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserialized)
     }
 
@@ -190,12 +189,12 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
 // sample decoding function, to use in tests here
 function decoderSample () {
-  // return { hello: 'world', year: 2018 }
+  // return { hello: 'world', year: 2019 }
   return { decoded: 'Sample' }
 }
 
 /** @test {CloudEvent} */
-test('serialize/deserialize a CloudEvent instance with a non default contentType, and ensure they are right', (t) => {
+test('serialize/deserialize a CloudEvent instance with a non default contenttype, and ensure they are right', (t) => {
   t.plan(23)
 
   const fastify = Fastify()
@@ -212,13 +211,13 @@ test('serialize/deserialize a CloudEvent instance with a non default contentType
 
     {
       // serialization tests
-      // create an instance with non default contentType (other options default): expected success ...
-      const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+      // create an instance with non default contenttype (other options default): expected success ...
+      const ceFullOtherContentType = new CloudEvent('1/non-default-contenttype/sample-data/no-strict',
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
         {
-          contentType: 'application/xml'
+          contenttype: 'application/xml'
         }
       )
       assert(ceFullOtherContentType !== null)
@@ -248,7 +247,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contentType
       }, Error, 'Expected exception when deserializing the current CloudEvent instance')
       // when I try to serialize it (with right serialization options), expect success ...
       const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
-        decodedData: { hello: 'world', year: 2018 }
+        decodedData: { hello: 'world', year: 2019 }
       })
       t.ok(ceFullOtherContentTypeDeserialized2)
       const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
@@ -265,13 +264,13 @@ test('serialize/deserialize a CloudEvent instance with a non default contentType
     {
       // the same but with strict mode enabled ...
       // serialization tests
-      const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
+      const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contenttype/sample-data/strict',
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
         {
           ...ceCommonOptionsStrict,
-          contentType: 'application/xml'
+          contenttype: 'application/xml'
         }
       )
       assert(ceFullOtherContentTypeStrict !== null)
@@ -295,7 +294,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contentType
       }, Error, 'Expected exception when deserializing the current CloudEvent instance')
       // when I try to serialize it (with right serialization options), expect success ...
       const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
-        decodedData: { hello: 'world', year: 2018 }
+        decodedData: { hello: 'world', year: 2019 }
       })
       t.ok(ceFullOtherContentTypeDeserialized2)
       const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {

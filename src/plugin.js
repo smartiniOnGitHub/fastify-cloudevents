@@ -16,13 +16,18 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// TODO: test the library before being released ... wip
+const { CloudEvent, CloudEventTransformer } = require('../../cloudevent.js') // get CloudEvent definition and related utilities
+
+const pluginName = require('../package.json').name // get plugin name
+const pluginVersion = require('../package.json').version // get plugin version
 
 function fastifyCloudEvents (fastify, options, next) {
   const {
     serverUrl = '/',
     serverUrlMode = null,
-    baseNamespace = 'com.github.fastify.plugins.fastify-cloudevents',
+    baseNamespace = `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`,
     idGenerator = idMaker(),
     includeHeaders = false,
     onRequestCallback = null,
@@ -71,7 +76,7 @@ function fastifyCloudEvents (fastify, options, next) {
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
-   *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
+   *        encodedData (string, no default) already encoded data (but consistency with the contenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
@@ -80,7 +85,7 @@ function fastifyCloudEvents (fastify, options, next) {
   function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
     ensureIsObject(event, 'event')
 
-    if (event.contentType === CloudEvent.contentTypeDefault()) {
+    if (event.contenttype === CloudEvent.contenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return stringify(event)
       } else {
@@ -90,17 +95,17 @@ function fastifyCloudEvents (fastify, options, next) {
     // else
     if (encoder !== undefined && encoder !== null) {
       if (typeof encoder !== 'function') {
-        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contentType}'.`)
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contenttype}'.`)
       }
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
       if (encodedData === undefined || encodedData === null) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contentType}'.`)
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contenttype}'.`)
       }
     }
     if (typeof encodedData !== 'string') {
-      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contenttype}'.`)
     }
     const newEvent = CloudEventTransformer.mergeObjects(event, { data: encodedData })
     // console.log(`DEBUG - new event details: ${CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
@@ -111,19 +116,11 @@ function fastifyCloudEvents (fastify, options, next) {
     }
   }
 
-  // check/finish to setup cloudEventOptions
-  const pluginName = require('../package.json').name // get plugin name
-  const pluginVersion = require('../package.json').version // get plugin version
-
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
-  // then set as eventTypeVersion if not already specified, could be useful
-  if (cloudEventOptions.eventTypeVersion === null || typeof cloudEventOptions.eventTypeVersion !== 'string') {
-    cloudEventOptions.eventTypeVersion = pluginVersion
-  }
   // add to extensions the serverUrlMode defined, if set
   if (serverUrlMode !== null) {
     cloudEventOptions.extensions = cloudEventOptions.extensions || {}

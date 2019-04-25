@@ -20,12 +20,15 @@ const fastify = require('fastify')()
 const fastifyVersion = require('fastify/package.json').version // get Fastify version
 const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to another script in the library
 
+const pluginName = require('../package.json').name // get plugin name
+const pluginVersion = require('../package.json').version // get plugin version
+
 const k = {
   protocol: 'http',
   address: '0.0.0.0',
   port: 3000,
   serverUrlMode: 'pluginAndRequestSimplified', // same behavior as default value, but in this way set in CloudEvent extension object
-  baseNamespace: 'com.github.smartiniOnGitHub.fastify-cloudevents.example-enhanced',
+  baseNamespace: `com.github.smartiniOnGitHub.${pluginName}-v${pluginVersion}.example-enhanced`,
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
@@ -56,6 +59,7 @@ raiseEventAtStartServerScript()
 fastify.register(require('../src/plugin'), {
   serverUrl: k.serverUrl,
   serverUrlMode: k.serverUrlMode,
+  baseNamespace: k.baseNamespace,
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
   onRequestCallback: loggingCallback,
@@ -84,21 +88,24 @@ assert(loggingCloseServerCallback !== null)
 
 function raiseEventAtStartServerScript () {
   // example to get exposed functions of the plugin, before/without registering it ...
-  const ce = new CloudEventUtilityConstructor.CloudEvent(gen.next().value,
-    `${k.baseNamespace}.server-script.start`,
-    k.source,
-    {
-      timestamp: Date.now(),
-      description: 'Fastify server startup begin',
-      version: fastifyVersion,
-      status: 'starting',
-      hostname: hostname,
-      pid: pid
-    }, // data
-    k.cloudEventOptions
-  )
-  console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.CloudEventTransformer.dumpObject(ce, 'ce')}`)
-  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing (like eventTypeVersion)
+  if (CloudEventUtilityConstructor) {
+    // with local, relative path could not be available
+    const ce = new CloudEventUtilityConstructor.CloudEvent(gen.next().value,
+      `${k.baseNamespace}.server-script.start`,
+      k.source,
+      {
+        timestamp: Date.now(),
+        description: 'Fastify server startup begin',
+        version: fastifyVersion,
+        status: 'starting',
+        hostname: hostname,
+        pid: pid
+      }, // data
+      k.cloudEventOptions
+    )
+    console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.CloudEventTransformer.dumpObject(ce, 'ce')}`)
+  // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing
+  }
 }
 
 // example to handle a sample home request to serve a static page, optional here
