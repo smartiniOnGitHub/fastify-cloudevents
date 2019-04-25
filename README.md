@@ -55,7 +55,7 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^2.1.0 , Node.js 8.15.x or later.
+Fastify ^2.1.0 , Node.js 8.16.x or later.
 Note that plugin releases 2.x are for Fastify 2.x, etc.
 
 
