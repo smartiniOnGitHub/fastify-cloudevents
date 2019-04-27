@@ -44,28 +44,16 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   })
 })
 
-/** create some common options, for better reuse in tests */
-const commonEventTime = new Date()
-const ceCommonOptions = {
-  time: commonEventTime,
-  extensions: { 'exampleExtension': 'value' },
-  contenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
-  strict: false
-}
-/** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-/** create a sample namespace for events here, for better reuse in tests */
-const ceNamespace = 'com.github.smartiniOnGitHub.fastify-cloudevents.testevent'
-/** create a sample common server URL, for better reuse in tests */
-const ceServerUrl = '/test'
-/** create some common data from an object, for better reuse in tests */
-const ceCommonData = { 'hello': 'world', 'year': 2019 }
-/** create some common data from a Map, for better reuse in tests */
-const ceMapData = new Map() // empty Map
-// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
-ceMapData.set('key-1', 'value 1')
-ceMapData.set('key-2', 'value 2')
+// import some common test data
+const {
+  commonEventTime,
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData
+  // ceMapData
+} = require('./common-test-data')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {

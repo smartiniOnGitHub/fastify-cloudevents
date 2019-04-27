@@ -203,25 +203,16 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   })
 })
 
-/** create some common options, for better reuse in tests */
-const ceCommonOptions = {
-  time: new Date(),
-  extensions: { 'exampleExtension': 'value' },
-  contenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
-  strict: false
-}
-/** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-/** create a sample common server URL, for better reuse in tests */
-const ceServerUrl = '/test'
-/** create some common data from an object, for better reuse in tests */
-const ceCommonData = { 'hello': 'world', 'year': 2019 }
-/** create some common data from a Map, for better reuse in tests */
-const ceMapData = new Map() // empty Map
-// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
-ceMapData.set('key-1', 'value 1')
-ceMapData.set('key-2', 'value 2')
+// import some common test data
+const {
+  // commonEventTime,
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  // ceNamespace,
+  ceServerUrl,
+  ceCommonData,
+  ceMapData
+} = require('./common-test-data')
 
 /** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
