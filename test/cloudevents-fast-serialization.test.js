@@ -112,7 +112,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullSerializedFast = ceSerializeFast(ceFull)
       t.ok(ceFullSerializedFast)
 
-      const ceFullSerializedFastComparison = `{"data":{"hello":"world","year":2019},"extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","time":"${commonEventTime.toISOString()}","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullSerializedFast, ceFullSerializedFastComparison)
       const ceFullDeserializedFast = JSON.parse(ceFullSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullDeserializedFast.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -144,7 +144,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerializedFast)
 
-      const ceFullStrictSerializedFastComparison = `{"data":{"hello":"world","year":2019},"extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","time":"${commonEventTime.toISOString()}","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullStrictSerializedFast, ceFullStrictSerializedFastComparison)
       const ceFullStrictDeserializedFast = JSON.parse(ceFullStrictSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullStrictDeserializedFast.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -511,7 +511,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullSerialized = ceSerializeFast(ceFull)
       t.ok(ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","time":"${commonEventTime.toISOString()}","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -559,7 +559,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullStrictSerialized = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","time":"${commonEventTime.toISOString()}","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
