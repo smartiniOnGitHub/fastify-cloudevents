@@ -117,5 +117,3 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
     // TODO: add other tests for the other schema validator ... wip
   })
 })
-
-// TODO: check if add an explicit dependency to 'ajv', important; and write in docs ... maybe in peerDependencies, but it's already a (transitive) dependency here, so for now add nothing
