@@ -16,9 +16,7 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-// const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
-// TODO: test the library before being released ... wip
-const { CloudEvent, CloudEventTransformer } = require('../../cloudevent.js') // get CloudEvent definition and related utilities
+const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
