@@ -22,44 +22,10 @@ const Fastify = require('fastify')
 
 // use 'ajv' (dependency of fast-json-stringify') in all tests here
 
-// TODO: check if remove this test function here (redundant) ... wip
-/** @test {fastifyCloudEvents} */
-test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(9)
-  const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
-  fastify.register(require('../src/plugin')) // configure this plugin with its default options
-
-  fastify.listen(0, (err, address) => {
-    t.error(err)
-
-    // ensure CloudEvent class exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('CloudEvent'))
-    const CloudEvent = fastify.CloudEvent
-    // optional, add some assertions with standard Node.js assert statements, as a sample
-    assert(CloudEvent !== null)
-    assert(typeof CloudEvent === 'function')
-    assert(new CloudEvent() instanceof CloudEvent)
-    assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-    t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-
-    // ensure cloudEventSerializeFast function exist in Fastify decorators ...
-    t.ok(fastify.hasDecorator('cloudEventSerializeFast'))
-    const ceSerializeFast = fastify.cloudEventSerializeFast
-    assert(ceSerializeFast !== null)
-    assert(typeof ceSerializeFast === 'function')
-    t.ok(ceSerializeFast)
-    t.strictEqual(typeof ceSerializeFast, 'function')
-  })
-})
-
 // import some common test data
 const {
   // commonEventTime,
-  // ceCommonOptions,
+  ceCommonOptions,
   ceCommonOptionsStrict,
   ceNamespace,
   ceServerUrl,
@@ -71,7 +37,7 @@ const Ajv = require('ajv')
 
 /** @test {fastifyCloudEvents} */
 test('ensure CloudEvent schema (exposed by the plugin) pass validation with a schema compiler', (t) => {
-  t.plan(11)
+  t.plan(20)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -89,31 +55,69 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
     t.strictEqual(typeof ceSchema, 'object')
 
     const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
+    assert(ajv !== null)
     t.ok(ajv)
     const ceValidate = ajv.compile(ceSchema)
+    assert(ceValidate !== null)
+    assert(typeof ceValidate === 'function')
     t.ok(ceValidate)
     const ceValidateAlwaysFail = function (schema) {
-      return { error: new Error('Always fail') }
-      // TODO: check if it's good ... wip
+      return false // always fail
     }
     t.ok(ceValidateAlwaysFail)
 
+    // test on some good data
+    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData, // data
+      ceCommonOptionsStrict
+    )
+    t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isValid())
+
+    // additional tests, with bad objects ...
+    const ceFullBad = new CloudEvent(null,
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData, // data
+      ceCommonOptions
+    )
+    t.ok(ceFullBad)
+    t.ok(!ceFullBad.isValid())
+
     {
-      // test on some good data
-      const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-        ceNamespace,
-        ceServerUrl,
-        ceCommonData, // data
-        ceCommonOptionsStrict
-      )
-      t.ok(ceFullStrict)
+      // tests using the good validator
+      // serialization and validation tests on the good test object
       const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true })
       t.ok(ceFullStrictSerializedFast)
       const ceFullStrictValid = ceValidate(ceFullStrict)
-      if (!ceFullStrictValid) console.log(ceValidate.errors)
+      // if (!ceFullStrictValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidate.errors)}`)
       t.ok(ceFullStrictValid)
+
+      // serialization and validation tests on the bad test object
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
+      t.ok(ceFullBadSerializedOnlyValidFalse)
+      const ceFullBadValid = ceValidate(ceFullBad)
+      // if (!ceFullBadValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidate.errors)}`)
+      t.ok(!ceFullBadValid)
     }
 
-    // TODO: add other tests for the other schema validator ... wip
+    {
+      // tests using the bad validator
+      // serialization and validation tests on the good test object
+      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true })
+      t.ok(ceFullStrictSerializedFast)
+      const ceFullStrictValid = ceValidateAlwaysFail(ceFullStrict)
+      // if (!ceFullStrictValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidateAlwaysFail.errors)}`)
+      t.ok(!ceFullStrictValid)
+
+      // serialization and validation tests on the bad test object
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
+      t.ok(ceFullBadSerializedOnlyValidFalse)
+      const ceFullBadValid = ceValidateAlwaysFail(ceFullBad)
+      // if (!ceFullBadValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidateAlwaysFail.errors)}`)
+      t.ok(!ceFullBadValid)
+    }
   })
 })
