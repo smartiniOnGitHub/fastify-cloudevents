@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.2.0) (2019-05-02)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.0.0...2.2.0)
+Summary Changelog:
+- Update dependency on cloudevent to '0.5.x' which implements the 
+  [v0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.2) 
+  with all breaking changes since its v0.1
+- Updated dependencies for the development environment
+- Updated documentation and samples to describe/show changes and the new behavior
+- Updated Tap unit tests to always run in strict mode, and some refactoring
+- Clarify which CloudEvents Spec version is implemented in the current release
+
 ## [2.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.0.0) (2019-04-08)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/1.0.0...2.0.0)
 Summary Changelog:
