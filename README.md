@@ -9,6 +9,8 @@
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
+Current release implements the v0.2 of the CloudEvents Spec.
+
 The purpose of this plugin is to let Fastify web applications create instances of CloudEvents 
 in a simple way (with some useful defaults), or in a full way (all attributes).
 Optionally, it's possible to validate created instances to be sure they are compliant 
