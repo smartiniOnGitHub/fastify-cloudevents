@@ -5,7 +5,7 @@
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/fastify-cloudevents/?branch=master)
   [![dependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents)
-  [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents?type=dev)
+  [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents?type=dev) [![Greenkeeper badge](https://badges.greenkeeper.io/smartiniOnGitHub/fastify-cloudevents.svg)](https://greenkeeper.io/)
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
