@@ -72,12 +72,12 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
     // undefined
     t.notOk()
     t.notOk(ceIsValid())
-    t.strictSame(ceValidate(), [ new Error('CloudEvent undefined or null') ])
+    t.strictSame(ceValidate(), [new Error('CloudEvent undefined or null')])
 
     // null
     t.notOk(null)
     t.notOk(ceIsValid(null))
-    t.strictSame(ceValidate(null), [ new Error('CloudEvent undefined or null') ])
+    t.strictSame(ceValidate(null), [new Error('CloudEvent undefined or null')])
   })
 })
 
@@ -112,7 +112,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     } catch (e) {
       t.ok(e) // expected error here
       t.ok(!ceIsValid(ceEmpty2))
-      t.strictSame(ceValidate(ceEmpty2), [ new Error('CloudEvent undefined or null') ])
+      t.strictSame(ceValidate(ceEmpty2), [new Error('CloudEvent undefined or null')])
     }
     t.equal(ceEmpty2, null)
     // the same test, but in a shorter form ...
