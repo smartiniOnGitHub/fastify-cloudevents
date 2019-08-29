@@ -274,13 +274,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       ceFullOtherContentTypeStrictBad.id = null // remove some mandatory attribute now, to let serialization fail
       t.ok(!ceFullOtherContentTypeStrictBad.isValid())
       const ceFullStrictBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
-        encodedData: `<data "hello"="world" "year"="2019" />`,
+        encodedData: '<data "hello"="world" "year"="2019" />',
         onlyValid: false
       })
       t.ok(ceFullStrictBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullStrictBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
-          encodedData: `<data "hello"="world" "year"="2019" />`,
+          encodedData: '<data "hello"="world" "year"="2019" />',
           onlyValid: true
         })
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
@@ -291,8 +291,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 
 // sample encoding function, to use in tests here
 function encoderSample () {
-  // return `<data "hello"="world" "year"="2019" />`
-  return `<data encoder="sample" />`
+  // return '<data "hello"="world" "year"="2019" />'
+  return '<data encoder="sample" />'
 }
 
 /** @test {CloudEvent} */
@@ -334,16 +334,16 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       t.ok(cceFullOtherContentTypeSerialized1)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const cceFullOtherContentTypeSerialized2 = ceSerializeFast(ceFullOtherContentType, {
-        encodedData: `<data "hello"="world" "year"="2019" />`
+        encodedData: '<data "hello"="world" "year"="2019" />'
       })
       t.ok(cceFullOtherContentTypeSerialized2)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-      const constEncodedData = `<data "constant"="encoded" />`
+      const constEncodedData = '<data "constant"="encoded" />'
       const cceFullOtherContentTypeSerialized3 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
         // encodedData: undefined
         // encodedData: null
-        // encodedData: `<data "hello"="world" "year"="2019" />`
+        // encodedData: '<data "hello"="world" "year"="2019" />'
         encodedData: constEncodedData
       })
       t.ok(cceFullOtherContentTypeSerialized3)
@@ -387,16 +387,16 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       t.ok(ceFullOtherContentTypeStrictSerialized1)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       const ceFullOtherContentTypeStrictSerialized2 = ceSerializeFast(ceFullOtherContentTypeStrict, {
-        encodedData: `<data "hello"="world" "year"="2019" />`
+        encodedData: '<data "hello"="world" "year"="2019" />'
       })
       t.ok(ceFullOtherContentTypeStrictSerialized2)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-      const constEncodedData = `<data "constant"="encoded" />`
+      const constEncodedData = '<data "constant"="encoded" />'
       const ceFullOtherContentTypeStrictSerialized3 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         // encodedData: undefined
         // encodedData: null
-        // encodedData: `<data "hello"="world" "year"="2019" />`
+        // encodedData: '<data "hello"="world" "year"="2019" />'
         encodedData: constEncodedData
       })
       t.ok(ceFullOtherContentTypeStrictSerialized3)

@@ -87,7 +87,7 @@ function fastifyCloudEvents (fastify, options, next) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return stringify(event)
       } else {
-        throw new Error(`Unable to serialize a not valid CloudEvent.`)
+        throw new Error('Unable to serialize a not valid CloudEvent.')
       }
     }
     // else
@@ -110,7 +110,7 @@ function fastifyCloudEvents (fastify, options, next) {
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return stringify(newEvent)
     } else {
-      throw new Error(`Unable to serialize a not valid CloudEvent.`)
+      throw new Error('Unable to serialize a not valid CloudEvent.')
     }
   }
 

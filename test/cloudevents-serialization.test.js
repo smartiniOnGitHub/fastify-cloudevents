@@ -194,7 +194,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
 
-    const fixedEncodedData = `<data "fixed"="encoded" />`
+    const fixedEncodedData = '<data "fixed"="encoded" />'
     const fixedDecodedData = { fixed: 'encoded' }
 
     {
