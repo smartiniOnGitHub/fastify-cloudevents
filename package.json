@@ -5,12 +5,15 @@
   "main": "src/plugin",
   "scripts": {
     "dependency:log": "npm list > ./temp/dependencies.log",
+    "example:debug": "node --inspect-brk example/example",
+    "example-enhanced:debug": "node --inspect-brk example/example-enhanced",
     "example": "node example/example",
     "example-enhanced": "node example/example-enhanced",
     "lint": "standard \"./*.js\" \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
-    "test:unit": "tap -J --comments --strict test/*.test.js",
-    "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --strict test/*.test.js",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
+    "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
+    "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
+    "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --no-esm --strict test/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
