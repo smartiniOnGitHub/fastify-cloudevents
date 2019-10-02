@@ -111,11 +111,12 @@ and *not* arguments like in error-first callbacks: (error, data), because here i
 Since v0.2 of the spec, there is no more a standard attribute to specify the version 
 of any specific event type, so the best if to follow their recommendations, 
 and for example add a version in the 'type' attribute 
-(for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
+(for example '-v1.0.0' at the end of its base value, or at the end of its full value),
 or into the 'schemaurl' attribute but only its major version 
 (like '-v1' or '/v1/' at the end).
 Since v0.3 of the spec, extensions are no more inside a specific attribute, 
-so even mine (for the 'strict' mode for example) has been moved into a namespaced one.
+so even mine (for the 'strict' mode for example) has been moved into a namespaced one;
+plugin extensions has been moved in another (specific) namespace.
 
 For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 

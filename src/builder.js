@@ -39,7 +39,8 @@ function builder (options = {}) {
     baseNamespace,
     idGenerator,
     includeHeaders,
-    cloudEventOptions
+    cloudEventOptions,
+    cloudEventExtensions
   } = options
 
   return {
@@ -211,7 +212,8 @@ function builder (options = {}) {
           reply: this.buildReplyDataForCE(reply),
           payload
         }, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       return ce
     }
