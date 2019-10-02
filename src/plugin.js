@@ -43,7 +43,7 @@ function fastifyCloudEvents (fastify, options, next) {
     onRegisterCallback = null,
     onReadyCallback = null,
     cloudEventOptions = {},
-    cloudEventExtensions = {}
+    cloudEventExtensions = null
   } = options
 
   ensureIsString(serverUrl, 'serverUrl')
