@@ -229,6 +229,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
+
       next()
     })
   }
@@ -236,8 +237,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
-      // remove the request attribute from data, for less verbose data
-      delete ce.data.request
+      // keep the request attribute from data, even if more data will be shown here
       onResponseCallback(ce)
 
       next()
