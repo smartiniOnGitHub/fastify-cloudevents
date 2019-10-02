@@ -58,8 +58,3 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     }
   })
 })
-
-function loggingCallback (ce) {
-  console.log(`loggingCallback - CloudEvent dump ${Fastify().CloudEvent.dumpObject(ce, 'ce')}`)
-}
-assert(loggingCallback !== null)
