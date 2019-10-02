@@ -16,7 +16,9 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// TODO: temp, do not commit ... wip
+const { CloudEvent, CloudEventTransformer } = require('../../cloudevent.js/')
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
@@ -74,7 +76,7 @@ function fastifyCloudEvents (fastify, options, next) {
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
-   *        encodedData (string, no default) already encoded data (but consistency with the contenttype is not checked),
+   *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
@@ -83,7 +85,7 @@ function fastifyCloudEvents (fastify, options, next) {
   function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
     ensureIsObject(event, 'event')
 
-    if (event.contenttype === CloudEvent.contenttypeDefault()) {
+    if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return stringify(event)
       } else {
@@ -93,17 +95,17 @@ function fastifyCloudEvents (fastify, options, next) {
     // else
     if (encoder !== undefined && encoder !== null) {
       if (typeof encoder !== 'function') {
-        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
       }
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
       if (encodedData === undefined || encodedData === null) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.datacontenttype}'.`)
       }
     }
     if (typeof encodedData !== 'string') {
-      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contenttype}'.`)
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.datacontenttype}'.`)
     }
     const newEvent = CloudEventTransformer.mergeObjects(event, { data: encodedData })
     // console.log(`DEBUG - new event details: ${CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
