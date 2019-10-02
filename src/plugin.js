@@ -42,7 +42,8 @@ function fastifyCloudEvents (fastify, options, next) {
     onRouteCallback = null,
     onRegisterCallback = null,
     onReadyCallback = null,
-    cloudEventOptions = {}
+    cloudEventOptions = {},
+    cloudEventExtensions = {}
   } = options
 
   ensureIsString(serverUrl, 'serverUrl')
@@ -62,6 +63,8 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsFunction(onRouteCallback, 'onRouteCallback')
   ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
+  ensureIsObject(cloudEventOptions, 'cloudEventOptions')
+  ensureIsObject(cloudEventExtensions, 'cloudEventExtensions')
 
   const fastJson = require('fast-json-stringify')
   // get a schema for serializing a CloudEvent object to JSON
@@ -122,9 +125,9 @@ function fastifyCloudEvents (fastify, options, next) {
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // add to extensions the serverUrlMode defined, if set
-  if (serverUrlMode !== null) {
-    cloudEventOptions.extensions = cloudEventOptions.extensions || {}
-    cloudEventOptions.extensions.serverUrlMode = serverUrlMode
+  if (serverUrlMode !== null && cloudEventExtensions !== null) {
+    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents = {}
+    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents.serverUrlMode = serverUrlMode
   }
 
   // references builders, configured with some plugin options
@@ -136,7 +139,8 @@ function fastifyCloudEvents (fastify, options, next) {
     baseNamespace,
     idGenerator,
     includeHeaders,
-    cloudEventOptions
+    cloudEventOptions,
+    cloudEventExtensions
   })
 
   // handle hooks, only when related callback are defined
@@ -212,7 +216,8 @@ function fastifyCloudEvents (fastify, options, next) {
           error: errorAsData,
           process: processInfoAsData
         }, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onErrorCallback(ce)
 
@@ -246,7 +251,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onClose`,
         builders.buildSourceUrl(),
         builders.buildPluginDataForCE('plugin shutdown'), // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onCloseCallback(ce)
 
@@ -260,7 +266,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onRoute`,
         builders.buildSourceUrl(),
         routeOptions, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onRouteCallback(ce)
     })
@@ -272,7 +279,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onRegister`,
         builders.buildSourceUrl(),
         builders.buildPluginDataForCE('plugin registration'), // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onRegisterCallback(ce)
     })
@@ -284,7 +292,8 @@ function fastifyCloudEvents (fastify, options, next) {
       `${baseNamespace}.ready`,
       builders.buildSourceUrl(),
       builders.buildPluginDataForCE('plugin startup successfully'), // data
-      cloudEventOptions
+      cloudEventOptions,
+      cloudEventExtensions
     )
     fastify.ready(onReadyCallback(ce))
   }
