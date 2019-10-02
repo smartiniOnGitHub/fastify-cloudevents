@@ -60,6 +60,8 @@ const {
   commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonExtensions,
+  // ceExtensionStrict,
   ceNamespace,
   ceServerUrl,
   ceCommonData
@@ -93,7 +95,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        ceCommonExtensions
       )
       assert(ceFull !== null)
       t.ok(ceFull)
@@ -112,10 +115,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullSerializedFast = ceSerializeFast(ceFull)
       t.ok(ceFullSerializedFast)
 
-      const ceFullSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","exampleExtension":"value","specversion":"0.3","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject"}`
       t.strictSame(ceFullSerializedFast, ceFullSerializedFastComparison)
       const ceFullDeserializedFast = JSON.parse(ceFullSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullDeserializedFast.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullDeserializedFast.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullDeserializedFast.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFull, ceFullDeserializedFast)
     }
 
@@ -125,7 +129,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptionsStrict
+        ceCommonOptionsStrict,
+        ceCommonExtensions
       )
       assert(ceFullStrict !== null)
       t.ok(ceFullStrict)
@@ -144,10 +149,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerializedFast)
 
-      const ceFullStrictSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedFastComparison = `{"data":{"hello":"world","year":2019},"time":"${commonEventTime.toISOString()}","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value","specversion":"0.3","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject"}`
       t.strictSame(ceFullStrictSerializedFast, ceFullStrictSerializedFastComparison)
       const ceFullStrictDeserializedFast = JSON.parse(ceFullStrictSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullStrictDeserializedFast.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullStrictDeserializedFast.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullStrictDeserializedFast.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserializedFast)
     }
 
@@ -157,7 +163,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        {} // extensions
       )
       assert(ceFullBad !== null)
       t.ok(ceFullBad)
@@ -196,8 +203,9 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         ceCommonData, // data
         {
           ...ceCommonOptions,
-          contenttype: 'application/xml'
-        }
+          datacontenttype: 'application/xml'
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentType !== null)
       t.ok(ceFullOtherContentType)
@@ -220,8 +228,9 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         ceCommonData, // data
         {
           ...ceCommonOptionsStrict,
-          contenttype: 'application/xml'
-        }
+          datacontenttype: 'application/xml'
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentTypeStrict !== null)
       t.ok(ceFullOtherContentTypeStrict)
@@ -266,8 +275,9 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         ceCommonData, // data
         {
           ...ceCommonOptions,
-          contenttype: 'application/xml'
-        }
+          datacontenttype: 'application/xml'
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentTypeStrictBad !== null)
       t.ok(ceFullOtherContentTypeStrictBad)
@@ -319,8 +329,9 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
         ceCommonData, // data
         {
           ...ceCommonOptions,
-          contenttype: 'application/xml'
-        }
+          datacontenttype: 'application/xml'
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentType !== null)
       t.ok(ceFullOtherContentType)
@@ -372,8 +383,9 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
         ceCommonData, // data
         {
           ...ceCommonOptionsStrict,
-          contenttype: 'application/xml'
-        }
+          datacontenttype: 'application/xml'
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentTypeStrict !== null)
       t.ok(ceFullOtherContentTypeStrict)
@@ -444,7 +456,8 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
       ceNamespace,
       ceServerUrl,
       ceCommonData, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullStrict !== null)
     t.ok(ceFullStrict)
@@ -495,7 +508,8 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
         ceNamespace,
         ceServerUrl,
         ceCommonNestedData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        ceCommonExtensions
       )
       assert(ceFull !== null)
       t.ok(ceFull)
@@ -511,10 +525,11 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullSerialized = ceSerializeFast(ceFull)
       t.ok(ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"specversion":"0.2","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","exampleExtension":"value","specversion":"0.3","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFull, ceFullDeserialized)
 
       // ensure payload data is a copy of event data
@@ -543,7 +558,8 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
         ceNamespace,
         ceServerUrl,
         ceCommonNestedData, // data
-        ceCommonOptionsStrict
+        ceCommonOptionsStrict,
+        ceCommonExtensions
       )
       assert(ceFullStrict !== null)
       t.ok(ceFullStrict)
@@ -559,10 +575,11 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullStrictSerialized = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"specversion":"0.2","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","contenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedComparison = `{"data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"time":"${commonEventTime.toISOString()}","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value","specversion":"0.3","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserialized)
 
       // ensure payload data is a copy of event data

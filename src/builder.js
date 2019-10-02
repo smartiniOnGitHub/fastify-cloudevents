@@ -26,7 +26,9 @@
  * @private
  */
 
-const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// TODO: temp, do not commit ... wip
+const { CloudEvent, CloudEventTransformer } = require('../../cloudevent.js/')
 
 function builder (options = {}) {
   const {

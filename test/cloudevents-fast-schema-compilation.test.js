@@ -27,6 +27,8 @@ const {
   // commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonExtensions,
+  // ceExtensionStrict,
   ceNamespace,
   ceServerUrl,
   ceCommonData
@@ -71,7 +73,8 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
       ceNamespace,
       ceServerUrl,
       ceCommonData, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     t.ok(ceFullStrict)
     t.ok(ceFullStrict.isValid())
@@ -81,7 +84,8 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
       ceNamespace,
       ceServerUrl,
       ceCommonData, // data
-      ceCommonOptions
+      ceCommonOptions,
+      {} // extensions
     )
     t.ok(ceFullBad)
     t.ok(!ceFullBad.isValid())
