@@ -73,8 +73,8 @@ The plugin decorate Fastify and expose some functions:
 Plugin options are:
 - `serverUrl`, the URL (absolute, or relative) of the current webapp, 
   to use as a base `source` in generated CloudEvents
-- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents 
-  (any non null value will cause this setting to be aded to the extension attribute):
+- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents; 
+  any not null value will cause this setting to be added to extensions (if set not null in plugin options):
   - null, (default value) same as 'pluginAndRequestSimplified'
   - 'pluginServerUrl', use only the given `serverUrl`
   - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
