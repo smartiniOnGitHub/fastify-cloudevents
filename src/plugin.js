@@ -16,9 +16,9 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-// const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
-// TODO: temp, do not commit ... wip
-const { CloudEvent, CloudEventTransformer } = require('../../cloudevent.js/')
+// const { CloudEvent, JSONBatch, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// TODO: temp, do not merge to master ... wip
+const { CloudEvent, JSONBatch, CloudEventTransformer } = require('../../cloudevent.js/')
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
@@ -63,8 +63,8 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsFunction(onRouteCallback, 'onRouteCallback')
   ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
-  ensureIsObject(cloudEventOptions, 'cloudEventOptions')
-  ensureIsObject(cloudEventExtensions, 'cloudEventExtensions')
+  ensureIsObjectPlain(cloudEventOptions, 'cloudEventOptions')
+  ensureIsObjectPlain(cloudEventExtensions, 'cloudEventExtensions')
 
   const fastJson = require('fast-json-stringify')
   // get a schema for serializing a CloudEvent object to JSON
@@ -86,7 +86,7 @@ function fastifyCloudEvents (fastify, options, next) {
    * @throws {Error} if onlyValid is true, and the given event is not a valid CloudEvent instance
    */
   function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
-    ensureIsObject(event, 'event')
+    ensureIsObjectPlain(event, 'event')
 
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
@@ -122,6 +122,7 @@ function fastifyCloudEvents (fastify, options, next) {
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
+  fastify.decorate('JSONBatch', JSONBatch)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // add to extensions the serverUrlMode defined, if set
@@ -301,25 +302,31 @@ function fastifyCloudEvents (fastify, options, next) {
   next()
 }
 
-function ensureIsString (arg, name) {
+function ensureIsString (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'string') {
     throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsBoolean (arg, name) {
+function ensureIsBoolean (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'boolean') {
     throw new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsObject (arg, name) {
+function ensureIsObject (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'object') {
     throw new TypeError(`The argument '${name}' must be a object, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsFunction (arg, name) {
+function ensureIsObjectPlain (arg, name = 'arg') {
+  if (arg !== null && Object.prototype.toString.call(arg) === '[object Object]') {
+    return new TypeError(`The argument '${name}' must be a plain object, instead got a '${typeof arg}'`)
+  }
+}
+
+function ensureIsFunction (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'function') {
     throw new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
   }
@@ -335,6 +342,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^2.1.0',
+  fastify: '^2.7.1',
   name: 'fastify-cloudevents'
 })
