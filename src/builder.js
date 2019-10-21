@@ -124,7 +124,7 @@ function builder (options = {}) {
     buildValues (request) {
       const clientIp = this.buildClientIP(request)
       const headers = this.buildHeaders(request)
-      const sourceUrl = this.buildSourceUrl(request.url)
+      const sourceUrl = this.buildSourceUrl(request.req.url)
       return { clientIp, headers, sourceUrl }
     },
 
@@ -204,7 +204,7 @@ function builder (options = {}) {
       }
       const ce = new CloudEvent(idGenerator.next().value,
         `${baseNamespace}.${hookName}`,
-        this.buildSourceUrl(request.url),
+        this.buildSourceUrl(request.req.url),
         {
           id: request.id,
           timestamp: CloudEventTransformer.timestampToNumber(),
