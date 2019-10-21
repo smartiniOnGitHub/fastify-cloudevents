@@ -66,6 +66,7 @@ Note that plugin releases 2.x are for Fastify 2.x, etc.
 The plugin decorate Fastify and expose some functions:
 - `CloudEvent`, the CloudEvent implementation, as a class
 - `CloudEventTransformer`, the CloudEventTransformer utility class
+- `JSONBatch`, the class to handle JSONBatch instances
 - `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
   and not standard JSON serialization functions; note that similar features of the underlying library 
   has been implemented here (like serialization options)

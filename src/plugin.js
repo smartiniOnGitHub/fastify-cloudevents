@@ -16,9 +16,9 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-// const { CloudEvent, JSONBatch, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+// const { CloudEvent, CloudEventTransformer, JSONBatch } = require('cloudevent') // get CloudEvent definition and related utilities
 // TODO: temp, do not merge to master ... wip
-const { CloudEvent, JSONBatch, CloudEventTransformer } = require('../../cloudevent.js/')
+const { CloudEvent, CloudEventTransformer, JSONBatch } = require('../../cloudevent.js/')
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
@@ -77,7 +77,7 @@ function fastifyCloudEvents (fastify, options, next) {
    * Serialize the given CloudEvent in JSON format.
    *
    * @param {!object} event the CloudEvent to serialize
-   * @param {object} options optional serialization attributes:
+   * @param {object} [options={}] optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
    *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,

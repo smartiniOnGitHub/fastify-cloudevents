@@ -23,7 +23,7 @@ const fastifyCloudevents = require('../src/plugin')
 
 /** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(8)
+  t.plan(11)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
@@ -50,6 +50,16 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
       assert(typeof CloudEventTransformer === 'function')
       t.ok(CloudEventTransformer)
       t.strictEqual(typeof CloudEventTransformer, 'function')
+    }
+
+    {
+      // ensure JSONBatch class exist in Fastify decorators ...
+      t.ok(fastify.hasDecorator('JSONBatch'))
+      const JSONBatch = fastify.JSONBatch
+      assert(JSONBatch !== null)
+      assert(typeof JSONBatch === 'function')
+      t.ok(JSONBatch)
+      t.strictEqual(typeof JSONBatch, 'function')
     }
 
     {
