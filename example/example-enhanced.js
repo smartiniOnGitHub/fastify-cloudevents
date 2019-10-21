@@ -33,7 +33,10 @@ const k = {
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   },
-  cloudEventExtensions: {} // to be able to store serverUrlMode in CloudEvents extensions, optional
+  // to be able to store serverUrlMode in CloudEvents extensions, set it
+  cloudEventExtensions: null // sample null extension, good even in strict mode
+  // cloudEventExtensions: {} // ok, but no empty extensions in strict mode
+  // cloudEventExtensions: { exampleExtension: 'value' } // sample extension
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}`
 k.source = k.serverUrl
