@@ -24,8 +24,6 @@
 /**
  * Get a reference to cloudevent class.
  */
-// const CloudEventLibrary = require('cloudevent') // get CloudEvent definition and related utilities
-// TODO: temp, do not commit ... wip
-const CloudEventLibrary = require('../../cloudevent.js/')
+const CloudEventLibrary = require('cloudevent') // get CloudEvent definition and related utilities
 
 module.exports = CloudEventLibrary
