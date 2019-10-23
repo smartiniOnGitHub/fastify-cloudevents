@@ -37,7 +37,8 @@ function builder (options = {}) {
     baseNamespace,
     idGenerator,
     includeHeaders,
-    cloudEventOptions
+    cloudEventOptions,
+    cloudEventExtensions
   } = options
 
   return {
@@ -49,7 +50,7 @@ function builder (options = {}) {
      * Note that this is mainly for usage inside the plugin,
      * but in some cases could be useful even outside.
      *
-     * @param {string} url the uri part of the current request
+     * @param {string} [url='']  the uri part of the current request
      * @return {string} the source value to use, as a string
      * @private
      */
@@ -170,7 +171,7 @@ function builder (options = {}) {
      * to be used in a CloudEvent data (sub-)property.
      * Note that some config options for builders are used here.
      *
-     * @param {object} description the description (maybe related to the event)
+     * @param {object} [description='']  the description (maybe related to the event)
      * @return {object} an object containing extracted attributes
      * @private
      */
@@ -209,7 +210,8 @@ function builder (options = {}) {
           reply: this.buildReplyDataForCE(reply),
           payload
         }, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       return ce
     }

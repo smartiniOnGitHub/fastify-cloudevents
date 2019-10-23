@@ -16,7 +16,7 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
+const { CloudEvent, CloudEventTransformer, JSONBatch } = require('cloudevent') // get CloudEvent definition and related utilities
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
@@ -40,7 +40,8 @@ function fastifyCloudEvents (fastify, options, next) {
     onRouteCallback = null,
     onRegisterCallback = null,
     onReadyCallback = null,
-    cloudEventOptions = {}
+    cloudEventOptions = {},
+    cloudEventExtensions = null
   } = options
 
   ensureIsString(serverUrl, 'serverUrl')
@@ -60,6 +61,8 @@ function fastifyCloudEvents (fastify, options, next) {
   ensureIsFunction(onRouteCallback, 'onRouteCallback')
   ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
+  ensureIsObjectPlain(cloudEventOptions, 'cloudEventOptions')
+  ensureIsObjectPlain(cloudEventExtensions, 'cloudEventExtensions')
 
   const fastJson = require('fast-json-stringify')
   // get a schema for serializing a CloudEvent object to JSON
@@ -72,18 +75,18 @@ function fastifyCloudEvents (fastify, options, next) {
    * Serialize the given CloudEvent in JSON format.
    *
    * @param {!object} event the CloudEvent to serialize
-   * @param {object} options optional serialization attributes:
+   * @param {object} [options={}] optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
-   *        encodedData (string, no default) already encoded data (but consistency with the contenttype is not checked),
+   *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} if onlyValid is true, and the given event is not a valid CloudEvent instance
    */
   function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
-    ensureIsObject(event, 'event')
+    ensureIsObjectPlain(event, 'event')
 
-    if (event.contenttype === CloudEvent.contenttypeDefault()) {
+    if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return stringify(event)
       } else {
@@ -93,17 +96,17 @@ function fastifyCloudEvents (fastify, options, next) {
     // else
     if (encoder !== undefined && encoder !== null) {
       if (typeof encoder !== 'function') {
-        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
       }
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
       if (encodedData === undefined || encodedData === null) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.datacontenttype}'.`)
       }
     }
     if (typeof encodedData !== 'string') {
-      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contenttype}'.`)
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.datacontenttype}'.`)
     }
     const newEvent = CloudEventTransformer.mergeObjects(event, { data: encodedData })
     // console.log(`DEBUG - new event details: ${CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
@@ -117,12 +120,13 @@ function fastifyCloudEvents (fastify, options, next) {
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
+  fastify.decorate('JSONBatch', JSONBatch)
   fastify.decorate('cloudEventSerializeFast', serialize)
 
   // add to extensions the serverUrlMode defined, if set
-  if (serverUrlMode !== null) {
-    cloudEventOptions.extensions = cloudEventOptions.extensions || {}
-    cloudEventOptions.extensions.serverUrlMode = serverUrlMode
+  if (serverUrlMode !== null && cloudEventExtensions !== null) {
+    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents = {}
+    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents.serverUrlMode = serverUrlMode
   }
 
   // references builders, configured with some plugin options
@@ -134,7 +138,8 @@ function fastifyCloudEvents (fastify, options, next) {
     baseNamespace,
     idGenerator,
     includeHeaders,
-    cloudEventOptions
+    cloudEventOptions,
+    cloudEventExtensions
   })
 
   // handle hooks, only when related callback are defined
@@ -210,7 +215,8 @@ function fastifyCloudEvents (fastify, options, next) {
           error: errorAsData,
           process: processInfoAsData
         }, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onErrorCallback(ce)
 
@@ -222,6 +228,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.addHook('onSend', (request, reply, payload, next) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
+
       next()
     })
   }
@@ -229,8 +236,7 @@ function fastifyCloudEvents (fastify, options, next) {
   if (onResponseCallback !== null) {
     fastify.addHook('onResponse', (request, reply, next) => {
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
-      // remove the request attribute from data, for less verbose data
-      delete ce.data.request
+      // keep the request attribute from data, even if more data will be shown here
       onResponseCallback(ce)
 
       next()
@@ -244,7 +250,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onClose`,
         builders.buildSourceUrl(),
         builders.buildPluginDataForCE('plugin shutdown'), // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onCloseCallback(ce)
 
@@ -258,7 +265,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onRoute`,
         builders.buildSourceUrl(),
         routeOptions, // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onRouteCallback(ce)
     })
@@ -270,7 +278,8 @@ function fastifyCloudEvents (fastify, options, next) {
         `${baseNamespace}.onRegister`,
         builders.buildSourceUrl(),
         builders.buildPluginDataForCE('plugin registration'), // data
-        cloudEventOptions
+        cloudEventOptions,
+        cloudEventExtensions
       )
       onRegisterCallback(ce)
     })
@@ -282,7 +291,8 @@ function fastifyCloudEvents (fastify, options, next) {
       `${baseNamespace}.ready`,
       builders.buildSourceUrl(),
       builders.buildPluginDataForCE('plugin startup successfully'), // data
-      cloudEventOptions
+      cloudEventOptions,
+      cloudEventExtensions
     )
     fastify.ready(onReadyCallback(ce))
   }
@@ -290,25 +300,31 @@ function fastifyCloudEvents (fastify, options, next) {
   next()
 }
 
-function ensureIsString (arg, name) {
+function ensureIsString (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'string') {
     throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsBoolean (arg, name) {
+function ensureIsBoolean (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'boolean') {
     throw new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsObject (arg, name) {
+function ensureIsObject (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'object') {
     throw new TypeError(`The argument '${name}' must be a object, instead got a '${typeof arg}'`)
   }
 }
 
-function ensureIsFunction (arg, name) {
+function ensureIsObjectPlain (arg, name = 'arg') {
+  if (arg !== null && Object.prototype.toString.call(arg) === '[object Object]') {
+    return new TypeError(`The argument '${name}' must be a plain object, instead got a '${typeof arg}'`)
+  }
+}
+
+function ensureIsFunction (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'function') {
     throw new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
   }
@@ -324,6 +340,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^2.1.0',
+  fastify: '^2.7.1',
   name: 'fastify-cloudevents'
 })

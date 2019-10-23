@@ -32,7 +32,11 @@ const k = {
   includeHeaders: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
-  }
+  },
+  // to be able to store serverUrlMode in CloudEvents extensions, set it
+  cloudEventExtensions: null // sample null extension, good even in strict mode
+  // cloudEventExtensions: {} // ok, but no empty extensions in strict mode
+  // cloudEventExtensions: { exampleExtension: 'value' } // sample extension
 }
 k.serverUrl = `${k.protocol}://${k.address}:${k.port}`
 k.source = k.serverUrl
@@ -74,7 +78,8 @@ fastify.register(require('../src/plugin'), {
   onRouteCallback: loggingCallback,
   onRegisterCallback: loggingCallback,
   onReadyCallback: loggingCallback,
-  cloudEventOptions: k.cloudEventOptions
+  cloudEventOptions: k.cloudEventOptions,
+  cloudEventExtensions: k.cloudEventExtensions
 })
 
 function loggingCallback (ce) {
@@ -101,7 +106,8 @@ function raiseEventAtStartServerScript () {
         hostname: hostname,
         pid: pid
       }, // data
-      k.cloudEventOptions
+      k.cloudEventOptions,
+      k.cloudEventExtensions
     )
     console.log(`console - server-script.start: created CloudEvent ${CloudEventUtilityConstructor.CloudEventTransformer.dumpObject(ce, 'ce')}`)
   // note that in this case still I can't use some features exposed by the plugin, and some fields take a default value in the plugin so here could be missing
@@ -153,7 +159,8 @@ fastify.listen(k.port, k.address, (err, address) => {
         ...processInfoAsData,
         port: address
       }, // data
-      k.cloudEventOptions
+      k.cloudEventOptions,
+      k.cloudEventExtensions
     )
     loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
@@ -168,7 +175,8 @@ fastify.listen(k.port, k.address, (err, address) => {
       ...processInfoAsData,
       port: address
     }, // data
-    k.cloudEventOptions
+    k.cloudEventOptions,
+    k.cloudEventExtensions
   )
   loggingCallback(ce)
 })
@@ -188,7 +196,8 @@ fastify.ready((err) => {
         ...errorAsData,
         ...processInfoAsData
       }, // data
-      k.cloudEventOptions
+      k.cloudEventOptions,
+      k.cloudEventExtensions
     )
     loggingCallback(ce) // forward generated event to a callback before exiting ...
     throw err
@@ -203,7 +212,8 @@ fastify.ready((err) => {
       status: 'ready',
       ...processInfoAsData
     }, // data
-    k.cloudEventOptions
+    k.cloudEventOptions,
+    k.cloudEventExtensions
   )
   loggingCallback(ce)
 })

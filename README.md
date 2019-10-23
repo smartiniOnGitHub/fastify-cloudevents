@@ -66,6 +66,7 @@ Note that plugin releases 2.x are for Fastify 2.x, etc.
 The plugin decorate Fastify and expose some functions:
 - `CloudEvent`, the CloudEvent implementation, as a class
 - `CloudEventTransformer`, the CloudEventTransformer utility class
+- `JSONBatch`, the class to handle JSONBatch instances
 - `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
   and not standard JSON serialization functions; note that similar features of the underlying library 
   has been implemented here (like serialization options)
@@ -73,8 +74,8 @@ The plugin decorate Fastify and expose some functions:
 Plugin options are:
 - `serverUrl`, the URL (absolute, or relative) of the current webapp, 
   to use as a base `source` in generated CloudEvents
-- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents 
-  (any non null value will cause this setting to be aded to the extension attribute):
+- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents; 
+  any not null value will cause this setting to be added to extensions (if set not null in plugin options):
   - null, (default value) same as 'pluginAndRequestSimplified'
   - 'pluginServerUrl', use only the given `serverUrl`
   - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
@@ -111,11 +112,12 @@ and *not* arguments like in error-first callbacks: (error, data), because here i
 Since v0.2 of the spec, there is no more a standard attribute to specify the version 
 of any specific event type, so the best if to follow their recommendations, 
 and for example add a version in the 'type' attribute 
-(for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
+(for example '-v1.0.0' at the end of its base value, or at the end of its full value),
 or into the 'schemaurl' attribute but only its major version 
 (like '-v1' or '/v1/' at the end).
 Since v0.3 of the spec, extensions are no more inside a specific attribute, 
-so even mine (for the 'strict' mode for example) has been moved into a namespaced one.
+so even mine (for the 'strict' mode for example) has been moved into a namespaced one;
+plugin extensions has been moved in another (specific) namespace.
 
 For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 

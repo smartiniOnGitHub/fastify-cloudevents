@@ -49,6 +49,8 @@ const {
   commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonExtensions,
+  // ceExtensionStrict,
   ceNamespace,
   ceServerUrl,
   ceCommonData
@@ -80,7 +82,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        ceCommonExtensions
       )
       assert(ceFull !== null)
       t.ok(ceFull)
@@ -107,10 +110,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
       t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.2","contenttype":"application/json","time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${commonEventTime.toISOString()}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFull, ceFullDeserialized)
     }
 
@@ -120,7 +124,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptionsStrict
+        ceCommonOptionsStrict,
+        ceCommonExtensions
       )
       assert(ceFullStrict !== null)
       t.ok(ceFullStrict)
@@ -147,10 +152,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.2","contenttype":"application/json","time":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
+      const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${commonEventTime.toISOString()}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserialized)
     }
 
@@ -160,7 +166,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        {} // extensions
       )
       assert(ceFullBad !== null)
       t.ok(ceFullBad)
@@ -205,7 +212,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
         ceServerUrl,
         ceCommonData, // data
         {
-          contenttype: 'application/xml'
+          datacontenttype: 'application/xml'
         }
       )
       assert(ceFullOtherContentType !== null)
@@ -258,7 +265,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
         ceCommonData, // data
         {
           ...ceCommonOptionsStrict,
-          contenttype: 'application/xml'
+          datacontenttype: 'application/xml'
         }
       )
       assert(ceFullOtherContentTypeStrict !== null)
@@ -294,5 +301,123 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: true }))
       t.ok(CloudEvent.isCloudEvent(ceFullOtherContentTypeDeserialized5))
     }
+  })
+})
+
+/** @test {CloudEvent} */
+test('ensure JSONBatch decorator function (exposed by the plugin) exists, and related serialization/deserialization functions', (t) => {
+  t.plan(9)
+  const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
+
+  fastify.listen(0, (err) => {
+    t.error(err)
+
+    // ensure JSONBatch class exist in Fastify decorators ...
+    t.ok(fastify.hasDecorator('JSONBatch'))
+    const JSONBatch = fastify.JSONBatch
+    // optional, add some assertions with standard Node.js assert statements, as a sample
+    assert(JSONBatch !== null)
+    assert(typeof JSONBatch === 'function')
+    assert.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+    t.ok(JSONBatch)
+    t.strictEqual(typeof JSONBatch, 'function')
+    t.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+
+    // ensure JSONBatch serialization/deserialization functions exists ...
+    const batchSerialize = JSONBatch.serializeEvents
+    assert(batchSerialize !== null)
+    assert(typeof batchSerialize === 'function')
+    t.ok(batchSerialize)
+    t.strictEqual(typeof batchSerialize, 'function')
+
+    const batchDeserialize = JSONBatch.deserializeEvents
+    assert(batchDeserialize !== null)
+    assert(typeof batchDeserialize === 'function')
+    t.ok(batchDeserialize)
+    t.strictEqual(typeof batchDeserialize, 'function')
+  })
+})
+
+/** @test {CloudEvent} */
+test('ensure JSONBatch serialization/deserialization functions works good', (t) => {
+  t.plan(13)
+  const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
+
+  fastify.listen(0, (err) => {
+    t.error(err)
+
+    // ensure JSONBatch class exist in Fastify decorators ...
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
+    const JSONBatch = fastify.JSONBatch
+    t.ok(JSONBatch)
+
+    // build some example CloudEvent instance ...
+    const ceFull = new CloudEvent('1/full',
+      ceNamespace,
+      ceServerUrl,
+      // ceCommonData,
+      'sample data', // data as string, to let this ce instance have some strict validation errors
+      ceCommonOptions,
+      // ceCommonExtensions
+      {} // extensions as empty object, to let this ce instance have some strict validation errors
+    )
+    const ceFullStrict = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData,
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    // define an array containing different CloudEvent instances, and even other objects ...
+    const arr = [
+      undefined,
+      null,
+      'string',
+      1234567890,
+      false,
+      true,
+      ceFull,
+      new Date(),
+      {},
+      [],
+      ceFullStrict,
+      null,
+      undefined
+    ]
+
+    // in following tests to simplify comparison of results, do only some brief checks ...
+    const ser = JSONBatch.serializeEvents(arr, { prettyPrint: true, logError: true })
+    // console.log(`DEBUG: serialized JSONBatch (prettyPrint enabled) = ${ser}`)
+    t.ok(ser)
+
+    const events = JSONBatch.getEvents(arr, {
+      onlyValid: true,
+      strict: false
+    })
+    // console.log(`DEBUG: events JSONBatch length = ${events.length}, summary: ${events}`)
+    // console.log(`DEBUG: events JSONBatch length = ${events.length}, details: ${JSON.stringify(events)}`)
+    t.ok(events)
+    t.strictSame(events.length, 2)
+
+    const deser = JSONBatch.deserializeEvents(ser, {
+      logError: true,
+      throwError: true,
+      onlyValid: true // sample, to filter out not valid serialized instances ...
+      // onlyIfLessThan64KB: true // to force throw here ...
+    })
+    // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
+    // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
+    t.ok(deser)
+    t.strictSame(deser.length, 2)
+
+    // ensure events and deser contains similar CloudEvent instances
+    t.strictSame(events.length, deser.length)
+    events.forEach((e, i) => t.ok(e.id === deser[i].id)) // this count events.length tests ...
+    events.forEach((e, i) => t.ok(e.isStrict === deser[i].isStrict)) // this count events.length tests ...
   })
 })
