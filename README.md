@@ -6,6 +6,7 @@
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/fastify-cloudevents/?branch=master)
   [![dependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents)
   [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents?type=dev)
+  [![Known Vulnerabilities](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?targetFile=package.json)](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents?targetFile=package.json)
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
