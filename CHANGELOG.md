@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.2.1](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.2.1) (2019-10-23)
+Summary Changelog:
+- Updated all dependencies
+- Fix usage of request url
+
 ## [2.2.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.2.0) (2019-05-02)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.0.0...2.2.0)
 Summary Changelog:
