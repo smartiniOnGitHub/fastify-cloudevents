@@ -21,7 +21,7 @@ const { CloudEvent, CloudEventTransformer, JSONBatch } = require('cloudevent') /
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
 
-function fastifyCloudEvents (fastify, options, next) {
+function fastifyCloudEvents (fastify, options, done) {
   const {
     serverUrl = '/',
     serverUrlMode = null,
@@ -144,7 +144,7 @@ function fastifyCloudEvents (fastify, options, next) {
 
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
-    fastify.addHook('onRequest', (request, reply, next) => {
+    fastify.addHook('onRequest', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('onRequest', request, reply)
       // add more attributes to data, could be useful to have
       ce.data.request.httpVersion = request.req.httpVersion
@@ -156,48 +156,48 @@ function fastifyCloudEvents (fastify, options, next) {
       // send the event to the callback
       onRequestCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (preParsingCallback !== null) {
-    fastify.addHook('preParsing', (request, reply, next) => {
+    fastify.addHook('preParsing', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preParsing', request, reply)
       preParsingCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (preValidationCallback !== null) {
-    fastify.addHook('preValidation', (request, reply, next) => {
+    fastify.addHook('preValidation', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preValidation', request, reply)
       preValidationCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (preHandlerCallback !== null) {
-    fastify.addHook('preHandler', (request, reply, next) => {
+    fastify.addHook('preHandler', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preHandler', request, reply)
       preHandlerCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (preSerializationCallback !== null) {
-    fastify.addHook('preSerialization', (request, reply, payload, next) => {
+    fastify.addHook('preSerialization', (request, reply, payload, done) => {
       const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
       preSerializationCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (onErrorCallback !== null) {
-    fastify.addHook('onError', (request, reply, error, next) => {
+    fastify.addHook('onError', (request, reply, error, done) => {
       const processInfoAsData = CloudEventTransformer.processInfoToData()
       const errorAsData = CloudEventTransformer.errorToData(error, {
         includeStackTrace: true,
@@ -220,26 +220,26 @@ function fastifyCloudEvents (fastify, options, next) {
       )
       onErrorCallback(ce)
 
-      next() // do not pass the error to the next callback here
+      done() // do not pass the error to the done callback here
     })
   }
 
   if (onSendCallback !== null) {
-    fastify.addHook('onSend', (request, reply, payload, next) => {
+    fastify.addHook('onSend', (request, reply, payload, done) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
 
-      next()
+      done()
     })
   }
 
   if (onResponseCallback !== null) {
-    fastify.addHook('onResponse', (request, reply, next) => {
+    fastify.addHook('onResponse', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
       // keep the request attribute from data, even if more data will be shown here
       onResponseCallback(ce)
 
-      next()
+      done()
     })
   }
 
@@ -297,7 +297,7 @@ function fastifyCloudEvents (fastify, options, next) {
     fastify.ready(onReadyCallback(ce))
   }
 
-  next()
+  done()
 }
 
 function ensureIsString (arg, name = 'arg') {
