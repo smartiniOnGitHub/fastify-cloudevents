@@ -87,8 +87,12 @@ Plugin options are:
 - `baseNamespace`, a base namespace for the `type`; more specific suffix 
   should be added to it in any CloudEvent
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
-- `includeHeaders`, a boolean flag that when `true` tells that request headers will be put 
-  in generated CloudEvents (but by default is `false`)
+- `includeHeaders`, a boolean flag to add request headers in generated CloudEvents when `true`
+  (by default is `false`)
+- `includeHttpAttributes`, a boolean flag to add some HTTP attributes in generated CloudEvents when `true`
+  (by default is `false`)
+- `includeRedundantAttributes`, a boolean flag to add some redundant attributes
+  in the data section of generated CloudEvents when `true` (by default is `false`)
 - `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
 - `preParsingCallback`, callback to handle generated CloudEvents in Fastify hook `preParsing`
 - `preValidationCallback`, callback to handle generated CloudEvents in Fastify hook `preValidation`

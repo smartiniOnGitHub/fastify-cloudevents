@@ -28,6 +28,8 @@ function fastifyCloudEvents (fastify, options, done) {
     baseNamespace = `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`,
     idGenerator = idMaker(),
     includeHeaders = false,
+    includeHttpAttributes = false,
+    includeRedundantAttributes = false,
     onRequestCallback = null,
     preParsingCallback = null,
     preValidationCallback = null,
@@ -49,6 +51,8 @@ function fastifyCloudEvents (fastify, options, done) {
   ensureIsString(baseNamespace, 'baseNamespace')
   ensureIsObject(idGenerator, 'idGenerator')
   ensureIsBoolean(includeHeaders, 'includeHeaders')
+  ensureIsBoolean(includeHttpAttributes, 'includeHttpAttributes')
+  ensureIsBoolean(includeRedundantAttributes, 'includeRedundantAttributes')
   ensureIsFunction(onRequestCallback, 'onRequestCallback')
   ensureIsFunction(preParsingCallback, 'preParsingCallback')
   ensureIsFunction(preValidationCallback, 'preValidationCallback')
@@ -138,6 +142,7 @@ function fastifyCloudEvents (fastify, options, done) {
     baseNamespace,
     idGenerator,
     includeHeaders,
+    includeRedundantAttributes,
     cloudEventOptions,
     cloudEventExtensions
   })
@@ -146,10 +151,12 @@ function fastifyCloudEvents (fastify, options, done) {
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('onRequest', request, reply)
-      // add more attributes to data, could be useful to have
-      ce.data.request.httpVersion = request.req.httpVersion
-      ce.data.request.originalUrl = request.req.originalUrl
-      ce.data.request.upgrade = request.req.upgrade
+      // add some http related attributes to data, could be useful to have
+      if (includeHttpAttributes !== null && includeHttpAttributes === true) {
+        ce.data.request.httpVersion = request.req.httpVersion
+        ce.data.request.originalUrl = request.req.originalUrl
+        ce.data.request.upgrade = request.req.upgrade
+      }
       // remove the reply attribute from data, for less verbose data
       delete ce.data.reply
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
@@ -204,17 +211,20 @@ function fastifyCloudEvents (fastify, options, done) {
         addStatus: true,
         addTimestamp: true
       })
+      const ceData = {
+        request: builders.buildRequestDataForCE(request),
+        reply: builders.buildReplyDataForCE(reply),
+        error: errorAsData,
+        process: processInfoAsData
+      }
+      if (includeRedundantAttributes !== null && includeRedundantAttributes === true) {
+        ceData.id = request.id
+        ceData.timestamp = CloudEventTransformer.timestampToNumber()
+      }
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onError`,
         builders.buildSourceUrl(request.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: builders.buildRequestDataForCE(request),
-          reply: builders.buildReplyDataForCE(reply),
-          error: errorAsData,
-          process: processInfoAsData
-        }, // data
+        ceData,
         cloudEventOptions,
         cloudEventExtensions
       )

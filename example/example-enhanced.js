@@ -30,6 +30,8 @@ const k = {
   serverUrlMode: 'pluginAndRequestSimplified', // same behavior as default value, but in this way set in CloudEvent extension object
   baseNamespace: `com.github.smartiniOnGitHub.${pluginName}-v${pluginVersion}.example-enhanced`,
   includeHeaders: true, // change from default value, as a sample
+  includeHttpAttributes: true, // change from default value, as a sample
+  includeRedundantAttributes: true, // change from default value, as a sample
   cloudEventOptions: {
     strict: true // enable strict mode in generated CloudEvents, optional
   },
@@ -66,6 +68,8 @@ fastify.register(require('../src/plugin'), {
   baseNamespace: k.baseNamespace,
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
+  includeHttpAttributes: k.includeHttpAttributes,
+  includeRedundantAttributes: k.includeRedundantAttributes,
   onRequestCallback: loggingCallback,
   preParsingCallback: loggingCallback,
   preValidationCallback: loggingCallback,

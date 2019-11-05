@@ -37,6 +37,7 @@ function builder (options = {}) {
     baseNamespace,
     idGenerator,
     includeHeaders,
+    includeRedundantAttributes,
     cloudEventOptions,
     cloudEventExtensions
   } = options
@@ -95,7 +96,7 @@ function builder (options = {}) {
     /**
      * Extract and build the value for the HTTP headers,
      * useful to add into the CloudEvent in a custom attribute inside data.
-     * If related plugin flag 'includeHeaders' is enabled headers will be returned,
+     * If plugin flag 'includeHeaders' is enabled, headers will be returned,
      * otherwise nothing.
      * Note that some config options for builders are used here.
      *
@@ -187,6 +188,8 @@ function builder (options = {}) {
     /**
      * Build a CloudEvent instance from the given arguments,
      * useful for simplify plugin hooks.
+     * If plugin flag 'includeRedundantAttributes' is enabled,
+     * some redundant attributes will be added to data.
      * Note that some config options for builders are used here.
      *
      * @param {!string} hookName the name of the hook
@@ -200,16 +203,19 @@ function builder (options = {}) {
       if (!hookName || !request || !reply) {
         throw new Error('Illegal arguments: mandatory argument undefined or null')
       }
+      const ceData = {
+        request: this.buildRequestDataForCE(request),
+        reply: this.buildReplyDataForCE(reply),
+        payload
+      }
+      if (includeRedundantAttributes !== null && includeRedundantAttributes === true) {
+        ceData.id = request.id
+        ceData.timestamp = CloudEventTransformer.timestampToNumber()
+      }
       const ce = new CloudEvent(idGenerator.next().value,
         `${baseNamespace}.${hookName}`,
         this.buildSourceUrl(request.req.url),
-        {
-          id: request.id,
-          timestamp: CloudEventTransformer.timestampToNumber(),
-          request: this.buildRequestDataForCE(request),
-          reply: this.buildReplyDataForCE(reply),
-          payload
-        }, // data
+        ceData,
         cloudEventOptions,
         cloudEventExtensions
       )
