@@ -18,13 +18,13 @@
   },
   "dependencies": {
     "fastify-plugin": "^1.6.0",
-    "fast-json-stringify": "^1.15.5",
+    "fast-json-stringify": "^1.15.6",
     "cloudevent": "~0.6.0"
   },
   "devDependencies": {
     "fastify": "^2.7.1",
     "standard": "^14.3.1",
-    "tap": "^14.8.2"
+    "tap": "^14.9.1"
   },
   "peerDependencies": {},
   "engines": {
