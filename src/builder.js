@@ -194,18 +194,18 @@ function builder (options = {}) {
      *
      * @param {!string} hookName the name of the hook
      * @param {!object} request the request
-     * @param {!object} reply the reply
+     * @param {object} reply the reply
      * @param {object} payload the payload
      * @return {object} the CloudEvent instance
      * @private
      */
     buildCloudEventForHook (hookName, request, reply, payload) {
-      if (!hookName || !request || !reply) {
+      if (!hookName || !request) {
         throw new Error('Illegal arguments: mandatory argument undefined or null')
       }
       const ceData = {
         request: this.buildRequestDataForCE(request),
-        reply: this.buildReplyDataForCE(reply),
+        reply: (reply === null) ? undefined : this.buildReplyDataForCE(reply),
         payload
       }
       if (includeRedundantAttributes !== null && includeRedundantAttributes === true) {

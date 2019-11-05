@@ -150,15 +150,14 @@ function fastifyCloudEvents (fastify, options, done) {
   // handle hooks, only when related callback are defined
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', (request, reply, done) => {
-      const ce = builders.buildCloudEventForHook('onRequest', request, reply)
+      // small optimization: pass a null reply because no useful here
+      const ce = builders.buildCloudEventForHook('onRequest', request, null)
       // add some http related attributes to data, could be useful to have
       if (includeHttpAttributes !== null && includeHttpAttributes === true) {
         ce.data.request.httpVersion = request.req.httpVersion
         ce.data.request.originalUrl = request.req.originalUrl
         ce.data.request.upgrade = request.req.upgrade
       }
-      // remove the reply attribute from data, for less verbose data
-      delete ce.data.reply
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
