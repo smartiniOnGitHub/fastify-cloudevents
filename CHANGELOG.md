@@ -1,5 +1,25 @@
 # Change Log
 
+## [2.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.3.0) (2019-11-08)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.2.0...2.3.0)
+Summary Changelog:
+- Update dependency on cloudevent to '0.6.x' which implements the 
+  [v0.3 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.3) 
+  with all breaking changes since its v0.2
+- Breaking Change: CloudEvent constructor signature has changed a little, 
+  to handle extensions as per spec
+- Breaking Change: CloudEvent attributes has been renamed for better consistency with the spec, 
+  and renamed related methods too
+- Updated all dependencies
+- Update requirements to a more recent Fastify, release '^2.7.1'
+- Updated documentation and samples to describe/show changes and the new behavior
+- Export even JSONBatch via Fastify decorators
+- Add plugin option flags to enable the output of redundant attributes and HTTP attributes
+- Fix usage of request url (fix already present in 2.2.1)
+- Clarify and cleanup docs and examples
+- Add npm custom commands to run examples and tests in debug mode
+- Other minor changes
+
 ## [2.2.1](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.2.1) (2019-10-23)
 Summary Changelog:
 - Updated all dependencies
