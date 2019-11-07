@@ -24,7 +24,7 @@
   "devDependencies": {
     "fastify": "^2.7.1",
     "standard": "^14.3.1",
-    "tap": "^14.9.1"
+    "tap": "^14.9.2"
   },
   "peerDependencies": {},
   "engines": {
