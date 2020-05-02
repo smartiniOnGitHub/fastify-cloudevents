@@ -14,12 +14,15 @@
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
     "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
     "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --no-esm --strict test/*.test.js",
-    "test": "npm run lint && npm run test:unit"
+    "test": "npm run lint && npm run test:unit",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "fastify-plugin": "^1.6.0",
     "fast-json-stringify": "^1.15.6",
-    "cloudevent": "~0.6.0"
+    "cloudevent": "~0.6.0",
+    "snyk": "^1.316.2"
   },
   "devDependencies": {
     "fastify": "^2.7.1",
@@ -44,5 +47,6 @@
     "cloudevents"
   ],
   "author": "Sandro Martini <sandro.martini@gmail.com>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "snyk": true
 }
