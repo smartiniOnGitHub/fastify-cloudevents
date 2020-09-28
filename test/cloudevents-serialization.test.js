@@ -59,7 +59,7 @@ const {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(45)
+  t.plan(49)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -110,12 +110,15 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
       t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${commonEventTime.toISOString()}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
+      const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","exampleextension":"value"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+      // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+      ceFullDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFull, ceFullDeserialized)
+      t.ok(!CloudEvent.isCloudEvent(ceFullDeserialized))
+      t.ok(!ceFullDeserialized.isStrict) // ok here, but doesn't mattter because is not a real CloudEvent instance
     }
 
     {
@@ -152,12 +155,15 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
       t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${commonEventTime.toISOString()}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
+      const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","strictvalidation":true,"exampleextension":"value"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+      // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+      ceFullStrictDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserialized)
+      t.ok(!CloudEvent.isCloudEvent(ceFullStrictDeserialized))
+      t.ok(!ceFullStrictDeserialized.isStrict) // wrong here, but doesn't mattter because is not a real CloudEvent instance
     }
 
     {
@@ -184,7 +190,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
 // sample decoding function, to use in tests here
 function decoderSample () {
-  // return { hello: 'world', year: 2019 }
+  // return { hello: 'world', year: 2020 }
   return { decoded: 'Sample' }
 }
 
@@ -242,7 +248,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       }, Error, 'Expected exception when deserializing the current CloudEvent instance')
       // when I try to serialize it (with right serialization options), expect success ...
       const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
-        decodedData: { hello: 'world', year: 2019 }
+        decodedData: { hello: 'world', year: 2020 }
       })
       t.ok(ceFullOtherContentTypeDeserialized2)
       const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
@@ -289,7 +295,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       }, Error, 'Expected exception when deserializing the current CloudEvent instance')
       // when I try to serialize it (with right serialization options), expect success ...
       const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
-        decodedData: { hello: 'world', year: 2019 }
+        decodedData: { hello: 'world', year: 2020 }
       })
       t.ok(ceFullOtherContentTypeDeserialized2)
       const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {

@@ -10,7 +10,7 @@
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
-Current release uses the v0.3 of the CloudEvents Spec.
+Current release uses the v1.0 of the CloudEvents Spec.
 
 The purpose of this plugin is to let Fastify web applications create instances of CloudEvents 
 in a simple way (with some useful defaults), or in a full way (all attributes).
@@ -23,7 +23,8 @@ Other features of the plugin: enable forwarding of Fastify events to given callb
 and wrapping main data of the original event in a specific CloudEvent instance.
 
 
-Note that all CloudEvents features exposed here are in the the library [cloudevent](https://npmjs.org/package/cloudevent/).
+Note that all CloudEvents features exposed here are in the the library 
+[cloudevent](https://npmjs.org/package/cloudevent/).
 
 
 ## Usage
@@ -58,7 +59,7 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^2.7.1 , Node.js 8.16.x or later.
+Fastify ^2.12.0 , Node.js 8.17.x or later.
 Note that plugin releases 2.x are for Fastify 2.x, etc.
 
 
@@ -114,6 +115,14 @@ all plugin options are optional, and have a default value.
 Note that all callbacks given to hooks accepts only a single argument: the generated CloudEvent instance, 
 and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
 
+Note that there is even the ability to validate CloudEvent instances 
+in a stricter way, by setting to true the attribute 'strict' in constructor options; 
+that attribute (when set) will be put in the extensions of the instance.
+Otherwise you can specify it only during validation, in validation options.
+
+You can find Code Documentation for the API of the library 
+[here](https://smartiniongithub.github.io/cloudevent.js/).
+
 Since v0.2 of the spec, there is no more a standard attribute to specify the version 
 of any specific event type, so the best if to follow their recommendations, 
 and for example add a version in the 'type' attribute 
@@ -123,6 +132,10 @@ or into the 'schemaurl' attribute but only its major version
 Since v0.3 of the spec, extensions are no more inside a specific attribute; 
 as recommended even mine (for the 'strict' mode for example) has been moved into a namespaced one;
 plugin extensions ('serverUrlMode') has been moved in another (specific) namespace.
+Since v1.0 of the spec, some properties has been removed/simplified; 
+extension properties must be simple (no nested properties) 
+and must contain only lowercase letters and numbers in the name (and less than 20 chars in total); 
+so for example my strict extension now is 'strictvalidation' with a boolean value.
 
 For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 

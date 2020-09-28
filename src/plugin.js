@@ -73,6 +73,11 @@ function fastifyCloudEvents (fastify, options, done) {
   // note that properties not in the schema will be ignored
   // (in json output) if additionalProperties is false
   const ceSchema = CloudEvent.getJSONSchema()
+  // remove the definition of data, or it won't be managed in the right way
+  delete ceSchema.properties.data
+  // add additionalProperties, to let serialization export properties not in schema
+  // ceSchema.additionalProperties = true // already in schema, so no need to add here
+  // compile schema and return the serialization function to use
   const stringify = fastJson(ceSchema)
 
   /**
@@ -129,8 +134,7 @@ function fastifyCloudEvents (fastify, options, done) {
 
   // add to extensions the serverUrlMode defined, if set
   if (serverUrlMode !== null && cloudEventExtensions !== null) {
-    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents = {}
-    cloudEventExtensions.com_github_smartiniOnGitHub_fastifycloudevents.serverUrlMode = serverUrlMode
+    cloudEventExtensions.fastifyserverurlmode = serverUrlMode
   }
 
   // references builders, configured with some plugin options
@@ -349,6 +353,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^2.7.1',
+  fastify: '^2.12.0',
   name: 'fastify-cloudevents'
 })

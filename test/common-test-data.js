@@ -25,22 +25,22 @@ const commonEventTime = new Date()
 const ceCommonOptions = {
   time: commonEventTime,
   datacontenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
+  dataschema: 'http://my-schema.localhost.localdomain',
   subject: 'subject',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 /** create some common extensions, for better reuse in tests */
-const ceCommonExtensions = { exampleExtension: 'value' }
+const ceCommonExtensions = { exampleextension: 'value' }
 /** create a common extension only for the strict mode, for better reuse in tests */
-const ceExtensionStrict = { com_github_smartiniOnGitHub_cloudevent: { strict: true } }
+const ceExtensionStrict = { strictvalidation: true }
 /** create a sample namespace for events here, for better reuse in tests */
 const ceNamespace = 'com.github.smartiniOnGitHub.fastify-cloudevents.testevent'
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
-const ceCommonData = { hello: 'world', year: 2019 }
+const ceCommonData = { hello: 'world', year: 2020 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
