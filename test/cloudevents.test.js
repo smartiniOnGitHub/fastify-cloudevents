@@ -398,3 +398,68 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceValidate(ceFullDataMapStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
   })
 })
+
+/** @test {CloudEvent} */
+test('create CloudEvent instances with data encoded in base64, and ensure the validation is right', (t) => {
+  t.plan(23)
+
+  const fastify = Fastify()
+  t.tearDown(fastify.close.bind(fastify))
+  fastify.register(require('../src/plugin')) // configure this plugin with its default options
+
+  fastify.listen(0, (err) => {
+    t.error(err)
+    const CloudEvent = fastify.CloudEvent
+    t.ok(CloudEvent)
+    const ceIsValid = CloudEvent.isValidEvent
+    t.ok(ceIsValid)
+    const ceValidate = CloudEvent.validateEvent
+    t.ok(ceValidate)
+    const CloudEventTransformer = fastify.CloudEventTransformer
+    t.ok(CloudEventTransformer)
+
+    const ceDataAsString = 'Hello World, 2020'
+    const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
+    const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataEncoded }
+    {
+      // data_base64 good, and no data defined here (good), expect no validation errors ...
+      const ceFull = new CloudEvent('1/full',
+        ceNamespace,
+        ceServerUrl,
+        null,
+        ceOptionsWithDataInBase64,
+        ceCommonExtensions
+      )
+      t.ok(ceFull)
+      t.ok(ceIsValid(ceFull, { strict: false }))
+      t.ok(ceIsValid(ceFull, { strict: true }))
+      t.strictSame(ceValidate(ceFull, { strict: false }).length, 0)
+      t.strictSame(ceValidate(ceFull, { strict: true }).length, 0)
+      t.strictSame(CloudEventTransformer.stringFromBase64(ceDataEncoded), ceDataAsString)
+      t.strictSame(CloudEventTransformer.stringFromBase64(CloudEventTransformer.stringToBase64(ceDataAsString)), ceDataAsString)
+      t.strictSame(ceFull.payload, CloudEventTransformer.stringFromBase64(ceFull.data_base64))
+      t.strictSame(ceFull.dataType, 'Binary')
+    }
+    // the same but with strict mode ...
+    // note that in this case validation will use the strict flag set into ce instance ...
+    {
+      // data_base64 good, and no data defined here (good), expect no validation errors ...
+      const ceFull = new CloudEvent('1/full-strict',
+        ceNamespace,
+        ceServerUrl,
+        null,
+        { ...ceOptionsWithDataInBase64, strict: true },
+        ceCommonExtensions
+      )
+      t.ok(ceFull)
+      t.ok(ceIsValid(ceFull, { strict: false }))
+      t.ok(ceIsValid(ceFull, { strict: true }))
+      t.strictSame(ceValidate(ceFull, { strict: false }).length, 0)
+      t.strictSame(ceValidate(ceFull, { strict: true }).length, 0)
+      t.strictSame(CloudEventTransformer.stringFromBase64(ceDataEncoded), ceDataAsString)
+      t.strictSame(CloudEventTransformer.stringFromBase64(CloudEventTransformer.stringToBase64(ceDataAsString)), ceDataAsString)
+      t.strictSame(ceFull.payload, CloudEventTransformer.stringFromBase64(ceFull.data_base64))
+      t.strictSame(ceFull.dataType, 'Binary')
+    }
+  })
+})
