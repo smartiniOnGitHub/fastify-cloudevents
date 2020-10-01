@@ -54,7 +54,7 @@ In the [example](./example/) folder there are some simple server scripts
 that uses the plugin (inline but it's the same using it from npm registry): 
 - `example` is a simple one
 - `example-enhanced` is a more complex sample 
-  to show even how to raise own events (normal an errors)
+  to show even how to raise own events (normal, errors, and some custom)
 
 
 ## Requirements
@@ -136,6 +136,7 @@ Since v1.0 of the spec, some properties has been removed/simplified;
 extension properties must be simple (no nested properties) 
 and must contain only lowercase letters and numbers in the name (and less than 20 chars in total); 
 so for example my strict extension now is 'strictvalidation' with a boolean value.
+Even my plugin extension now is 'fastifyserverurlmode' with a string value.
 
 For more info on the standard, see the [CloudEvents Specification](https://github.com/cloudevents/spec).
 

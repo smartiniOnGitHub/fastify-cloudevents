@@ -1,13 +1,12 @@
 # Change Log
 
-## [2.3.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.4.0) (unreleased)
+## [2.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.4.0) (unreleased)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.3.0...2.4.0)
 Summary Changelog:
 - Update dependency on cloudevent to '0.7.x' which implements the 
   [v1.0 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0) 
   with all breaking changes since its v0.3
 - Update requirements to a more recent Fastify, release '^2.12.0' 
-  (but this is latest release that supports Fastify 2.x)
 - Feature: keep compatibility with Node.js 8 (but this is latest release that supports it)
 - Update dependencies for the development environment
 - Other minor changes
