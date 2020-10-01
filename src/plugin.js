@@ -286,11 +286,11 @@ function fastifyCloudEvents (fastify, options, done) {
   }
 
   if (onRegisterCallback !== null) {
-    fastify.addHook('onRegister', (instance) => {
+    fastify.addHook('onRegister', (instance, opts) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRegister`,
         builders.buildSourceUrl(),
-        builders.buildPluginDataForCE('plugin registration'), // data
+        builders.buildPluginDataForCE(`plugin registration, with options: ${JSON.stringify(opts)}`), // data
         cloudEventOptions,
         cloudEventExtensions
       )
@@ -301,7 +301,7 @@ function fastifyCloudEvents (fastify, options, done) {
   if (onReadyCallback !== null) {
     // hook to plugin successful startup, not server
     const ce = new fastify.CloudEvent(idGenerator.next().value,
-      `${baseNamespace}.ready`,
+      `${baseNamespace}.onReady`,
       builders.buildSourceUrl(),
       builders.buildPluginDataForCE('plugin startup successfully'), // data
       cloudEventOptions,
