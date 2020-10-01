@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.4.0) (unreleased)
+## [2.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.4.0) (2020-10-01)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.3.0...2.4.0)
 Summary Changelog:
 - Update dependency on cloudevent to '0.7.x' which implements the 
