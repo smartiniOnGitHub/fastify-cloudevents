@@ -165,7 +165,6 @@ function fastifyCloudEvents (fastify, options, done) {
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
       onRequestCallback(ce)
-
       done()
     })
   }
@@ -174,7 +173,6 @@ function fastifyCloudEvents (fastify, options, done) {
     fastify.addHook('preParsing', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preParsing', request, reply)
       preParsingCallback(ce)
-
       done()
     })
   }
@@ -183,7 +181,6 @@ function fastifyCloudEvents (fastify, options, done) {
     fastify.addHook('preValidation', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preValidation', request, reply)
       preValidationCallback(ce)
-
       done()
     })
   }
@@ -192,7 +189,6 @@ function fastifyCloudEvents (fastify, options, done) {
     fastify.addHook('preHandler', (request, reply, done) => {
       const ce = builders.buildCloudEventForHook('preHandler', request, reply)
       preHandlerCallback(ce)
-
       done()
     })
   }
@@ -201,7 +197,6 @@ function fastifyCloudEvents (fastify, options, done) {
     fastify.addHook('preSerialization', (request, reply, payload, done) => {
       const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
       preSerializationCallback(ce)
-
       done()
     })
   }
@@ -232,7 +227,6 @@ function fastifyCloudEvents (fastify, options, done) {
         cloudEventExtensions
       )
       onErrorCallback(ce)
-
       done() // do not pass the error to the done callback here
     })
   }
@@ -241,7 +235,6 @@ function fastifyCloudEvents (fastify, options, done) {
     fastify.addHook('onSend', (request, reply, payload, done) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
       onSendCallback(ce)
-
       done()
     })
   }
@@ -251,13 +244,12 @@ function fastifyCloudEvents (fastify, options, done) {
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
       // keep the request attribute from data, even if more data will be shown here
       onResponseCallback(ce)
-
       done()
     })
   }
 
   if (onCloseCallback !== null) {
-    // hook to plugin shutdown, not server
+    // hook to plugin shutdown
     fastify.addHook('onClose', (instance, done) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onClose`,
@@ -267,7 +259,6 @@ function fastifyCloudEvents (fastify, options, done) {
         cloudEventExtensions
       )
       onCloseCallback(ce)
-
       done()
     })
   }
@@ -299,15 +290,18 @@ function fastifyCloudEvents (fastify, options, done) {
   }
 
   if (onReadyCallback !== null) {
-    // hook to plugin successful startup, not server
-    const ce = new fastify.CloudEvent(idGenerator.next().value,
-      `${baseNamespace}.onReady`,
-      builders.buildSourceUrl(),
-      builders.buildPluginDataForCE('plugin startup successfully'), // data
-      cloudEventOptions,
-      cloudEventExtensions
-    )
-    fastify.ready(onReadyCallback(ce))
+    // triggered before the server starts listening for requests
+    fastify.addHook('onReady', (done) => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onReady`,
+        builders.buildSourceUrl(),
+        builders.buildPluginDataForCE('plugin ready'), // data
+        cloudEventOptions,
+        cloudEventExtensions
+      )
+      onReadyCallback(ce)
+      done()
+    })
   }
 
   done()
@@ -353,6 +347,6 @@ function * idMaker () {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^2.12.0',
+  fastify: '^2.15.0',
   name: 'fastify-cloudevents'
 })
