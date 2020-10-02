@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.5.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.5.0) (2020-10-02)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.4.0...2.5.0)
+Summary Changelog:
+- Update requirements to latest Fastify 2.x, so currently release '^2.15.0' 
+- Feature: update the 'onReady' hook due to an improvement done in Fastify 2.15.0
+- Feature: keep compatibility with Node.js 8 (only for plugin releases 2.x)
+
 ## [2.4.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.4.0) (2020-10-01)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.3.0...2.4.0)
 Summary Changelog:
@@ -7,7 +14,7 @@ Summary Changelog:
   [v1.0 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0) 
   with all breaking changes since its v0.3
 - Update requirements to a more recent Fastify, release '^2.12.0' 
-- Feature: keep compatibility with Node.js 8 (but this is latest release that supports it)
+- Feature: keep compatibility with Node.js 8
 - Update dependencies for the development environment
 - Other minor changes
 
