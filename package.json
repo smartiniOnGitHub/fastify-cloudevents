@@ -1,6 +1,6 @@
 {
   "name": "fastify-cloudevents",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Fastify Plugin to serialize events in the CloudEvents standard format",
   "main": "src/plugin",
   "scripts": {
@@ -9,7 +9,9 @@
     "example-enhanced:debug": "node --inspect-brk example/example-enhanced",
     "example": "node example/example",
     "example-enhanced": "node example/example-enhanced",
-    "lint": "standard \"./*.js\" \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
+    "lint": "npm run lint:standard",
+    "lint:fix": "standard --fix",
+    "lint:standard": "standard --verbose",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
     "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
@@ -23,8 +25,8 @@
   },
   "devDependencies": {
     "fastify": "^2.15.3",
-    "standard": "^14.3.4",
-    "tap": "^14.10.8"
+    "standard": "^16.0.3",
+    "tap": "^14.11.0"
   },
   "peerDependencies": {},
   "engines": {
