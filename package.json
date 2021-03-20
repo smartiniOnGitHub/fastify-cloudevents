@@ -12,6 +12,7 @@
     "lint": "npm run lint:standard",
     "lint:fix": "standard --fix",
     "lint:standard": "standard --verbose",
+    "test:clean": "rm -rf .nyc_output/* ./coverage/*",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
     "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
