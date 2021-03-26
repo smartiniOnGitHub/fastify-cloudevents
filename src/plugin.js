@@ -75,6 +75,8 @@ function fastifyCloudEvents (fastify, options, done) {
   const ceSchema = CloudEvent.getJSONSchema()
   // remove the definition of data, or it won't be managed in the right way
   delete ceSchema.properties.data
+  // remove the definition of time, or it won't be managed in the right way
+  delete ceSchema.properties.time // TODO: check if it's right ... wip
   // add additionalProperties, to let serialization export properties not in schema
   // ceSchema.additionalProperties = true // already in schema, so no need to add here
   // compile schema and return the serialization function to use
