@@ -18,8 +18,6 @@ temp/
 coverage/
 .nyc_output
 
-.clinic
-
 scripts/
 src/
 test/
@@ -45,6 +43,7 @@ test/
 
 gulpfile.*
 jsdoc-conf.*
+.jsdoc.json
 
 jenkins.sh
 tslint.json

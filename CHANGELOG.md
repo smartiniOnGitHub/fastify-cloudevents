@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.6.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.6.0) (unreleased)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.5.0...2.6.0)
+Summary Changelog:
+- Update dependency on cloudevent to '0.8.x' which implements the 
+  [v1.0.1 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.1) 
+  with many simplifications/clarifications on v1.0
+- Update requirements to latest Fastify 2.x, so currently release '^2.15.3' 
+- Feature: keep compatibility with Node.js 8 (only for plugin releases 2.x)
+
 ## [2.5.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.5.0) (2020-10-02)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.4.0...2.5.0)
 Summary Changelog:
