@@ -5,6 +5,9 @@
   "main": "src/plugin",
   "scripts": {
     "dependency:log": "npm list > ./temp/dependencies.log",
+    "docs:clean": "rm -rf ./docs/*",
+    "docs:generate": "npx jsdoc -c .jsdoc.json -R README.md",
+    "docs": "npm run docs:clean && npm run docs:generate",
     "example:debug": "node --inspect-brk example/example",
     "example-enhanced:debug": "node --inspect-brk example/example-enhanced",
     "example": "node example/example",
@@ -25,6 +28,7 @@
     "cloudevent": "~0.8.0"
   },
   "devDependencies": {
+    "jsdoc": "^3.6.6",
     "fastify": "^2.15.3",
     "standard": "^16.0.3",
     "tap": "^14.11.0"

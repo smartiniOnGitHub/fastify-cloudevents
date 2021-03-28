@@ -10,7 +10,7 @@
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
-Current release uses the v1.0 of the CloudEvents Spec.
+Current release uses the v1.0.1 of the CloudEvents Spec.
 
 The purpose of this plugin is to let Fastify web applications create instances of CloudEvents 
 in a simple way (with some useful defaults), or in a full way (all attributes).
@@ -59,8 +59,17 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^2.15.3 , Node.js 8.17.x or later.
+Fastify ^2.15.3 , Node.js 8.17.x (but recommended 10.23.1) or later.
 Note that plugin releases 2.x are for Fastify 2.x, etc.
+
+
+## Sources
+
+Source code is all inside main repo:
+[fastify-cloudevents](https://github.com/smartiniOnGitHub/fastify-cloudevents).
+
+Documentation generated from source code (library API):
+[here](https://smartiniongithub.github.io/fastify-cloudevents/).
 
 
 ## Note

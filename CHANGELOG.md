@@ -14,7 +14,8 @@ Summary Changelog:
 - Feature: update fast serialization to handle even data as value (string or boolean or number) 
   with datacontenttype not default (for example 'text/plain')
 - Feature: add to Fastify a decorator to add a function that validates with a schema compiler 
-  and return validation results and errors (if any) 
+  and return validation results and errors (if any)
+- Feature: generate documentation from sources with JSDoc
 
 ## [2.5.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.5.0) (2020-10-02)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.4.0...2.5.0)

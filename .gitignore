@@ -96,6 +96,7 @@ Thumbs.db
 _old/
 bin/
 build/
+docs/
 dist/
 out/
 private/
