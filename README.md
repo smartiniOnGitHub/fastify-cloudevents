@@ -72,6 +72,7 @@ The plugin decorate Fastify and expose some functions:
 - `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
   and not standard JSON serialization functions; note that similar features of the underlying library 
   has been implemented here (like serialization options)
+- `cloudEventJSONSchema`, the JSONSchema for a CloudEvent used in the plugin, as an object
 
 Plugin options are:
 - `serverUrl`, the URL (absolute, or relative) of the current webapp, 

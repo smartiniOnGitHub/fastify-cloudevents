@@ -8,6 +8,9 @@ Summary Changelog:
   with many simplifications/clarifications on v1.0
 - Update requirements to latest Fastify 2.x, so currently release '^2.15.3' 
 - Feature: keep compatibility with Node.js 8 (only for plugin releases 2.x)
+- Feature: add to Fastify a decorator to return the JSONSchema (for a CloudEvent) 
+  used in the plugin (with some small tweaks), instead of retrieving it 
+  from the underlying library
 
 ## [2.5.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.5.0) (2020-10-02)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.4.0...2.5.0)

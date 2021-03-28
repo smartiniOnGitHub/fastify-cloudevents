@@ -223,8 +223,10 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       )
       assert(ceFullOtherContentType !== null)
       t.ok(ceFullOtherContentType)
+      // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullOtherContentType)}`)
       t.ok(ceFullOtherContentType.isValid())
-      t.ok(!ceFullOtherContentType.isValid({ strict: true }))
+      // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullOtherContentType, { strict: true })}`)
+      t.ok(ceFullOtherContentType.isValid({ strict: true }))
       // when I try to serialize it (without serialization options), expect to have an error raised ...
       t.throws(function () {
         const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
@@ -258,7 +260,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       })
       t.ok(ceFullOtherContentTypeDeserialized5)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: false }))
-      t.ok(!CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: true }))
+      t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeDeserialized5, { strict: true }))
       t.ok(CloudEvent.isCloudEvent(ceFullOtherContentTypeDeserialized5))
     }
 

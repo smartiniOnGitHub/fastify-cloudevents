@@ -21,6 +21,7 @@ const test = require('tap').test
 const Fastify = require('fastify')
 
 // use 'ajv' (dependency of fast-json-stringify') in all tests here
+const Ajv = require('ajv')
 
 // import some common test data
 const {
@@ -34,8 +35,6 @@ const {
   ceCommonData
   // ceMapData
 } = require('./common-test-data')
-
-const Ajv = require('ajv')
 
 /** @test {fastifyCloudEvents} */
 test('ensure CloudEvent schema (exposed by the plugin) pass validation with a schema compiler', (t) => {
@@ -52,7 +51,7 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
     const ceSerializeFast = fastify.cloudEventSerializeFast
     t.ok(ceSerializeFast)
 
-    const ceSchema = CloudEvent.getJSONSchema()
+    const ceSchema = fastify.cloudEventJSONSchema
     t.ok(ceSchema)
     t.strictEqual(typeof ceSchema, 'object')
 
@@ -93,17 +92,24 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
     {
       // tests using the good validator
       // serialization and validation tests on the good test object
+      // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullStrict, {}, 'ceFullStrict')}`)
       const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true })
       t.ok(ceFullStrictSerializedFast)
       const ceFullStrictValid = ceValidate(ceFullStrict)
-      // if (!ceFullStrictValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidate.errors)}`)
+      // console.log(`DEBUG - ceFullStrict, validation ajv: ${ceFullStrictValid}`)
+      // if (!ceFullStrictValid) {
+      //   console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ceFullStrict)}`)
+      //   console.log(`DEBUG - ceFullStrict, dump validation errors with ajv: ${JSON.stringify(ceValidate.errors)}`)
+      // }
       t.ok(ceFullStrictValid)
 
       // serialization and validation tests on the bad test object
+      // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullBad, {}, 'ceFullBad')}`)
       const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       const ceFullBadValid = ceValidate(ceFullBad)
-      // if (!ceFullBadValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidate.errors)}`)
+      // console.log(`DEBUG - ceFullBad, validation ajv: ${ceFullBad}`)
+      // if (!ceFullBadValid) console.log(`DEBUG - ceFullBad, dump validation errors with ajv: ${JSON.stringify(ceValidate.errors)}`)
       t.ok(!ceFullBadValid)
     }
 

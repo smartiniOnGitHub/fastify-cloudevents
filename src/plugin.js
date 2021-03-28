@@ -76,7 +76,7 @@ function fastifyCloudEvents (fastify, options, done) {
   // remove the definition of data, or it won't be managed in the right way
   delete ceSchema.properties.data
   // remove the definition of time, or it won't be managed in the right way
-  delete ceSchema.properties.time // TODO: check if it's right ... wip
+  delete ceSchema.properties.time
   // add additionalProperties, to let serialization export properties not in schema
   // ceSchema.additionalProperties = true // already in schema, so no need to add here
   // compile schema and return the serialization function to use
@@ -133,6 +133,7 @@ function fastifyCloudEvents (fastify, options, done) {
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('JSONBatch', JSONBatch)
   fastify.decorate('cloudEventSerializeFast', serialize)
+  fastify.decorate('cloudEventJSONSchema', ceSchema)
 
   // add to extensions the serverUrlMode defined, if set
   if (serverUrlMode !== null && cloudEventExtensions !== null) {
