@@ -132,12 +132,35 @@ function fastifyCloudEvents (fastify, options, done) {
     }
   }
 
+  // use 'ajv' (dependency of fast-json-stringify')
+  const Ajv = require('ajv')
+  const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
+  const validateFromSchema = ajv.compile(ceSchema)
+
+  /**
+   * Validate the given CloudEvent with the schema compiler already instanced.
+   *
+   * @param {!object} event the CloudEvent to serialize
+   * @return {object} validation results: 'valid' boolean and 'errors' as array of strings or null
+   * @throws {Error} if event is undefined or null
+   */
+  function validate (event) {
+    ensureIsObjectPlain(event, 'event')
+
+    const isValid = validateFromSchema(event)
+    return {
+      valid: isValid,
+      errors: validateFromSchema.errors
+    }
+  }
+
   // execute plugin code
   fastify.decorate('CloudEvent', CloudEvent)
   fastify.decorate('CloudEventTransformer', CloudEventTransformer)
   fastify.decorate('JSONBatch', JSONBatch)
-  fastify.decorate('cloudEventSerializeFast', serialize)
   fastify.decorate('cloudEventJSONSchema', ceSchema)
+  fastify.decorate('cloudEventSerializeFast', serialize)
+  fastify.decorate('cloudEventValidateFast', validate)
 
   // add to extensions the serverUrlMode defined, if set
   if (serverUrlMode !== null && cloudEventExtensions !== null) {

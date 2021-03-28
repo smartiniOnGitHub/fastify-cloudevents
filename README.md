@@ -69,10 +69,12 @@ The plugin decorate Fastify and expose some functions:
 - `CloudEvent`, the CloudEvent implementation, as a class
 - `CloudEventTransformer`, the CloudEventTransformer utility class
 - `JSONBatch`, the class to handle JSONBatch instances
+- `cloudEventJSONSchema`, the JSONSchema for a CloudEvent used in the plugin, as an object
 - `cloudEventSerializeFast`, a serialize function implemented here using `fast-json-stringify` 
   and not standard JSON serialization functions; note that similar features of the underlying library 
   has been implemented here (like serialization options)
-- `cloudEventJSONSchema`, the JSONSchema for a CloudEvent used in the plugin, as an object
+- `cloudEventValidateFast`, a validation function implemented here using `ajv` 
+  (which is a dependency of `fast-json-stringify`) that uses a schema compiler
 
 Plugin options are:
 - `serverUrl`, the URL (absolute, or relative) of the current webapp, 
