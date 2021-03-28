@@ -11,6 +11,8 @@ Summary Changelog:
 - Feature: add to Fastify a decorator to return the JSONSchema (for a CloudEvent) 
   used in the plugin (with some small tweaks), instead of retrieving it 
   from the underlying library
+- Feature: update fast serialization to handle even data as value (string or boolean or number) 
+  with datacontenttype not default (for example 'text/plain')
 
 ## [2.5.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.5.0) (2020-10-02)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.4.0...2.5.0)

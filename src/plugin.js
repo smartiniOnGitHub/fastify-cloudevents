@@ -104,7 +104,7 @@ function fastifyCloudEvents (fastify, options, done) {
         throw new Error('Unable to serialize a not valid CloudEvent.')
       }
     }
-    // else
+    // else (non defaut datacontenttype)
     if (encoder !== undefined && encoder !== null) {
       if (typeof encoder !== 'function') {
         throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
@@ -112,8 +112,12 @@ function fastifyCloudEvents (fastify, options, done) {
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
-      if (encodedData === undefined || encodedData === null) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.datacontenttype}'.`)
+      // but mandatory only for non-value data
+      if (!isValue(event.data) && !isDefinedAndNotNull(encodedData)) {
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
+      }
+      if (isValue(event.data) && !isDefinedAndNotNull(encodedData)) {
+        encodedData = `${event.data}`
       }
     }
     if (typeof encodedData !== 'string') {
@@ -347,6 +351,16 @@ function * idMaker () {
     const timestamp = CloudEventTransformer.timestampToNumber()
     yield `${idPrefix}@${timestamp}`
   }
+}
+
+function isDefinedAndNotNull (arg) {
+  return (arg !== undefined && arg !== null)
+}
+
+function isValue (arg) {
+  return ((arg !== undefined && arg !== null) &&
+    (typeof arg === 'string' || typeof arg === 'boolean' || (typeof arg === 'number' && !isNaN(arg)))
+  )
 }
 
 module.exports = fp(fastifyCloudEvents, {
