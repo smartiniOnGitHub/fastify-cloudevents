@@ -29,10 +29,23 @@ const ceCommonOptions = {
   subject: 'subject',
   strict: false
 }
+const ceCommonOptionsWithSomeOptionalsNull = {
+  time: commonEventTime, // to simplify tests, keep it with a fixed value here
+  datacontenttype: null,
+  dataschema: null,
+  subject: null,
+  strict: false
+}
+const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
+const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
+const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, strict: true }
+const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, strict: true }
 /** create some common extensions, for better reuse in tests */
 const ceCommonExtensions = { exampleextension: 'value' }
+const ceCommonExtensionsWithNullValue = { exampleextension: null }
 /** create a common extension only for the strict mode, for better reuse in tests */
 const ceExtensionStrict = { strictvalidation: true }
 /** create a sample namespace for events here, for better reuse in tests */
@@ -46,15 +59,25 @@ const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
+/** create some common data from an array, for better reuse in tests */
+const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item as null
 
 module.exports = {
   commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
+  ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
+  ceCommonOptionsForTextData,
+  ceCommonOptionsForTextDataStrict,
   ceCommonExtensions,
+  ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
   ceNamespace,
   ceServerUrl,
   ceCommonData,
-  ceMapData
+  ceMapData,
+  ceArrayData
 }

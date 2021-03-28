@@ -28,17 +28,24 @@ const {
   // commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  // ceCommonOptionsWithSomeOptionalsNull,
+  // ceCommonOptionsWithSomeOptionalsNullStrict,
+  // ceCommonOptionsWithAllOptionalsNull,
+  // ceCommonOptionsWithAllOptionalsNullStrict,
+  // ceCommonOptionsForTextData,
+  ceCommonOptionsForTextDataStrict,
   ceCommonExtensions,
-  // ceExtensionStrict,
+  // ceCommonExtensionsWithNullValue,
   ceNamespace,
   ceServerUrl,
   ceCommonData
-  // ceMapData
+  // ceMapData,
+  // ceArrayData
 } = require('./common-test-data')
 
 /** @test {fastifyCloudEvents} */
 test('ensure CloudEvent schema (exposed by the plugin) pass validation with a schema compiler', (t) => {
-  t.plan(20)
+  t.plan(29)
   const fastify = Fastify()
   t.tearDown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -128,6 +135,40 @@ test('ensure CloudEvent schema (exposed by the plugin) pass validation with a sc
       const ceFullBadValid = ceValidateAlwaysFail(ceFullBad)
       // if (!ceFullBadValid) console.log(`DEBUG: validation errors: ${JSON.stringify(ceValidateAlwaysFail.errors)}`)
       t.ok(!ceFullBadValid)
+    }
+
+    {
+      const value = 'Hello World, 2020'
+      // use directly the event with strict mode enabled ...
+      const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
+        ceNamespace,
+        ceServerUrl,
+        value, // data
+        ceCommonOptionsForTextDataStrict,
+        ceCommonExtensions
+      )
+      assert(ceStrict !== null)
+      t.ok(ceStrict)
+      t.ok(CloudEvent.isValidEvent(ceStrict))
+      t.strictSame(ceStrict.payload, ceStrict.data)
+      t.strictSame(ceStrict.dataType, 'Text')
+      const ceStrictSerializedFast = ceSerializeFast(ceStrict, { onlyValid: true })
+      t.ok(ceStrictSerializedFast)
+      const ceStrictValid = ceValidate(ceFullStrict)
+      // console.log(`DEBUG - ceStrict, validation ajv: ${ceStrictValid}`)
+      // if (!ceStrictValid) {
+      //   console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ceStrict)}`)
+      //   console.log(`DEBUG - ceStrict, dump validation errors with ajv: ${JSON.stringify(ceValidate.errors)}`)
+      // }
+      t.ok(ceStrictValid)
+      // console.log(`DEBUG - ceStrict serialized:\n${ceStrictSerializedFast}`)
+      const ceStrictAsString = ceStrict.toString()
+      // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+      t.ok(ceStrictAsString != null && (typeof ceStrictAsString === 'string'))
+      const ceStrictPayloadDumped = JSON.stringify(ceStrict.payload)
+      // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+      t.ok(ceStrictPayloadDumped != null && (typeof ceStrictPayloadDumped === 'string'))
+      t.ok(ceStrictPayloadDumped.length < 1024)
     }
   })
 })
