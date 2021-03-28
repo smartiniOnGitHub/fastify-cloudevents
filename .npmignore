@@ -4,6 +4,7 @@
 .cache
 .metadata
 .settings
+.idea
 
 _old/
 build/
@@ -31,6 +32,8 @@ test/
 .env
 .envrc
 .babelrc
+.clinic
+.dependabot
 .eslintignore
 .eslintrc*
 .eslintcache
