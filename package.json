@@ -17,9 +17,9 @@
     "lint:standard": "standard --verbose",
     "test:clean": "rm -rf .nyc_output/* ./coverage/*",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
-    "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
-    "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
-    "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --no-esm --strict test/*.test.js",
+    "test:unit": "tap -J test/*.test.js",
+    "test:unit:dev": "tap -J --watch test/*.test.js",
+    "test:unit:debug": "tap -T --node-arg=--inspect-brk test/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
