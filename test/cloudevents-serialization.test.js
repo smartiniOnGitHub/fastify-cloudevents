@@ -23,7 +23,7 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(6)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -38,9 +38,9 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
     t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(new CloudEvent() instanceof CloudEvent, true)
+    t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
   })
 })
 
@@ -68,7 +68,7 @@ const {
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   t.plan(49)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -206,7 +206,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
   t.plan(32)
 
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -353,7 +353,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
 test('ensure JSONBatch decorator function (exposed by the plugin) exists, and related serialization/deserialization functions', (t) => {
   t.plan(9)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -367,21 +367,21 @@ test('ensure JSONBatch decorator function (exposed by the plugin) exists, and re
     assert(typeof JSONBatch === 'function')
     assert.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
     t.ok(JSONBatch)
-    t.strictEqual(typeof JSONBatch, 'function')
-    t.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+    t.equal(typeof JSONBatch, 'function')
+    t.equal(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
 
     // ensure JSONBatch serialization/deserialization functions exists ...
     const batchSerialize = JSONBatch.serializeEvents
     assert(batchSerialize !== null)
     assert(typeof batchSerialize === 'function')
     t.ok(batchSerialize)
-    t.strictEqual(typeof batchSerialize, 'function')
+    t.equal(typeof batchSerialize, 'function')
 
     const batchDeserialize = JSONBatch.deserializeEvents
     assert(batchDeserialize !== null)
     assert(typeof batchDeserialize === 'function')
     t.ok(batchDeserialize)
-    t.strictEqual(typeof batchDeserialize, 'function')
+    t.equal(typeof batchDeserialize, 'function')
   })
 })
 
@@ -389,7 +389,7 @@ test('ensure JSONBatch decorator function (exposed by the plugin) exists, and re
 test('ensure JSONBatch serialization/deserialization functions works good', (t) => {
   t.plan(13)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -488,7 +488,7 @@ function isDatePast (arg) {
 test('serialize some CloudEvent instances with data encoded in base64 to JSON, and ensure they are right', (t) => {
   t.plan(106)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err) => {
@@ -565,8 +565,8 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
       t.ok(isDateValid(ceDeserialized.time))
       t.ok(isDatePast(ceDeserialized.time))
       t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-      t.notStrictEqual(ceDeserialized.time, commonEventTime)
-      t.notEqual(ceDeserialized.time, commonEventTime)
+      t.not(ceDeserialized.time, commonEventTime)
+      t.not(ceDeserialized.time, commonEventTime)
       // console.log(`DEBUG - cloudEvent data: ${CloudEventTransformer.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
       // console.log(`DEBUG - cloudEvent data_base64: ${CloudEventTransformer.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
       // console.log(`DEBUG - cloudEvent payload: ${CloudEventTransformer.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
@@ -575,11 +575,11 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
       t.ok(ceDeserialized.payload)
       t.ok(isString(ceDeserialized.payload))
       // then ensure the value of both are the same ...
-      t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+      t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
       t.strictSame(ceDeserialized.payload, CloudEventTransformer.stringFromBase64(ceDeserialized.data_base64))
       // and that they are the same of initial value ...
       t.strictSame(ceDeserialized.data, ceFull.data)
-      t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+      t.strictNotSame(ceDeserialized.data, ceDataEncoded)
       // then ensure they are different object (references) ...
       // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
 
@@ -594,7 +594,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
         // console.log(`DEBUG - original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
         // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
         // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
-        t.notStrictSame(ceFullDeserializedJSON, ceFull)
+        t.strictNotSame(ceFullDeserializedJSON, ceFull)
         t.strictSame(ceFullDeserializedJSON.data, ceFull.data)
         t.strictSame(ceFullDeserializedJSON.data_base64, ceFull.data_base64)
       }
@@ -668,8 +668,8 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
       t.ok(isDateValid(ceDeserialized.time))
       t.ok(isDatePast(ceDeserialized.time))
       t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-      t.notStrictEqual(ceDeserialized.time, commonEventTime)
-      t.notEqual(ceDeserialized.time, commonEventTime)
+      t.not(ceDeserialized.time, commonEventTime)
+      t.not(ceDeserialized.time, commonEventTime)
       // console.log(`DEBUG - cloudEvent data: ${CloudEventTransformer.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
       // console.log(`DEBUG - cloudEvent data_base64: ${CloudEventTransformer.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
       // console.log(`DEBUG - cloudEvent payload: ${CloudEventTransformer.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
@@ -678,11 +678,11 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
       t.ok(ceDeserialized.payload)
       t.ok(isString(ceDeserialized.payload))
       // then ensure the value of both are the same ...
-      t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+      t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
       t.strictSame(ceDeserialized.payload, CloudEventTransformer.stringFromBase64(ceDeserialized.data_base64))
       // and that they are the same of initial value ...
       t.strictSame(ceDeserialized.data, ceFullStrict.data)
-      t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+      t.strictNotSame(ceDeserialized.data, ceDataEncoded)
       // then ensure they are different object (references) ...
       // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
 
@@ -697,7 +697,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
         // console.log(`DEBUG - original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
         // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
         // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
-        t.notStrictSame(ceFullDeserializedJSON, ceFullStrict)
+        t.strictNotSame(ceFullDeserializedJSON, ceFullStrict)
         t.strictSame(ceFullDeserializedJSON.data, ceFullStrict.data)
         t.strictSame(ceFullDeserializedJSON.data_base64, ceFullStrict.data_base64)
       }

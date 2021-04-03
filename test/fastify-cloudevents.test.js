@@ -25,7 +25,7 @@ const fastifyCloudevents = require('../src/plugin')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(11)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -39,7 +39,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
       assert(CloudEvent !== null)
       assert(typeof CloudEvent === 'function')
       t.ok(CloudEvent)
-      t.strictEqual(typeof CloudEvent, 'function')
+      t.equal(typeof CloudEvent, 'function')
     }
 
     {
@@ -49,7 +49,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
       assert(CloudEventTransformer !== null)
       assert(typeof CloudEventTransformer === 'function')
       t.ok(CloudEventTransformer)
-      t.strictEqual(typeof CloudEventTransformer, 'function')
+      t.equal(typeof CloudEventTransformer, 'function')
     }
 
     {
@@ -59,7 +59,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
       assert(JSONBatch !== null)
       assert(typeof JSONBatch === 'function')
       t.ok(JSONBatch)
-      t.strictEqual(typeof JSONBatch, 'function')
+      t.equal(typeof JSONBatch, 'function')
     }
 
     {

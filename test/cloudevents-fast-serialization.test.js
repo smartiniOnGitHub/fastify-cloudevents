@@ -26,7 +26,7 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.plan(9)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -41,9 +41,9 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
     t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(new CloudEvent() instanceof CloudEvent, true)
+    t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
 
     // ensure cloudEventSerializeFast function exist in Fastify decorators ...
     t.ok(fastify.hasDecorator('cloudEventSerializeFast'))
@@ -51,7 +51,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     assert(ceSerializeFast !== null)
     assert(typeof ceSerializeFast === 'function')
     t.ok(ceSerializeFast)
-    t.strictEqual(typeof ceSerializeFast, 'function')
+    t.equal(typeof ceSerializeFast, 'function')
   })
 })
 
@@ -72,7 +72,7 @@ const {
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   t.plan(39)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -190,7 +190,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
   t.plan(18)
 
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -316,7 +316,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
   t.plan(29)
 
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -442,7 +442,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   t.plan(10)
 
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -454,7 +454,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
     const jsonSchemaStatic = CloudEvent.getJSONSchema()
     assert(jsonSchemaStatic !== null)
     t.ok(jsonSchemaStatic)
-    t.strictEqual(typeof jsonSchemaStatic, 'object')
+    t.equal(typeof jsonSchemaStatic, 'object')
 
     const ceSerializeFast = fastify.cloudEventSerializeFast
     t.ok(ceSerializeFast)
@@ -471,7 +471,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
     const jsonSchema = ceFullStrict.schema
     assert(jsonSchema !== null)
     t.ok(jsonSchema)
-    t.strictEqual(typeof jsonSchema, 'object')
+    t.equal(typeof jsonSchema, 'object')
 
     const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
     t.ok(ceFullStrictSerializedFast)
@@ -499,7 +499,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   t.plan(47)
 
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -547,13 +547,13 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       assert(dataShallowClone !== null)
       assert(dataShallowClone !== ceFull.data) // they must be different object references
       assert(dataShallowClone !== ceFull.payload) // they must be different object references, at any invocation
-      t.notEqual(dataShallowClone, ceFull.data)
-      t.notStrictEqual(dataShallowClone, ceFull.data)
-      t.notEqual(dataShallowClone, ceFull.payload)
+      t.not(dataShallowClone, ceFull.data)
+      t.not(dataShallowClone, ceFull.data)
+      t.not(dataShallowClone, ceFull.payload)
       dataShallowClone = 'changed: true' // reassign to test that data won't be affected by that change
-      t.notEqual(dataShallowClone, ceFull.data)
+      t.not(dataShallowClone, ceFull.data)
       t.strictNotSame(dataShallowClone, ceFull.data)
-      t.notEqual(dataShallowClone, ceFull.payload)
+      t.not(dataShallowClone, ceFull.payload)
 
       const ceFullSerializedOnlyValidFalse = ceSerializeFast(ceFull, { onlyValid: false })
       t.ok(ceFullSerializedOnlyValidFalse)
@@ -600,13 +600,13 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       assert(dataShallowCloneStrict !== null)
       assert(dataShallowCloneStrict !== ceFullStrict.data) // they must be different object references
       assert(dataShallowCloneStrict !== ceFullStrict.payload) // they must be different object references, at any invocation
-      t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
-      t.notStrictEqual(dataShallowCloneStrict, ceFullStrict.data)
-      t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+      t.not(dataShallowCloneStrict, ceFullStrict.data)
+      t.not(dataShallowCloneStrict, ceFullStrict.data)
+      t.not(dataShallowCloneStrict, ceFullStrict.payload)
       dataShallowCloneStrict = 'changed: true' // reassign to test that data won't be affected by that change
-      t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+      t.not(dataShallowCloneStrict, ceFullStrict.data)
       t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
-      t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+      t.not(dataShallowCloneStrict, ceFullStrict.payload)
 
       const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { onlyValid: false })
       t.ok(ceFullStrictSerializedOnlyValidFalse)

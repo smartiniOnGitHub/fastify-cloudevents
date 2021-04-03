@@ -54,7 +54,7 @@ function ceValidateAlwaysFail (schema) {
 test('ensure normal instancing of fast validation (like the one exposed by the plugin) is good', (t) => {
   t.plan(30)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -64,11 +64,11 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     t.ok(CloudEvent)
     const ceSerializeFast = fastify.cloudEventSerializeFast
     t.ok(ceSerializeFast)
-    t.strictEqual(typeof ceSerializeFast, 'function')
+    t.equal(typeof ceSerializeFast, 'function')
 
     const ceSchema = fastify.cloudEventJSONSchema
     t.ok(ceSchema)
-    t.strictEqual(typeof ceSchema, 'object')
+    t.equal(typeof ceSchema, 'object')
 
     // instancing schema compiler in the same way of the plugin,
     // but in a manual way here, as a sample
@@ -78,7 +78,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     const ceValidate = ajv.compile(ceSchema)
     assert(ceValidate !== null)
     t.ok(ceValidate)
-    t.strictEqual(typeof ceValidate, 'function')
+    t.equal(typeof ceValidate, 'function')
 
     // test on some good data
     const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
@@ -183,7 +183,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
 test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) pass validation', (t) => {
   t.plan(26)
   const fastify = Fastify()
-  t.tearDown(fastify.close.bind(fastify))
+  t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -193,15 +193,15 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
     t.ok(CloudEvent)
     const ceSerializeFast = fastify.cloudEventSerializeFast
     t.ok(ceSerializeFast)
-    t.strictEqual(typeof ceSerializeFast, 'function')
+    t.equal(typeof ceSerializeFast, 'function')
 
     const ceSchema = fastify.cloudEventJSONSchema
     t.ok(ceSchema)
-    t.strictEqual(typeof ceSchema, 'object')
+    t.equal(typeof ceSchema, 'object')
 
     const ceValidateFast = fastify.cloudEventValidateFast
     t.ok(ceValidateFast)
-    t.strictEqual(typeof ceValidateFast, 'function')
+    t.equal(typeof ceValidateFast, 'function')
 
     // test on some good data
     const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
