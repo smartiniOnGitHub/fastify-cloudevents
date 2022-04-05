@@ -1,25 +1,26 @@
 {
   "name": "fastify-cloudevents",
-  "version": "2.7.0",
+  "version": "2.10.0",
   "description": "Fastify Plugin to serialize events in the CloudEvents standard format",
   "main": "src/plugin",
   "scripts": {
+    "clean:install": "rm -rf ./package-lock.json ./node_modules/",
     "dependency:log": "npm list > ./temp/dependencies.log",
     "docs:clean": "rm -rf ./docs/*",
     "docs:generate": "npx jsdoc -c .jsdoc.json -R README.md",
     "docs": "npm run docs:clean && npm run docs:generate",
-    "example:debug": "node --inspect-brk example/example",
     "example-enhanced:debug": "node --inspect-brk example/example-enhanced",
-    "example": "node example/example",
     "example-enhanced": "node example/example-enhanced",
-    "lint": "npm run lint:standard",
+    "example:debug": "node --inspect-brk example/example",
+    "example": "node example/example",
     "lint:fix": "standard --fix",
     "lint:standard": "standard --verbose",
+    "lint": "npm run lint:standard",
     "test:clean": "rm -rf .nyc_output/* ./coverage/*",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
-    "test:unit": "tap -J test/*.test.js",
-    "test:unit:dev": "tap -J --watch test/*.test.js",
     "test:unit:debug": "tap -T --node-arg=--inspect-brk test/*.test.js",
+    "test:unit:dev": "tap -J --watch test/*.test.js",
+    "test:unit": "tap -J test/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
@@ -28,14 +29,14 @@
     "cloudevent": "~0.8.0"
   },
   "devDependencies": {
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^3.6.10",
     "fastify": "^2.15.3",
-    "standard": "^16.0.3",
-    "tap": "^15.0.1"
+    "standard": "^16.0.4",
+    "tap": "^15.2.3"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.17.0"
+    "node": ">=10.13.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/fastify-cloudevents#readme",
   "repository": {

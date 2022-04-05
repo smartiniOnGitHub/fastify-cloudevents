@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.10.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.10.0) (unreleased)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.6.0...2.10.0)
+Summary Changelog:
+- Update requirements to latest Fastify 2.x, so currently release '^2.15.3'
+- Update all other dependencies
+- Breaking change: update requirements to Node.js 10 LTS
+- Note: this is last release for Fastify 2.x
+
 ## [2.6.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.6.0) (2021-03-28)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.5.0...2.6.0)
 Summary Changelog:

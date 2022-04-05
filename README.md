@@ -4,8 +4,6 @@
   [![NPM Downloads](https://img.shields.io/npm/dm/fastify-cloudevents.svg?style=flat)](https://npmjs.org/package/fastify-cloudevents/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/fastify-cloudevents/?branch=master)
-  [![dependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents)
-  [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/fastify-cloudevents?type=dev)
   [![Known Vulnerabilities](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?targetFile=package.json)](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents?targetFile=package.json)
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
@@ -59,8 +57,9 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^2.15.3 , Node.js 8.17.x (but recommended 10.23.1) or later.
-Note that plugin releases 2.x are for Fastify 2.x, etc.
+Fastify ^2.15.3 , Node.js 10 LTS (10.13.0) or later.
+
+Note that plugin releases 2.x are for Fastify 2.x, 3.x are for Fastify 3.x, etc.
 
 
 ## Sources
