@@ -26,7 +26,7 @@ const Fastify = require('fastify')
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   // t.plan(9)
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -73,7 +73,7 @@ const {
 /** @test {fastifyCloudEvents} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -191,7 +191,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 /** @test {fastifyCloudEvents} */
 test('serialize a CloudEvent instance with a non default contenttype and empty serialization options, expect error', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -317,7 +317,7 @@ function encoderSample () {
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contenttype and right serialization options, expect success', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -443,7 +443,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
 /** @test {fastifyCloudEvents} */
 test('ensure the JSON Schema for a CloudEvent (static and for a normal instance) is available', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -500,7 +500,7 @@ const ceCommonNestedData = {
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {

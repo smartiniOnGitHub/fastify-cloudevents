@@ -54,7 +54,7 @@ function ceValidateAlwaysFail (schema) {
 test('ensure normal instancing of fast validation (like the one exposed by the plugin) is good', (t) => {
   // t.plan(30)
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
@@ -184,7 +184,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
 /** @test {fastifyCloudEvents} */
 test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) pass validation', (t) => {
   const fastify = Fastify()
-  t.teardown(fastify.close.bind(fastify))
+  t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
   fastify.listen(0, (err, address) => {
