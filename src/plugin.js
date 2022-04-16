@@ -76,7 +76,7 @@ function fastifyCloudEvents (fastify, options, done) {
   // remove the definition of data, or it won't be managed in the right way
   delete ceSchema.properties.data
   // remove the definition of time, or it won't be managed in the right way
-  delete ceSchema.properties.time
+  // delete ceSchema.properties.time // no more needed now that time is set as a string
   // add additionalProperties, to let serialization export properties not in schema
   // ceSchema.additionalProperties = true // already in schema, so no need to add here
   // compile schema and return the serialization function to use
