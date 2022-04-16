@@ -199,8 +199,8 @@ async function fastifyCloudEvents (fastify, options) {
   }
 
   if (preParsingCallback !== null) {
-    fastify.addHook('preParsing', async (request, reply) => {
-      const ce = builders.buildCloudEventForHook('preParsing', request, reply)
+    fastify.addHook('preParsing', async (request, reply, payload) => {
+      const ce = builders.buildCloudEventForHook('preParsing', request, reply, payload)
       preParsingCallback(ce)
     })
   }
