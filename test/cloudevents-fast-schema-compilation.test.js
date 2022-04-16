@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
@@ -52,7 +52,7 @@ function ceValidateAlwaysFail (schema) {
 
 /** @test {fastifyCloudEvents} */
 test('ensure normal instancing of fast validation (like the one exposed by the plugin) is good', (t) => {
-  t.plan(30)
+  // t.plan(30)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -176,12 +176,13 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
       t.ok(ceStrictPayloadDumped != null && (typeof ceStrictPayloadDumped === 'string'))
       t.ok(ceStrictPayloadDumped.length < 1024)
     }
+
+    t.end()
   })
 })
 
 /** @test {fastifyCloudEvents} */
 test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) pass validation', (t) => {
-  t.plan(26)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -274,5 +275,7 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
       t.ok(ceStrictPayloadDumped != null && (typeof ceStrictPayloadDumped === 'string'))
       t.ok(ceStrictPayloadDumped.length < 1024)
     }
+
+    t.end()
   })
 })

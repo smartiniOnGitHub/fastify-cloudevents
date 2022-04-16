@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(6)
+  // t.plan(6)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -41,6 +41,8 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     t.equal(typeof CloudEvent, 'function')
     t.equal(new CloudEvent() instanceof CloudEvent, true)
     t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
+
+    t.end()
   })
 })
 
@@ -66,7 +68,6 @@ const {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(49)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -121,7 +122,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      // ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
       ceFullDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFull, ceFullDeserialized)
       t.ok(!CloudEvent.isCloudEvent(ceFullDeserialized))
@@ -166,7 +167,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-      ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+      // ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
       ceFullStrictDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
       t.same(ceFullStrict, ceFullStrictDeserialized)
       t.ok(!CloudEvent.isCloudEvent(ceFullStrictDeserialized))
@@ -192,6 +193,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
+
+    t.end()
   })
 })
 
@@ -203,8 +206,6 @@ function decoderSample () {
 
 /** @test {CloudEvent} */
 test('serialize/deserialize a CloudEvent instance with a non default contenttype, and ensure they are right', (t) => {
-  t.plan(32)
-
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -346,12 +347,13 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
       t.ok(ceStrictPayloadDumped != null && (typeof ceStrictPayloadDumped === 'string'))
       t.ok(ceStrictPayloadDumped.length < 1024)
     }
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('ensure JSONBatch decorator function (exposed by the plugin) exists, and related serialization/deserialization functions', (t) => {
-  t.plan(9)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -382,12 +384,13 @@ test('ensure JSONBatch decorator function (exposed by the plugin) exists, and re
     assert(typeof batchDeserialize === 'function')
     t.ok(batchDeserialize)
     t.equal(typeof batchDeserialize, 'function')
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('ensure JSONBatch serialization/deserialization functions works good', (t) => {
-  t.plan(13)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -464,6 +467,8 @@ test('ensure JSONBatch serialization/deserialization functions works good', (t) 
     t.strictSame(events.length, deser.length)
     events.forEach((e, i) => t.ok(e.id === deser[i].id)) // this count events.length tests ...
     events.forEach((e, i) => t.ok(e.isStrict === deser[i].isStrict)) // this count events.length tests ...
+
+    t.end()
   })
 })
 
@@ -486,7 +491,6 @@ function isDatePast (arg) {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances with data encoded in base64 to JSON, and ensure they are right', (t) => {
-  t.plan(106)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -561,11 +565,13 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
 
       // inspect content of deserialized CloudEvent, at least on some attributes
       t.ok(ceDeserialized.time)
-      t.ok(isDate(ceDeserialized.time))
-      t.ok(isDateValid(ceDeserialized.time))
-      t.ok(isDatePast(ceDeserialized.time))
-      t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-      t.not(ceDeserialized.time, commonEventTime)
+      const ceDeserializedTimeAsDate = ceDeserialized.timeAsDate
+      t.ok(ceDeserializedTimeAsDate)
+      t.ok(isDate(ceDeserializedTimeAsDate))
+      t.ok(isDateValid(ceDeserializedTimeAsDate))
+      t.ok(isDatePast(ceDeserializedTimeAsDate))
+      t.strictSame(ceDeserializedTimeAsDate.getTime(), commonEventTime.getTime())
+      t.not(ceDeserializedTimeAsDate, commonEventTime)
       t.not(ceDeserialized.time, commonEventTime)
       // console.log(`DEBUG - cloudEvent data: ${CloudEventTransformer.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
       // console.log(`DEBUG - cloudEvent data_base64: ${CloudEventTransformer.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
@@ -590,7 +596,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
         t.ok(isString(serialized))
         // some checks on serialized instance
         const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
-        ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+        // ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
         // console.log(`DEBUG - original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
         // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
         // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
@@ -664,11 +670,13 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
 
       // inspect content of deserialized CloudEvent, at least on some attributes
       t.ok(ceDeserialized.time)
-      t.ok(isDate(ceDeserialized.time))
-      t.ok(isDateValid(ceDeserialized.time))
-      t.ok(isDatePast(ceDeserialized.time))
-      t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-      t.not(ceDeserialized.time, commonEventTime)
+      const ceDeserializedTimeAsDate = ceDeserialized.timeAsDate
+      t.ok(ceDeserializedTimeAsDate)
+      t.ok(isDate(ceDeserializedTimeAsDate))
+      t.ok(isDateValid(ceDeserializedTimeAsDate))
+      t.ok(isDatePast(ceDeserializedTimeAsDate))
+      t.strictSame(ceDeserializedTimeAsDate.getTime(), commonEventTime.getTime())
+      t.not(ceDeserializedTimeAsDate, commonEventTime)
       t.not(ceDeserialized.time, commonEventTime)
       // console.log(`DEBUG - cloudEvent data: ${CloudEventTransformer.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
       // console.log(`DEBUG - cloudEvent data_base64: ${CloudEventTransformer.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
@@ -693,7 +701,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
         t.ok(isString(serialized))
         // some checks on serialized instance
         const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
-        ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
+        // ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
         // console.log(`DEBUG - original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
         // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
         // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
@@ -712,5 +720,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
         }, Error, 'Expected exception when creating a CloudEvent with data_base64 set but wrong')
       }
     }
+
+    t.end()
   })
 })

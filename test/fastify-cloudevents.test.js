@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
@@ -23,7 +23,7 @@ const fastifyCloudevents = require('../src/plugin')
 
 /** @test {fastifyCloudEvents} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(11)
+  // t.plan(11)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
@@ -66,5 +66,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
       const ceSerializeFast = fastify.cloudEventSerializeFast
       t.ok(ceSerializeFast)
     }
+
+    t.end()
   })
 })

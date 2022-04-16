@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(7)
+  // t.plan(7)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -46,12 +46,13 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
     assert(typeof ceSerializeFast === 'function')
     t.ok(ceSerializeFast)
     t.equal(typeof ceSerializeFast, 'function')
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
-  t.plan(11)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -78,12 +79,13 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
     t.notOk(null)
     t.notOk(ceIsValid(null))
     t.strictSame(ceValidate(null), [new Error('CloudEvent undefined or null')])
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
-  t.plan(12)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -120,12 +122,13 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
       const ce = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
       assert(ce === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
-  t.plan(28)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -200,6 +203,8 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       const ceMinimalMandatoryNullStrict = new CloudEvent(null, null, null, null, { strict: true })
       assert(ceMinimalMandatoryNullStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+
+    t.end()
   })
 })
 
@@ -218,7 +223,6 @@ const {
 
 /** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
-  t.plan(16)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -263,12 +267,13 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     assert(ceFull1 !== ceFull1Clone) // they must be different object references
     t.same(ceFull1, ceFull1Clone)
     t.strictSame(ceFull1, ceFull1Clone)
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
-  t.plan(44)
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -396,13 +401,13 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceIsValid(ceFullDataMapStrict, { strict: true }))
     t.strictSame(ceValidate(ceFullDataMapStrict).length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceValidate(ceFullDataMapStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+
+    t.end()
   })
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with data encoded in base64, and ensure the validation is right', (t) => {
-  t.plan(23)
-
   const fastify = Fastify()
   t.teardown(fastify.close.bind(fastify))
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
@@ -461,5 +466,7 @@ test('create CloudEvent instances with data encoded in base64, and ensure the va
       t.strictSame(ceFull.payload, CloudEventTransformer.stringFromBase64(ceFull.data_base64))
       t.strictSame(ceFull.dataType, 'Binary')
     }
+
+    t.end()
   })
 })
