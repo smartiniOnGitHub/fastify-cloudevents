@@ -1,14 +1,19 @@
 # Change Log
 
-## [2.10.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.10.0) (unreleased)
+## [2.10.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.10.0) (2022-04-16)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.6.0...2.10.0)
 Summary Changelog:
 - Update dependency on cloudevent to '0.9.x' which implements the 
   [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2) 
-  with some simplifications/clarifications on v1.0.1
+  with some simplifications/clarifications
 - Update requirements to latest Fastify 2.x, so currently release '^2.15.3'
 - Update all other dependencies
 - Breaking change: update requirements to Node.js 10 LTS
+- Breaking change: the 'time' attribute now is managed as a string in the ISO format 
+  (accordingly with the spec format and schema) but constructor will accept 
+  same inputs (undefined/null, a Date, now even a string 
+  that could be checked during validation of the event); 
+  a getter method 'timeAsDate' has been added just for convenience
 - Note: this is last release for Fastify 2.x
 
 ## [2.6.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.6.0) (2021-03-28)
