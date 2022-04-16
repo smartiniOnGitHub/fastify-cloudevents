@@ -1,5 +1,17 @@
 # Change Log
 
+## [3.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/3.0.0) (unreleased)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.10.0...3.0.0)
+Summary Changelog:
+- Update requirements to latest Fastify 3.x and Node.js 10 LTS
+- Use 'cloudevent' latest release ('~0.9.0') which implements the 
+  [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2)
+- Ensure all works again
+- Simplify async functions code (thanks to Fastify 3.x features)
+- Ensure all works with latest Node.js 10 (even if in End-of-Life status), 
+  12 (even if in End-of-Life status soon), 14 LTS, 16 LTS
+- Note: this plugin release has same features of previous release
+
 ## [2.10.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.10.0) (2022-04-16)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.6.0...2.10.0)
 Summary Changelog:

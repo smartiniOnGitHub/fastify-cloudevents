@@ -1,6 +1,6 @@
 {
   "name": "fastify-cloudevents",
-  "version": "2.10.0",
+  "version": "3.0.0",
   "description": "Fastify Plugin to serialize events in the CloudEvents standard format",
   "main": "src/plugin",
   "scripts": {
@@ -25,11 +25,11 @@
   },
   "dependencies": {
     "cloudevent": "~0.9.0",
-    "fast-json-stringify": "^1.21.0",
-    "fastify-plugin": "^1.6.1"
+    "fast-json-stringify": "^2.7.13",
+    "fastify-plugin": "^3.0.1"
   },
   "devDependencies": {
-    "fastify": "^2.15.3",
+    "fastify": "^3.3.0",
     "jsdoc": "^3.6.10",
     "standard": "^16.0.4",
     "tap": "^15.2.3"
