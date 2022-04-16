@@ -3,6 +3,9 @@
 ## [2.10.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/2.10.0) (unreleased)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.6.0...2.10.0)
 Summary Changelog:
+- Update dependency on cloudevent to '0.9.x' which implements the 
+  [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2) 
+  with some simplifications/clarifications on v1.0.1
 - Update requirements to latest Fastify 2.x, so currently release '^2.15.3'
 - Update all other dependencies
 - Breaking change: update requirements to Node.js 10 LTS
