@@ -188,9 +188,9 @@ async function fastifyCloudEvents (fastify, options) {
       const ce = builders.buildCloudEventForHook('onRequest', request, null)
       // add some http related attributes to data, could be useful to have
       if (includeHttpAttributes !== null && includeHttpAttributes === true) {
-        ce.data.request.httpVersion = request.req.httpVersion
-        ce.data.request.originalUrl = request.req.originalUrl
-        ce.data.request.upgrade = request.req.upgrade
+        ce.data.request.httpVersion = request.raw.httpVersion
+        ce.data.request.originalUrl = request.raw.originalUrl
+        ce.data.request.upgrade = request.raw.upgrade
       }
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
@@ -200,7 +200,8 @@ async function fastifyCloudEvents (fastify, options) {
 
   if (preParsingCallback !== null) {
     fastify.addHook('preParsing', async (request, reply, payload) => {
-      const ce = builders.buildCloudEventForHook('preParsing', request, reply, payload)
+      const ce = builders.buildCloudEventForHook('preParsing', request, reply, // payload)
+        null) // do not pass payload here or a "Converting circular structure to JSON" will be raised if enabled ...
       preParsingCallback(ce)
     })
   }

@@ -123,7 +123,7 @@ function builder (options = {}) {
     buildValues (request) {
       const clientIp = this.buildClientIP(request)
       const headers = this.buildHeaders(request)
-      const sourceUrl = this.buildSourceUrl(request.req.url)
+      const sourceUrl = this.buildSourceUrl(request.raw.url)
       return { clientIp, headers, sourceUrl }
     },
 
@@ -144,8 +144,8 @@ function builder (options = {}) {
         params: request.params,
         query: request.query,
         body: request.body,
-        method: request.req.method,
-        url: request.req.url
+        method: request.raw.method,
+        url: request.raw.url
       }
     },
 
@@ -160,9 +160,9 @@ function builder (options = {}) {
      */
     buildReplyDataForCE (reply) {
       return {
-        statusCode: reply.res.statusCode,
-        statusMessage: reply.res.statusMessage,
-        finished: reply.res.finished
+        statusCode: reply.raw.statusCode,
+        statusMessage: reply.raw.statusMessage,
+        finished: reply.raw.finished
       }
     },
 
@@ -214,7 +214,7 @@ function builder (options = {}) {
       }
       const ce = new CloudEvent(idGenerator.next().value,
         `${baseNamespace}.${hookName}`,
-        this.buildSourceUrl(request.req.url),
+        this.buildSourceUrl(request.raw.url),
         ceData,
         cloudEventOptions,
         cloudEventExtensions
