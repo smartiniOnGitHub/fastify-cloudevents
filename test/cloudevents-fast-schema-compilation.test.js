@@ -57,7 +57,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
 
     const CloudEvent = fastify.CloudEvent
@@ -187,7 +187,7 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
 
     const CloudEvent = fastify.CloudEvent

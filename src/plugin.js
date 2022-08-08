@@ -379,6 +379,6 @@ function isValue (arg) {
 }
 
 module.exports = fp(fastifyCloudEvents, {
-  fastify: '^3.3.0',
+  fastify: '^4.0.1',
   name: 'fastify-cloudevents'
 })

@@ -29,7 +29,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
 
     // ensure CloudEvent class exist in Fastify decorators ...
@@ -76,7 +76,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -194,7 +194,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -320,7 +320,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -446,7 +446,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -503,7 +503,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
