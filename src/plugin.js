@@ -134,7 +134,9 @@ async function fastifyCloudEvents (fastify, options) {
 
   // use 'ajv' (dependency of fast-json-stringify')
   const Ajv = require('ajv')
+  const addFormats = require('ajv-formats')
   const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
+  addFormats(ajv)
   const validateFromSchema = ajv.compile(ceSchema)
 
   /**

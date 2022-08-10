@@ -22,6 +22,7 @@ const Fastify = require('fastify')
 
 // use 'ajv' (dependency of fast-json-stringify') in all tests here
 const Ajv = require('ajv')
+const addFormats = require('ajv-formats') // already installed when installing Ajv itself
 
 // import some common test data
 const {
@@ -75,6 +76,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
     assert(ajv !== null)
     t.ok(ajv)
+    addFormats(ajv) // enhance ajv validation on some formats
     const ceValidate = ajv.compile(ceSchema)
     assert(ceValidate !== null)
     t.ok(ceValidate)
