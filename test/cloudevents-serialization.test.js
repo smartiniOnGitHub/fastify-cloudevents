@@ -26,7 +26,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
 
     // ensure CloudEvent class exist in Fastify decorators ...
@@ -72,7 +72,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -210,7 +210,7 @@ test('serialize/deserialize a CloudEvent instance with a non default contenttype
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)
@@ -358,7 +358,7 @@ test('ensure JSONBatch decorator function (exposed by the plugin) exists, and re
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
 
     // ensure JSONBatch class exist in Fastify decorators ...
@@ -395,7 +395,7 @@ test('ensure JSONBatch serialization/deserialization functions works good', (t) 
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
 
     // ensure JSONBatch class exist in Fastify decorators ...
@@ -495,7 +495,7 @@ test('serialize some CloudEvent instances with data encoded in base64 to JSON, a
   t.teardown(() => { fastify.close() })
   fastify.register(require('../src/plugin')) // configure this plugin with its default options
 
-  fastify.listen(0, (err) => {
+  fastify.listen({ port: 0 }, (err) => {
     t.error(err)
     const CloudEvent = fastify.CloudEvent
     t.ok(CloudEvent)

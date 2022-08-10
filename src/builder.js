@@ -179,7 +179,7 @@ function builder (options = {}) {
     buildPluginDataForCE (description = '') {
       return {
         timestamp: CloudEventTransformer.timestampToNumber(),
-        description: description,
+        description,
         name: pluginName,
         version: pluginVersion
       }

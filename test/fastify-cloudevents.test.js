@@ -28,7 +28,7 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
   t.teardown(() => { fastify.close() })
   fastify.register(fastifyCloudevents) // configure this plugin with its default options
 
-  fastify.listen(0, (err, address) => {
+  fastify.listen({ port: 0 }, (err, address) => {
     t.error(err)
 
     {

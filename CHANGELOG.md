@@ -1,5 +1,17 @@
 # Change Log
 
+## [4.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/4.0.0) (unreleased)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/3.0.0...4.0.0)
+Summary Changelog:
+- Updated requirements to Fastify '^4.0.1' and Fastify-plugin '^4.1.0', so require Node.js 14 LTS
+- Updated all dependencies to latest (for Node.js 14 LTS)
+- Use 'cloudevent' latest release ('~0.10.0') which implements the 
+  [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2)
+- Ensure all works again
+- Update some hooks for Fastify 4.x; keep them async
+- Remove/update some code now deprecated
+- Ensure all works with latest Node.js 14 LTS and later LTS releases
+
 ## [3.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/3.0.0) (2022-04-17)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.10.0...3.0.0)
 Summary Changelog:

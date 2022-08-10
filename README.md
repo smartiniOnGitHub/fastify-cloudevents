@@ -3,8 +3,8 @@
   [![NPM Version](https://img.shields.io/npm/v/fastify-cloudevents.svg?style=flat)](https://npmjs.org/package/fastify-cloudevents/)
   [![NPM Downloads](https://img.shields.io/npm/dm/fastify-cloudevents.svg?style=flat)](https://npmjs.org/package/fastify-cloudevents/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
-  [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/fastify-cloudevents/?branch=master)
   [![Known Vulnerabilities](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents/badge.svg?targetFile=package.json)](https://snyk.io//test/github/smartiniOnGitHub/fastify-cloudevents?targetFile=package.json)
+  [![license - APACHE-2.0](https://img.shields.io/npm/l/fastify-cloudevents.svg)](http://opensource.org/licenses/APACHE-2.0)
 
 Fastify Plugin to transform events in/from the CloudEvents standard format.
 
@@ -45,7 +45,10 @@ fastify.register(require('fastify-cloudevents'), {
 
 // implementation ...
 
-fastify.listen(3000)
+fastify.listen({ port: 3000, host: 'localhost' }, (err, address) => {
+  if (err) throw err
+  console.log(`server listening on ${address}`)
+})
 ```
 
 In the [example](./example/) folder there are some simple server scripts 
@@ -57,9 +60,9 @@ that uses the plugin (inline but it's the same using it from npm registry):
 
 ## Requirements
 
-Fastify ^3.3.0 , Node.js 10 LTS (10.13.0) or later.
+Fastify ^4.0.1 , Node.js 14 LTS (14.15.0) or later.
 
-Note that plugin releases 2.x are for Fastify 2.x, 3.x are for Fastify 3.x, etc.
+Note that plugin releases 3.x are for Fastify 3.x, 4.x are for Fastify 4.x, etc.
 
 
 ## Sources

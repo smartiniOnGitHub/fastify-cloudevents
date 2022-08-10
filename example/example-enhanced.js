@@ -107,8 +107,8 @@ function raiseEventAtStartServerScript () {
         description: 'Fastify server startup begin',
         version: fastifyVersion,
         status: 'starting',
-        hostname: hostname,
-        pid: pid
+        hostname,
+        pid
       }, // data
       k.cloudEventOptions,
       k.cloudEventExtensions
@@ -147,7 +147,7 @@ fastify.get('/error', async (req, reply) => {
   return err
 })
 
-fastify.listen(k.port, k.address, (err, address) => {
+fastify.listen({ port: k.port, host: k.address }, (err, address) => {
   const processInfoAsData = fastify.CloudEventTransformer.processInfoToData()
   if (err) {
     const errorAsData = fastify.CloudEventTransformer.errorToData(err, {

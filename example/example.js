@@ -89,7 +89,7 @@ fastify.get('/error', async (req, reply) => {
   return err
 })
 
-fastify.listen(k.port, k.address, (err, address) => {
+fastify.listen({ port: k.port, host: k.address }, (err, address) => {
   if (err) {
     throw err
   }
@@ -100,8 +100,8 @@ fastify.listen(k.port, k.address, (err, address) => {
     {
       timestamp: Date.now(),
       status: 'listening',
-      hostname: hostname,
-      pid: pid
+      hostname,
+      pid
     }, // data
     k.cloudEventOptions
   )
@@ -120,8 +120,8 @@ fastify.ready((err) => {
     {
       timestamp: Date.now(),
       status: 'ready',
-      hostname: hostname,
-      pid: pid
+      hostname,
+      pid
     }, // data
     k.cloudEventOptions
   )
