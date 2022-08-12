@@ -609,9 +609,9 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
       t.not(dataShallowCloneStrict, ceFullStrict.payload)
 
-      const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { onlyValid: false })
+      const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { onlyValid: false, printDebugInfo: true })
       t.ok(ceFullStrictSerializedOnlyValidFalse)
-      const ceFullStrictSerializedOnlyValidTrue = ceSerializeFast(ceFullStrict, { onlyValid: true })
+      const ceFullStrictSerializedOnlyValidTrue = ceSerializeFast(ceFullStrict, { onlyValid: true, printDebugInfo: false })
       t.ok(ceFullStrictSerializedOnlyValidTrue)
     }
 

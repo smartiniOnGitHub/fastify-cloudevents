@@ -87,19 +87,34 @@ async function fastifyCloudEvents (fastify, options) {
    *
    * @param {!object} event the CloudEvent to serialize
    * @param {object} [options={}] optional serialization attributes:
-   *        encoder (function, no default) a function that takes data and returns encoded data,
-   *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
-   *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        - encoder (function, no default) a function that takes data and returns encoded data as a string,
+   *        - encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
+   *        - onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
+   *        See {@link CloudEvent} and its [static method serializeEvent]{@link CloudEvent#serializeEvent} for similar options.
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} if onlyValid is true, and the given event is not a valid CloudEvent instance
    */
-  function serialize (event, { encoder, encodedData, onlyValid = false } = {}) {
+  function serialize (event, {
+    encoder, encodedData,
+    onlyValid = false,
+    printDebugInfo = false,
+    timezoneOffset = 0
+  } = {}) {
     ensureIsObjectPlain(event, 'event')
+    if (printDebugInfo === true) {
+      console.log(`DEBUG | trying to serialize ce: ${JSON.stringify(event)}`)
+    }
 
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
-      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
-        return stringify(event)
+      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event, { timezoneOffset }) === true)) {
+        const ser = stringify(event)
+        if (printDebugInfo === true) {
+          console.log(`DEBUG | ce successfully serialized as: ${ser}`)
+        }
+        return ser
       } else {
         throw new Error('Unable to serialize a not valid CloudEvent.')
       }
@@ -125,8 +140,12 @@ async function fastifyCloudEvents (fastify, options) {
     }
     const newEvent = CloudEventTransformer.mergeObjects(event, { data: encodedData })
     // console.log(`DEBUG - new event details: ${CloudEventTransformer.dumpObject(newEvent, 'newEvent')}`)
-    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
-      return stringify(newEvent)
+    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent, { timezoneOffset }) === true)) {
+      const ser = stringify(newEvent)
+      if (printDebugInfo === true) {
+        console.log(`DEBUG | ce successfully serialized as: ${ser}`)
+      }
+      return ser
     } else {
       throw new Error('Unable to serialize a not valid CloudEvent.')
     }
@@ -135,19 +154,36 @@ async function fastifyCloudEvents (fastify, options) {
   // use 'ajv' (dependency of fast-json-stringify')
   const Ajv = require('ajv')
   const addFormats = require('ajv-formats')
-  const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
-  addFormats(ajv)
-  const validateFromSchema = ajv.compile(ceSchema)
+  // define some default options for Ajv
+  const defaultAjvValidationOptions = {
+    coerceTypes: true,
+    removeAdditional: true
+  }
+  // create a default instance for Ajv and related schema validator
+  const defaultAjv = new Ajv(defaultAjvValidationOptions)
+  addFormats(defaultAjv)
+  const defaultAjvValidateFromSchema = defaultAjv.compile(ceSchema)
 
   /**
    * Validate the given CloudEvent with the schema compiler already instanced.
    *
-   * @param {!object} event the CloudEvent to serialize
+   * @param {!object} event the CloudEvent to validate
+   * @param {object} [options=null] Ajv validation options, see {@link https://ajv.js.org/options.html|Options - AJV Validator}
    * @return {object} validation results: 'valid' boolean and 'errors' as array of strings or null
    * @throws {Error} if event is undefined or null
    */
-  function validate (event) {
+  function validate (event, options = null) {
     ensureIsObjectPlain(event, 'event')
+
+    // depending on options given, it will be used a new Ajv instance
+    // or one already created with default settings, to speedup validation
+    let ajv = defaultAjv
+    let validateFromSchema = defaultAjvValidateFromSchema
+    if (options !== null) {
+      ajv = new Ajv(options)
+      addFormats(ajv)
+      validateFromSchema = ajv.compile(ceSchema)
+    }
 
     const isValid = validateFromSchema(event)
     return {
