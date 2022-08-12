@@ -19,6 +19,7 @@
  * Constructor:
  * Utility module to export Cloudevents directly,
  * useful to use Cloudevents even before registering this plugin.
+ * @module utility
  */
 
 /**

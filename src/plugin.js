@@ -15,12 +15,27 @@
  */
 'use strict'
 
+/**
+ * Plugin:
+ * this module exports the plugin as an async function.
+ * @module plugin
+ */
+
 const fp = require('fastify-plugin')
 const { CloudEvent, CloudEventTransformer, JSONBatch } = require('cloudevent') // get CloudEvent definition and related utilities
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
 
+/**
+ * Plugin implementation.
+ * Note that's an async function.
+ *
+ * @param {!object} fastify Fastify instance
+ * @param {object} [options={}] plugin configuration options
+ *
+ * @namespace
+ */
 async function fastifyCloudEvents (fastify, options) {
   const {
     serverUrl = '/',
@@ -45,6 +60,9 @@ async function fastifyCloudEvents (fastify, options) {
     cloudEventOptions = {},
     cloudEventExtensions = null
   } = options
+
+  ensureIsObjectPlain(fastify, 'fastify')
+  // ensureIsObjectPlain(options, 'options')
 
   ensureIsString(serverUrl, 'serverUrl')
   ensureIsString(serverUrlMode, 'serverUrlMode')
@@ -96,6 +114,8 @@ async function fastifyCloudEvents (fastify, options) {
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} if onlyValid is true, and the given event is not a valid CloudEvent instance
+   *
+   * @inner
    */
   function serialize (event, {
     encoder, encodedData,
@@ -169,8 +189,10 @@ async function fastifyCloudEvents (fastify, options) {
    *
    * @param {!object} event the CloudEvent to validate
    * @param {object} [options=null] Ajv validation options, see {@link https://ajv.js.org/options.html|Options - AJV Validator}
-   * @return {object} validation results: 'valid' boolean and 'errors' as array of strings or null
+   * @return {object} object with validation results: 'valid' boolean and 'errors' as array of strings or null
    * @throws {Error} if event is undefined or null
+   *
+   * @inner
    */
   function validate (event, options = null) {
     ensureIsObjectPlain(event, 'event')
@@ -366,6 +388,8 @@ async function fastifyCloudEvents (fastify, options) {
 
   // done()
 }
+
+// utility functions
 
 function ensureIsString (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'string') {

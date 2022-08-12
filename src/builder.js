@@ -20,14 +20,24 @@
  * Utility module to export builder functions useful for creating
  * values (grouped or not) to use in Cloudevents.
  * Should not be used outside of the plugin.
+ * @module utility
+ */
+
+/**
+ * Get a reference to CloudEvent class definition and related utilities.
+ * See {@link CloudEvent}.
+ * @private
+ */
+const { CloudEvent, CloudEventTransformer } = require('cloudevent')
+
+/**
+ * Utility function for creating grouped values to use in Cloudevents.
+ * Should not be used outside of the plugin.
  *
  * @param {!object} options configuration options
  * @return {object} an object with builder functions (configured) to use
  * @private
  */
-
-const { CloudEvent, CloudEventTransformer } = require('cloudevent') // get CloudEvent definition and related utilities
-
 function builder (options = {}) {
   const {
     pluginName,
