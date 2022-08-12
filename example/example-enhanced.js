@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const fastify = require('fastify')()
 const fastifyVersion = require('fastify/package.json').version // get Fastify version
 const CloudEventUtilityConstructor = require('../src/constructor') // direct reference to another script in the library
@@ -45,8 +45,8 @@ k.source = k.serverUrl
 // assert(k !== null)
 
 // define a sample id generator here
-const hostname = require('os').hostname()
-const pid = require('process').pid
+const hostname = require('node:os').hostname()
+const pid = require('node:process').pid
 function * idMakerExample () {
   const idPrefix = `fastify-${fastifyVersion}@${hostname}@${pid}`
   while (true) {
@@ -121,9 +121,9 @@ function raiseEventAtStartServerScript () {
 
 // example to handle a sample home request to serve a static page, optional here
 fastify.get('/', function (req, reply) {
-  const path = require('path')
+  const path = require('node:path')
   const scriptRelativeFolder = path.join(__dirname, path.sep)
-  const fs = require('fs')
+  const fs = require('node:fs')
   const stream = fs.createReadStream(path.join(scriptRelativeFolder, 'home.html'))
   reply.type('text/html; charset=utf-8').send(stream)
 })

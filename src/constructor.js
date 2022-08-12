@@ -23,8 +23,8 @@
  */
 
 /**
- * Get a reference to cloudevent class.
+ * Get a reference to cloudevent class and related utilities.
  */
-const CloudEventLibrary = require('cloudevent') // get CloudEvent definition and related utilities
+const CloudEventLibrary = require('cloudevent')
 
 module.exports = CloudEventLibrary

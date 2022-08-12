@@ -433,7 +433,7 @@ function ensureIsFunction (arg, name = 'arg') {
   }
 }
 
-const hostname = require('os').hostname()
+const hostname = require('node:os').hostname()
 const idPrefix = `fastify@${hostname}`
 function * idMaker () {
   while (true) {

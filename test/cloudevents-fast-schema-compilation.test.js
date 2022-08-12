@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const test = require('tap').test
 // const sget = require('simple-get').concat
 const Fastify = require('fastify')

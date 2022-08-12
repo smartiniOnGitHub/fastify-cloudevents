@@ -30,8 +30,8 @@ k.serverUrl = `${k.protocol}://${k.address}:${k.port}`
 k.source = k.serverUrl
 
 // define a sample id generator here
-const hostname = require('os').hostname()
-const pid = require('process').pid
+const hostname = require('node:os').hostname()
+const pid = require('node:process').pid
 function * idCounterExample () {
   let counter = 0
   while (true) {
@@ -63,9 +63,9 @@ function loggingCallback (ce) {
 
 // example to handle a sample home request to serve a static page, optional here
 fastify.get('/', function (req, reply) {
-  const path = require('path')
+  const path = require('node:path')
   const scriptRelativeFolder = path.join(__dirname, path.sep)
-  const fs = require('fs')
+  const fs = require('node:fs')
   const stream = fs.createReadStream(path.join(scriptRelativeFolder, 'home.html'))
   reply.type('text/html; charset=utf-8').send(stream)
 })
