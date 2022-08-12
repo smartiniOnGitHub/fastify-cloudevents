@@ -51,6 +51,7 @@ fastify.register(require('../src/plugin'), {
   preHandlerCallback: loggingCallback,
   onErrorCallback: loggingCallback,
   onResponseCallback: loggingCallback,
+  onTimeoutCallback: loggingCallback,
   onCloseCallback: loggingCallback,
   onReadyCallback: loggingCallback,
   cloudEventOptions: k.cloudEventOptions

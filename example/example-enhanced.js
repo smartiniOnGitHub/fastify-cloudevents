@@ -78,6 +78,7 @@ fastify.register(require('../src/plugin'), {
   onErrorCallback: loggingCallback,
   onSendCallback: loggingCallback,
   onResponseCallback: loggingCallback,
+  onTimeoutCallback: loggingCallback,
   onCloseCallback: loggingCallback,
   onRouteCallback: loggingCallback,
   onRegisterCallback: loggingCallback,

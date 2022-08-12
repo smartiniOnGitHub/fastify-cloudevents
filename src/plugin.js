@@ -57,6 +57,7 @@ async function fastifyCloudEvents (fastify, options) {
     onRouteCallback = null,
     onRegisterCallback = null,
     onReadyCallback = null,
+    onTimeoutCallback = null,
     cloudEventOptions = {},
     cloudEventExtensions = null
   } = options
@@ -83,6 +84,7 @@ async function fastifyCloudEvents (fastify, options) {
   ensureIsFunction(onRouteCallback, 'onRouteCallback')
   ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
+  ensureIsFunction(onTimeoutCallback, 'onTimeoutCallback')
   ensureIsObjectPlain(cloudEventOptions, 'cloudEventOptions')
   ensureIsObjectPlain(cloudEventExtensions, 'cloudEventExtensions')
 
@@ -242,6 +244,8 @@ async function fastifyCloudEvents (fastify, options) {
   })
 
   // handle hooks, only when related callback are defined
+  // see [Hooks - Fastify reference - GitHub](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md)
+
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', async (request, reply) => {
       // small optimization: pass a null reply because no useful here
@@ -254,7 +258,7 @@ async function fastifyCloudEvents (fastify, options) {
       }
       // console.log(`DEBUG - onRequest: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
-      onRequestCallback(ce)
+      await onRequestCallback(ce)
     })
   }
 
@@ -262,28 +266,28 @@ async function fastifyCloudEvents (fastify, options) {
     fastify.addHook('preParsing', async (request, reply, payload) => {
       const ce = builders.buildCloudEventForHook('preParsing', request, reply, // payload)
         null) // do not pass payload here or a "Converting circular structure to JSON" will be raised if enabled ...
-      preParsingCallback(ce)
+      await preParsingCallback(ce)
     })
   }
 
   if (preValidationCallback !== null) {
     fastify.addHook('preValidation', async (request, reply) => {
       const ce = builders.buildCloudEventForHook('preValidation', request, reply)
-      preValidationCallback(ce)
+      await preValidationCallback(ce)
     })
   }
 
   if (preHandlerCallback !== null) {
     fastify.addHook('preHandler', async (request, reply) => {
       const ce = builders.buildCloudEventForHook('preHandler', request, reply)
-      preHandlerCallback(ce)
+      await preHandlerCallback(ce)
     })
   }
 
   if (preSerializationCallback !== null) {
     fastify.addHook('preSerialization', async (request, reply, payload) => {
       const ce = builders.buildCloudEventForHook('preSerialization', request, reply, payload)
-      preSerializationCallback(ce)
+      await preSerializationCallback(ce)
     })
   }
 
@@ -312,7 +316,7 @@ async function fastifyCloudEvents (fastify, options) {
         cloudEventOptions,
         cloudEventExtensions
       )
-      onErrorCallback(ce)
+      await onErrorCallback(ce)
       // done() // do not pass the error to the done callback here
     })
   }
@@ -320,7 +324,7 @@ async function fastifyCloudEvents (fastify, options) {
   if (onSendCallback !== null) {
     fastify.addHook('onSend', async (request, reply, payload) => {
       const ce = builders.buildCloudEventForHook('onSend', request, reply, payload)
-      onSendCallback(ce)
+      await onSendCallback(ce)
     })
   }
 
@@ -328,7 +332,15 @@ async function fastifyCloudEvents (fastify, options) {
     fastify.addHook('onResponse', async (request, reply) => {
       const ce = builders.buildCloudEventForHook('onResponse', request, reply)
       // keep the request attribute from data, even if more data will be shown here
-      onResponseCallback(ce)
+      await onResponseCallback(ce)
+    })
+  }
+
+  if (onTimeoutCallback !== null) {
+    fastify.addHook('onTimeout', async (request, reply) => {
+      const ce = builders.buildCloudEventForHook('onTimeout', request, reply)
+      // keep the request attribute from data, even if more data will be shown here
+      await onTimeoutCallback(ce)
     })
   }
 
@@ -342,12 +354,12 @@ async function fastifyCloudEvents (fastify, options) {
         cloudEventOptions,
         cloudEventExtensions
       )
-      onCloseCallback(ce)
+      await onCloseCallback(ce)
     })
   }
 
   if (onRouteCallback !== null) {
-    fastify.addHook('onRoute', async (routeOptions) => {
+    fastify.addHook('onRoute', (routeOptions) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRoute`,
         builders.buildSourceUrl(),
@@ -360,7 +372,7 @@ async function fastifyCloudEvents (fastify, options) {
   }
 
   if (onRegisterCallback !== null) {
-    fastify.addHook('onRegister', async (instance, opts) => {
+    fastify.addHook('onRegister', (instance, opts) => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
         `${baseNamespace}.onRegister`,
         builders.buildSourceUrl(),
@@ -382,7 +394,7 @@ async function fastifyCloudEvents (fastify, options) {
         cloudEventOptions,
         cloudEventExtensions
       )
-      onReadyCallback(ce)
+      await onReadyCallback(ce)
     })
   }
 

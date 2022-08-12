@@ -10,7 +10,7 @@ Summary Changelog:
 - Ensure all works again
 - Update serialize function with some useful options (like in the 'cloudevent' library) 
 - Update validate function with the ability to pass custom AJV options if/when needed
-- Update some hooks for Fastify 4.x; keep them async
+- Update and add some hooks for Fastify 4.x; keep them async
 - Remove/update some code now deprecated
 - Ensure all works with latest Node.js 14 LTS and later LTS releases
 - Improve JSDoc comments, generated documentation is much better now
