@@ -8,9 +8,12 @@ Summary Changelog:
 - Use 'cloudevent' latest release ('~0.10.0') which implements the 
   [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2)
 - Ensure all works again
+- Update serialize function with some useful options (like in the 'cloudevent' library) 
+- Update validate function with the ability to pass custom AJV options if/when needed
 - Update some hooks for Fastify 4.x; keep them async
 - Remove/update some code now deprecated
 - Ensure all works with latest Node.js 14 LTS and later LTS releases
+- Improve JSDoc comments, generated documentation is much better now
 
 ## [3.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/3.0.0) (2022-04-17)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/2.10.0...3.0.0)
