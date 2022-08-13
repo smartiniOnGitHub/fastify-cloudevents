@@ -31,6 +31,10 @@ const {
   ceOptionsNoStrict,
   ceOptionsStrict,
   commonEventTime,
+  valDebugInfoDisable,
+  valDebugInfoEnable,
+  valOnlyValidAllInstance,
+  valOnlyValidInstance,
   valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
@@ -99,12 +103,12 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.ok(!ceFull.isStrict)
       t.ok(ceFull.isValid())
       t.ok(ceFull.validate().length === 0)
-      t.ok(ceFull.validate({ strict: false }).length === 0)
-      t.ok(ceFull.validate({ strict: true }).length === 0)
+      t.ok(ceFull.validate({ ...valOptionsNoStrict }).length === 0)
+      t.ok(ceFull.validate({ ...valOptionsStrict }).length === 0)
       t.ok(CloudEvent.isValidEvent(ceFull))
       t.ok(CloudEvent.validateEvent(ceFull).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { ...valOptionsNoStrict }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { ...valOptionsStrict }).length === 0)
 
       // const ceSerializeFast = fastify.cloudEventSerializeFast
       assert(ceSerializeFast !== null)
@@ -131,12 +135,12 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.ok(ceFullStrict.isStrict)
       t.ok(ceFullStrict.isValid())
       t.ok(ceFullStrict.validate().length === 0)
-      t.ok(ceFullStrict.validate({ strict: true }).length === 0)
-      t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+      t.ok(ceFullStrict.validate({ ...valOptionsStrict }).length === 0)
+      t.ok(ceFullStrict.validate({ ...valOptionsNoStrict }).length === 0)
       t.ok(CloudEvent.isValidEvent(ceFullStrict))
       t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { ...valOptionsStrict }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { ...valOptionsNoStrict }).length === 0)
 
       // const ceSerializeFast = fastify.cloudEventSerializeFast
       assert(ceSerializeFast !== null)
@@ -162,10 +166,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.ok(ceFullBad)
       t.ok(!ceFullBad.isStrict)
       t.ok(!ceFullBad.isValid())
-      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { ...valOnlyValidAllInstance })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       t.throws(function () {
-        const ceFullBadSerializedOnlyValidTrue = ceSerializeFast(ceFullBad, { onlyValid: true })
+        const ceFullBadSerializedOnlyValidTrue = ceSerializeFast(ceFullBad, { ...valOnlyValidInstance })
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
@@ -200,7 +204,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         assert(ceFullOtherContentTypeSerializedFast === null) // never executed
       }, Error, 'Expected exception when serializing the current CloudEvent instance')
       t.throws(function () {
-        const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType, { onlyValid: true })
+        const ceFullOtherContentTypeSerializedFast = ceSerializeFast(ceFullOtherContentType, { ...valOnlyValidInstance })
         assert(ceFullOtherContentTypeSerializedFast === null) // never executed
       }, Error, 'Expected exception when serializing the current CloudEvent instance')
     }
@@ -227,7 +231,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         const ceFullOtherContentTypeStrictSerialized = ceSerializeFast(ceFullOtherContentTypeStrict, {
           encoder: null,
           encodedData: null,
-          onlyValid: true
+          ...valOnlyValidInstance
         })
         assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
       }, Error, 'Expected exception when serializing the current CloudEvent instance')
@@ -253,13 +257,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       t.ok(!ceFullOtherContentTypeStrictBad.isValid())
       const ceFullStrictBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
         encodedData: ceDataXMLAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       t.ok(ceFullStrictBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullStrictBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
           encodedData: ceDataXMLAsString,
-          onlyValid: true
+          ...valOnlyValidInstance
         })
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
@@ -325,14 +329,14 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       const cceFullOtherContentTypeSerialized4 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
         encodedData: constEncodedData,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       t.ok(cceFullOtherContentTypeSerialized4)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
       const cceFullOtherContentTypeSerialized5 = ceSerializeFast(ceFullOtherContentType, {
         encoder: encoderSample,
         encodedData: constEncodedData,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       t.ok(cceFullOtherContentTypeSerialized5)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
@@ -374,14 +378,14 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       const ceFullOtherContentTypeStrictSerialized4 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       t.ok(ceFullOtherContentTypeStrictSerialized4)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
       const ceFullOtherContentTypeStrictSerialized5 = ceSerializeFast(ceFullOtherContentTypeStrict, {
         encoder: encoderSample,
         encodedData: constEncodedData,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       t.ok(ceFullOtherContentTypeStrictSerialized5)
       t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
@@ -449,12 +453,12 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.ok(!ceFull.isStrict)
       t.ok(ceFull.isValid())
       t.ok(ceFull.validate().length === 0)
-      t.ok(ceFull.validate({ strict: false }).length === 0)
-      t.ok(ceFull.validate({ strict: true }).length === 0)
+      t.ok(ceFull.validate({ ...valOptionsNoStrict }).length === 0)
+      t.ok(ceFull.validate({ ...valOptionsStrict }).length === 0)
       t.ok(CloudEvent.isValidEvent(ceFull))
       t.ok(CloudEvent.validateEvent(ceFull).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { ...valOptionsNoStrict }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFull, { ...valOptionsStrict }).length === 0)
 
       const ceFullSerialized = ceSerializeFast(ceFull)
       t.ok(ceFullSerialized)
@@ -483,9 +487,9 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.strictNotSame(dataShallowClone, ceFull.data)
       t.not(dataShallowClone, ceFull.payload)
 
-      const ceFullSerializedOnlyValidFalse = ceSerializeFast(ceFull, { onlyValid: false })
+      const ceFullSerializedOnlyValidFalse = ceSerializeFast(ceFull, { ...valOnlyValidAllInstance })
       t.ok(ceFullSerializedOnlyValidFalse)
-      const ceFullSerializedOnlyValidTrue = ceSerializeFast(ceFull, { onlyValid: true })
+      const ceFullSerializedOnlyValidTrue = ceSerializeFast(ceFull, { ...valOnlyValidInstance })
       t.ok(ceFullSerializedOnlyValidTrue)
     }
 
@@ -497,12 +501,12 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.ok(ceFullStrict.isStrict)
       t.ok(ceFullStrict.isValid())
       t.ok(ceFullStrict.validate().length === 0)
-      t.ok(ceFullStrict.validate({ strict: true }).length === 0)
-      t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+      t.ok(ceFullStrict.validate({ ...valOptionsStrict }).length === 0)
+      t.ok(ceFullStrict.validate({ ...valOptionsNoStrict }).length === 0)
       t.ok(CloudEvent.isValidEvent(ceFullStrict))
       t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-      t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { ...valOptionsStrict }).length === 0)
+      t.ok(CloudEvent.validateEvent(ceFullStrict, { ...valOptionsNoStrict }).length === 0)
 
       const ceFullStrictSerialized = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerialized)
@@ -531,9 +535,9 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
       t.not(dataShallowCloneStrict, ceFullStrict.payload)
 
-      const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { onlyValid: false, printDebugInfo: true })
+      const ceFullStrictSerializedOnlyValidFalse = ceSerializeFast(ceFullStrict, { ...valOnlyValidAllInstance, ...valDebugInfoEnable })
       t.ok(ceFullStrictSerializedOnlyValidFalse)
-      const ceFullStrictSerializedOnlyValidTrue = ceSerializeFast(ceFullStrict, { onlyValid: true, printDebugInfo: false })
+      const ceFullStrictSerializedOnlyValidTrue = ceSerializeFast(ceFullStrict, { ...valOnlyValidInstance, ...valDebugInfoDisable })
       t.ok(ceFullStrictSerializedOnlyValidTrue)
     }
 
