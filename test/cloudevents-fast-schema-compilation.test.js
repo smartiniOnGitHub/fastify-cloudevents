@@ -24,24 +24,19 @@ const Fastify = require('fastify')
 const Ajv = require('ajv')
 const addFormats = require('ajv-formats') // already installed when installing Ajv itself
 
+// get factory for instances to test
+const ceFactory = require('./common-test-factory')
+
 // import some common test data
+// const td = require('./common-test-data')
 const {
   // commonEventTime,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  // ceCommonOptionsWithSomeOptionalsNull,
-  // ceCommonOptionsWithSomeOptionalsNullStrict,
-  // ceCommonOptionsWithAllOptionalsNull,
-  // ceCommonOptionsWithAllOptionalsNullStrict,
-  // ceCommonOptionsForTextData,
-  ceCommonOptionsForTextDataStrict,
-  ceCommonExtensions,
-  // ceCommonExtensionsWithNullValue,
-  ceNamespace,
-  ceServerUrl,
-  ceCommonData
-  // ceMapData,
-  // ceArrayData
+  ceOptionsNoStrict,
+  ceOptionsStrict,
+  valDebugInfoDisable,
+  valDebugInfoEnable,
+  valOnlyValidAllInstance,
+  valOnlyValidInstance
 } = require('./common-test-data')
 
 function ceValidateAlwaysFail (schema) {
@@ -73,7 +68,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
 
     // instancing schema compiler in the same way of the plugin,
     // but in a manual way here, as a sample
-    const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
+    const ajv = new Ajv({ coerceTypes: true, removeAdditional: true }) // use same defaults used in plugin code
     assert(ajv !== null)
     t.ok(ajv)
     addFormats(ajv) // enhance ajv validation on some formats
@@ -83,32 +78,22 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     t.equal(typeof ceValidate, 'function')
 
     // test on some good data
-    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptionsStrict,
-      ceCommonExtensions
-    )
+    const ceFullStrict = ceFactory.createFull(ceOptionsStrict)
     t.ok(ceFullStrict)
     t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.isStrict)
 
     // additional tests, with bad objects ...
-    const ceFullBad = new CloudEvent(null,
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptions,
-      {} // extensions
-    )
+    const ceFullBad = ceFactory.createFullBadIdAndExtension()
     t.ok(ceFullBad)
     t.ok(!ceFullBad.isValid())
+    t.ok(!ceFullBad.isStrict)
 
     {
       // tests using the good validator
       // serialization and validation tests on the good test object
       // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullStrict, {}, 'ceFullStrict')}`)
-      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true })
+      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { ...valOnlyValidInstance })
       t.ok(ceFullStrictSerializedFast)
       const ceFullStrictValid = ceValidate(ceFullStrict)
       // console.log(`DEBUG - ceFullStrict, validation ajv: ${ceFullStrictValid}`)
@@ -120,7 +105,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
 
       // serialization and validation tests on the bad test object
       // console.log(`DEBUG - dump validation errors: ${CloudEvent.dumpValidationResults(ceFullBad, {}, 'ceFullBad')}`)
-      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { ...valOnlyValidAllInstance })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       const ceFullBadValid = ceValidate(ceFullBad)
       // console.log(`DEBUG - ceFullBad, validation ajv: ${ceFullBad}`)
@@ -131,14 +116,14 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     {
       // tests using the bad validator
       // serialization and validation tests on the good test object
-      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true })
+      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { ...valOnlyValidInstance })
       t.ok(ceFullStrictSerializedFast)
       const ceFullStrictValidated = ceValidateAlwaysFail(ceFullStrict)
       // console.log(`DEBUG - ceFullStrict, validation by always fail validator: ${JSON.stringify(ceFullStrictValidated)}`)
       t.ok(!ceFullStrictValidated.valid)
 
       // serialization and validation tests on the bad test object
-      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false })
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { ...valOnlyValidAllInstance })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       const ceFullBadValidated = ceValidateAlwaysFail(ceFullBad)
       // console.log(`DEBUG - ceFullBad, validation by always fail validator: ${JSON.stringify(ceFullBadValidated)}`)
@@ -146,21 +131,15 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     }
 
     {
-      const value = 'Hello World, 2020'
       // use directly the event with strict mode enabled ...
-      const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
-        ceNamespace,
-        ceServerUrl,
-        value, // data
-        ceCommonOptionsForTextDataStrict,
-        ceCommonExtensions
-      )
+      const ceStrict = ceFactory.createFullTextData(ceOptionsStrict)
       assert(ceStrict !== null)
       t.ok(ceStrict)
+      t.ok(ceStrict.isStrict)
       t.ok(CloudEvent.isValidEvent(ceStrict))
       t.strictSame(ceStrict.payload, ceStrict.data)
       t.strictSame(ceStrict.dataType, 'Text')
-      const ceStrictSerializedFast = ceSerializeFast(ceStrict, { onlyValid: true })
+      const ceStrictSerializedFast = ceSerializeFast(ceStrict, { ...valOnlyValidInstance })
       t.ok(ceStrictSerializedFast)
       const ceStrictValid = ceValidate(ceFullStrict)
       // console.log(`DEBUG - ceStrict, validation ajv: ${ceStrictValid}`)
@@ -207,32 +186,22 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
     t.equal(typeof ceValidateFast, 'function')
 
     // test on some good data
-    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptionsStrict,
-      ceCommonExtensions
-    )
+    const ceFullStrict = ceFactory.createFull(ceOptionsStrict)
     t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isStrict)
     t.ok(ceFullStrict.isValid())
 
     // additional tests, with bad objects ...
-    const ceFullBad = new CloudEvent(null,
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptions,
-      {} // extensions
-    )
+    const ceFullBad = ceFactory.createFullBadIdAndExtension(ceOptionsNoStrict)
     t.ok(ceFullBad)
+    t.ok(!ceFullBad.isStrict)
     t.ok(!ceFullBad.isValid())
 
     {
       // tests using the good validator
       // serialization and validation tests on the good test object
       // console.log(`DEBUG - dump standard validation errors: ${CloudEvent.dumpValidationResults(ceFullStrict, {}, 'ceFullStrict')}`)
-      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { onlyValid: true, printDebugInfo: false })
+      const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict, { ...valOnlyValidInstance, ...valDebugInfoDisable })
       t.ok(ceFullStrictSerializedFast)
       const ceFullStrictValidated = ceValidateFast(ceFullStrict)
       // console.log(`DEBUG - ceFullStrict, validation by ajv: ${JSON.stringify(ceFullStrictValidated)}`)
@@ -240,7 +209,7 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
 
       // serialization and validation tests on the bad test object
       // console.log(`DEBUG - dump standard validation errors: ${CloudEvent.dumpValidationResults(ceFullBad, {}, 'ceFullBad')}`)
-      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { onlyValid: false, printDebugInfo: false })
+      const ceFullBadSerializedOnlyValidFalse = ceSerializeFast(ceFullBad, { ...valOnlyValidAllInstance, ...valDebugInfoDisable })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       const ceFullBadValidated = ceValidateFast(ceFullBad)
       // console.log(`DEBUG - ceFullBad, validation by ajv: ${JSON.stringify(ceFullBadValidated)}`)
@@ -248,21 +217,15 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
     }
 
     {
-      const value = 'Hello World, 2020'
       // use directly the event with strict mode enabled ...
-      const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
-        ceNamespace,
-        ceServerUrl,
-        value, // data
-        ceCommonOptionsForTextDataStrict,
-        ceCommonExtensions
-      )
+      const ceStrict = ceFactory.createFullTextData(ceOptionsStrict)
       assert(ceStrict !== null)
       t.ok(ceStrict)
+      t.ok(ceStrict.isStrict)
       t.ok(CloudEvent.isValidEvent(ceStrict))
       t.strictSame(ceStrict.payload, ceStrict.data)
       t.strictSame(ceStrict.dataType, 'Text')
-      const ceStrictSerializedFast = ceSerializeFast(ceStrict, { onlyValid: true, printDebugInfo: true })
+      const ceStrictSerializedFast = ceSerializeFast(ceStrict, { ...valOnlyValidInstance, ...valDebugInfoEnable })
       t.ok(ceStrictSerializedFast)
       const ceStrictValidated = ceValidateFast(ceStrict)
       // console.log(`DEBUG - ceStrict, validation by ajv: ${JSON.stringify(ceStrictValidated)}`)
