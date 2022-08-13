@@ -12,6 +12,7 @@ Summary Changelog:
 - Update validate function with the ability to pass custom AJV options if/when needed
 - Update and add some hooks for Fastify 4.x; keep them async
 - Remove/update some code now deprecated
+- Refactor CloudEvents creation in tests, for better consistency
 - Ensure all works with latest Node.js 14 LTS and later LTS releases
 - Improve JSDoc comments, generated documentation is much better now
 
