@@ -24,24 +24,15 @@ const Fastify = require('fastify')
 const Ajv = require('ajv')
 const addFormats = require('ajv-formats') // already installed when installing Ajv itself
 
+// get factory for instances to test
+const ceFactory = require('./common-test-factory')
+
 // import some common test data
+// const td = require('./common-test-data')
 const {
   // commonEventTime,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  // ceCommonOptionsWithSomeOptionalsNull,
-  // ceCommonOptionsWithSomeOptionalsNullStrict,
-  // ceCommonOptionsWithAllOptionalsNull,
-  // ceCommonOptionsWithAllOptionalsNullStrict,
-  // ceCommonOptionsForTextData,
-  ceCommonOptionsForTextDataStrict,
-  ceCommonExtensions,
-  // ceCommonExtensionsWithNullValue,
-  ceNamespace,
-  ceServerUrl,
-  ceCommonData
-  // ceMapData,
-  // ceArrayData
+  ceOptionsNoStrict,
+  ceOptionsStrict
 } = require('./common-test-data')
 
 function ceValidateAlwaysFail (schema) {
@@ -73,7 +64,7 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
 
     // instancing schema compiler in the same way of the plugin,
     // but in a manual way here, as a sample
-    const ajv = new Ajv({ coerceTypes: true, removeAdditional: true })
+    const ajv = new Ajv({ coerceTypes: true, removeAdditional: true }) // use same defaults used in plugin code
     assert(ajv !== null)
     t.ok(ajv)
     addFormats(ajv) // enhance ajv validation on some formats
@@ -83,26 +74,16 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     t.equal(typeof ceValidate, 'function')
 
     // test on some good data
-    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptionsStrict,
-      ceCommonExtensions
-    )
+    const ceFullStrict = ceFactory.createFull(ceOptionsStrict)
     t.ok(ceFullStrict)
     t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.isStrict)
 
     // additional tests, with bad objects ...
-    const ceFullBad = new CloudEvent(null,
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptions,
-      {} // extensions
-    )
+    const ceFullBad = ceFactory.createFullBadIdAndExtension()
     t.ok(ceFullBad)
     t.ok(!ceFullBad.isValid())
+    t.ok(!ceFullBad.isStrict)
 
     {
       // tests using the good validator
@@ -146,17 +127,11 @@ test('ensure normal instancing of fast validation (like the one exposed by the p
     }
 
     {
-      const value = 'Hello World, 2020'
       // use directly the event with strict mode enabled ...
-      const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
-        ceNamespace,
-        ceServerUrl,
-        value, // data
-        ceCommonOptionsForTextDataStrict,
-        ceCommonExtensions
-      )
+      const ceStrict = ceFactory.createFullTextData(ceOptionsStrict)
       assert(ceStrict !== null)
       t.ok(ceStrict)
+      t.ok(ceStrict.isStrict)
       t.ok(CloudEvent.isValidEvent(ceStrict))
       t.strictSame(ceStrict.payload, ceStrict.data)
       t.strictSame(ceStrict.dataType, 'Text')
@@ -207,25 +182,15 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
     t.equal(typeof ceValidateFast, 'function')
 
     // test on some good data
-    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptionsStrict,
-      ceCommonExtensions
-    )
+    const ceFullStrict = ceFactory.createFull(ceOptionsStrict)
     t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isStrict)
     t.ok(ceFullStrict.isValid())
 
     // additional tests, with bad objects ...
-    const ceFullBad = new CloudEvent(null,
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData, // data
-      ceCommonOptions,
-      {} // extensions
-    )
+    const ceFullBad = ceFactory.createFullBadIdAndExtension(ceOptionsNoStrict)
     t.ok(ceFullBad)
+    t.ok(!ceFullBad.isStrict)
     t.ok(!ceFullBad.isValid())
 
     {
@@ -248,17 +213,11 @@ test('ensure CloudEvent schema and schema compiler (both exposed by the plugin) 
     }
 
     {
-      const value = 'Hello World, 2020'
       // use directly the event with strict mode enabled ...
-      const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
-        ceNamespace,
-        ceServerUrl,
-        value, // data
-        ceCommonOptionsForTextDataStrict,
-        ceCommonExtensions
-      )
+      const ceStrict = ceFactory.createFullTextData(ceOptionsStrict)
       assert(ceStrict !== null)
       t.ok(ceStrict)
+      t.ok(ceStrict.isStrict)
       t.ok(CloudEvent.isValidEvent(ceStrict))
       t.strictSame(ceStrict.payload, ceStrict.data)
       t.strictSame(ceStrict.dataType, 'Text')
