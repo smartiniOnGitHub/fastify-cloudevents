@@ -42,7 +42,7 @@ const {
   // valExcludeExtensionsEnable,
   // valOnlyValidAllInstance,
   // valOnlyValidInstance,
-  valOptionsNoOverride,
+  // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
 } = require('./common-test-data')

@@ -39,19 +39,18 @@ const {
   ceCommonData,
   ceCommonExtensions,
   ceCommonOptions,
-  // ceCommonOptionsForTextData,
-  // ceCommonOptionsForXMLData,
-  // ceCommonOptionsForXMLDataStrict,
+  ceCommonOptionsForTextData,
+  ceCommonOptionsForXMLData,
   ceCommonOptionsStrict,
-  // ceDataAsJSONString,
+  ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
-  // ceDataNested,
-  // ceDataXMLAsString,
+  ceDataNested,
+  ceDataXMLAsString,
   ceNamespace,
-  ceOptionsNoStrict,
+  // ceOptionsNoStrict,
   ceOptionsStrict,
-  // ceReservedExtensions,
+  ceReservedExtensions,
   ceServerUrl,
   getRandomString,
   ceMapData
@@ -102,6 +101,16 @@ function createFull (overrideOptions = {}) {
     ceCommonData,
     { ...ceCommonOptions, ...overrideOptions },
     ceCommonExtensions
+  )
+}
+
+function createFullBadIdAndExtension (overrideOptions = {}) {
+  return new CloudEvent(null,
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData,
+    { ...ceCommonOptions, ...overrideOptions },
+    {}
   )
 }
 
@@ -211,42 +220,22 @@ function createFullStrictJSONTextData () {
   )
 }
 
-function createFullXMLData () {
+function createFullXMLData (overrideOptions = {}) {
   return new CloudEvent('7/full-no-strict-xml-string-data',
     ceNamespace,
     ceServerUrl,
     ceDataXMLAsString, // XML string for data
-    ceCommonOptionsForXMLData, // specify XML type
+    { ...ceCommonOptionsForXMLData, ...overrideOptions }, // specify XML type
     ceCommonExtensions
   )
 }
 
-function createFullXMLDataStrict () {
-  return new CloudEvent('7/full-strict-xml-string-data',
-    ceNamespace,
-    ceServerUrl,
-    ceDataXMLAsString, // XML string fordata
-    ceCommonOptionsForXMLDataStrict, // specify XML type, strict
-    ceCommonExtensions
-  )
-}
-
-function createFullDataAsXMLType () {
+function createFullDataAsXMLType (overrideOptions = {}) {
   return new CloudEvent('8/full-no-strict-data-as-xml-type',
     ceNamespace,
     ceServerUrl,
     ceCommonData, // object for data
-    ceCommonOptionsForXMLData, // specify XML type
-    ceCommonExtensions
-  )
-}
-
-function createFullDataAsXMLTypeStrict () {
-  return new CloudEvent('8/full-strict-data-as-xml-type',
-    ceNamespace,
-    ceServerUrl,
-    ceCommonData, // object for data
-    ceCommonOptionsForXMLDataStrict, // specify XML type, strict
+    { ...ceCommonOptionsForXMLData, ...overrideOptions }, // specify XML type
     ceCommonExtensions
   )
 }
@@ -304,24 +293,23 @@ function createFullBigBinaryData (base64Data = '', overrideOptions = {}) {
 module.exports = {
   createEmpty,
   createFull,
+  createFullBadExtension,
+  createFullBadExtensionStrict,
+  createFullBadIdAndExtension,
   createFullBigBinaryData,
   createFullBigStringData,
   createFullBinaryData,
   createFullDataAsJSONNonDefaultType,
   createFullDataAsJSONNonDefaultTypeStrict,
   createFullDataAsXMLType,
-  createFullDataAsXMLTypeStrict,
-  createFullNestedData,
-  createFullBadExtension,
-  createFullBadExtensionStrict,
   createFullMapData,
+  createFullNestedData,
   createFullNullData,
   createFullStrictJSONTextData,
   createFullTextData,
   createFullTextDataBadContentType,
   createFullUndefinedData,
   createFullXMLData,
-  createFullXMLDataStrict,
   createMinimal,
   createMinimalBadSource,
   createMinimalMandatoryNull,

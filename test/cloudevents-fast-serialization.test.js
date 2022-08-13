@@ -116,7 +116,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullSerializedFast = ceSerializeFast(ceFull)
       t.ok(ceFullSerializedFast)
 
-      const ceFullSerializedFastComparison = `{"specversion":"1.0","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020},"exampleextension":"value"}`
+      const ceFullSerializedFastComparison = `{"specversion":"1.0","id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent-v1.0.0","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"enabled":true},"exampleextension":"value"}`
       t.strictSame(ceFullSerializedFast, ceFullSerializedFastComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullDeserializedFast = JSON.parse(ceFullSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
@@ -153,7 +153,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       const ceFullStrictSerializedFast = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerializedFast)
 
-      const ceFullStrictSerializedFastComparison = `{"specversion":"1.0","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020},"strictvalidation":true,"exampleextension":"value"}`
+      const ceFullStrictSerializedFastComparison = `{"specversion":"1.0","id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent-v1.0.0","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"enabled":true},"strictvalidation":true,"exampleextension":"value"}`
       t.strictSame(ceFullStrictSerializedFast, ceFullStrictSerializedFastComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullStrictDeserializedFast = JSON.parse(ceFullStrictSerializedFast) // note that some fields (like dates) will be different when deserialized in this way ...
@@ -532,7 +532,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullSerialized = ceSerializeFast(ceFull)
       t.ok(ceFullSerialized)
 
-      const ceFullSerializedComparison = `{"specversion":"1.0","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"exampleextension":"value"}`
+      const ceFullSerializedComparison = `{"specversion":"1.0","id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent-v1.0.0","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"enabled":true,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"exampleextension":"value"}`
       t.strictSame(ceFullSerialized, ceFullSerializedComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
@@ -585,7 +585,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       const ceFullStrictSerialized = ceSerializeFast(ceFullStrict)
       t.ok(ceFullStrictSerialized)
 
-      const ceFullStrictSerializedComparison = `{"specversion":"1.0","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"strictvalidation":true,"exampleextension":"value"}`
+      const ceFullStrictSerializedComparison = `{"specversion":"1.0","id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.fastify-cloudevents.testevent-v1.0.0","source":"/test","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${commonEventTime.toISOString()}","subject":"subject","data":{"hello":"world","year":2020,"enabled":true,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"strictvalidation":true,"exampleextension":"value"}`
       t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
       // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
       const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...

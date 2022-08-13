@@ -78,7 +78,7 @@ const ceDataNested = {
   }
 }
 
-// ----
+const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
@@ -96,53 +96,14 @@ function getRandomString (length) {
   return str.substring(0, length)
 }
 
-/*
-const ceCommonOptionsWithSomeOptionalsNull = {
-  time: commonEventTime, // to simplify tests, keep it with a fixed value here
-  datacontenttype: null,
-  dataschema: null,
-  subject: null,
-  strict: false
-}
-const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
-const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
-
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
-const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, strict: true }
-const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, strict: true }
-
-const ceCommonExtensions = { exampleextension: 'value' }
-const ceCommonExtensionsWithNullValue = { exampleextension: null }
-
-const ceExtensionStrict = { strictvalidation: true }
-
-const ceNamespace = 'com.github.smartiniOnGitHub.fastify-cloudevents.testevent'
-
-const ceServerUrl = '/test'
-
-const ceCommonData = { hello: 'world', year: 2020 }
-*/
-
 module.exports = {
   ceArrayData,
   ceCommonData,
   ceCommonExtensions,
-  // ceCommonExtensionsWithNullValue,
   ceCommonOptions,
-  // ceCommonOptionsForTextData,
-  // ceCommonOptionsForTextDataStrict,
-  // ceCommonOptionsForTextDataWithFixedTime,
+  ceCommonOptionsForTextData,
   // ceCommonOptionsForXMLData,
-  // ceCommonOptionsForXMLDataStrict,
-  // ceCommonOptionsForXMLWithFixedTime,
   ceCommonOptionsStrict,
-  // ceCommonOptionsWithAllOptionalsNull,
-  // ceCommonOptionsWithAllOptionalsNullStrict,
-  // ceCommonOptionsWithFixedTime,
-  // ceCommonOptionsWithFixedTimeStrict,
-  // ceCommonOptionsWithSomeOptionalsNull,
-  // ceCommonOptionsWithSomeOptionalsNullStrict,
   ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
