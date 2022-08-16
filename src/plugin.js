@@ -34,7 +34,7 @@ const pluginVersion = require('../package.json').version // get plugin version
  * @param {!object} fastify Fastify instance
  * @param {object} [options={}] plugin configuration options
  * <ul>
- *     <li>baseNamespace (string, default `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`) as base namespace for events generated,</li
+ *     <li>baseNamespace (string, default `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`) as base namespace for events generated,</li>
  *     <li>cloudEventExtensions (object, default null) Extensions for events generated,</li>
  *     <li>cloudEventOptions (object, default empty) Options for events generated,</li>
  *     <li>idGenerator (function, default idMaker) to build ID for events generated,</li>

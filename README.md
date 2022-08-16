@@ -88,19 +88,11 @@ The plugin decorate Fastify and expose some functions:
   (which is a dependency of `fast-json-stringify`) that uses a schema compiler
 
 Plugin options are:
-- `serverUrl`, the URL (absolute, or relative) of the current webapp, 
-  to use as a base `source` in generated CloudEvents
-- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents; 
-  any not null value will cause this setting to be added to extensions (if set not null in plugin options):
-  - null, (default value) same as 'pluginAndRequestSimplified'
-  - 'pluginServerUrl', use only the given `serverUrl`
-  - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
-  - 'pluginAndRequestSimplified', use the given `serverUrl` and add the current request url, 
-    but without arguments (if any)
-  - 'requestUrl', use only the request url
-  - anything other, will raise an `Error`
 - `baseNamespace`, a base namespace for the `type`; more specific suffix 
   should be added to it in any CloudEvent
+- `cloudEventExtensions`, CloudEvent extensions to add in all generated events
+- `cloudEventOptions`, CloudEvent options common to all generated events; 
+  anyway objects are copied to not be shared between instances
 - `idGenerator`, a generator function that returns the id (if possible, unique) for any CloudEvent
 - `includeHeaders`, a boolean flag to add request headers in generated CloudEvents when `true`
   (by default is `false`)
@@ -108,26 +100,39 @@ Plugin options are:
   (by default is `false`)
 - `includeRedundantAttributes`, a boolean flag to add some redundant attributes
   in the data section of generated CloudEvents when `true` (by default is `false`)
-- `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
-- `preParsingCallback`, callback to handle generated CloudEvents in Fastify hook `preParsing`
-- `preValidationCallback`, callback to handle generated CloudEvents in Fastify hook `preValidation`
-- `preHandlerCallback`, callback to handle generated CloudEvents in Fastify hook `preHandler`
-- `preSerializationCallback`, callback to handle generated CloudEvents in Fastify hook `preSerialization`
-- `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
-- `onSendCallback`, callback to handle generated CloudEvents in Fastify hook `onSend`
-- `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
+- `serverUrl`, the URL (absolute, or relative) of the current webapp, 
+  to use as a base `source` in generated CloudEvents
+- `serverUrlMode`, the mode to build the `source` attribute in generated CloudEvents; 
+  any not null value will cause this setting to be added to extensions (if set not null in plugin options):
+  - null, (default value) same as 'pluginAndRequestSimplified'
+    but without arguments (if any)
+  - 'pluginAndRequestSimplified', use the given `serverUrl` and add the current request url, 
+  - 'pluginAndRequestUrl', use the given `serverUrl` and add the current request url
+  - 'pluginServerUrl', use only the given `serverUrl`
+  - 'requestUrl', use only the request url
+  - anything other, will raise an `Error`
 - `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`, for the plugin
-- `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`
-- `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
+- `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
 - `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready`, 
   for the plugin (when the plugin has been loaded)
-- `cloudEventOptions`, CloudEvent options common to all generated event instances; 
-  anyway objects are copied to not be shared between instances
+- `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
+- `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
+- `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
+- `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`
+- `onSendCallback`, callback to handle generated CloudEvents in Fastify hook `onSend`
+- `onTimeoutCallback`, callback to handle generated CloudEvents in Fastify hook `onTimeout`
+- `preHandlerCallback`, callback to handle generated CloudEvents in Fastify hook `preHandler`
+- `preParsingCallback`, callback to handle generated CloudEvents in Fastify hook `preParsing`
+- `preSerializationCallback`, callback to handle generated CloudEvents in Fastify hook `preSerialization`
+- `preValidationCallback`, callback to handle generated CloudEvents in Fastify hook `preValidation`
+all plugin options have a default value, so are optional.
 
-all plugin options are optional, and have a default value.
-
+See [README - cloudevent.js - GitHub](https://github.com/smartiniOnGitHub/cloudevent.js/blob/master/README.md) for more info on events.
 Note that all callbacks given to hooks accepts only a single argument: the generated CloudEvent instance, 
 and *not* arguments like in error-first callbacks: (error, data), because here is not really needed.
+Most callbacks now here are async.
+See [Hooks - Fastify reference - GitHub](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md) for more info on Fastify Hooks.
+
 
 Note that there is even the ability to validate CloudEvent instances 
 in a stricter way, by setting to true the attribute 'strict' in constructor options; 
