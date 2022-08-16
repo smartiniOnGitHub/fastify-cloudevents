@@ -4,6 +4,7 @@
   "description": "Fastify Plugin to serialize events in the CloudEvents standard format",
   "main": "src/plugin",
   "scripts": {
+    "audit:log": "npm audit > ./temp/audit.log",
     "clean:install": "rm -rf ./package-lock.json ./node_modules/",
     "dependency:log": "npm list > ./temp/dependencies.log",
     "docs:clean": "rm -rf ./docs/*",
@@ -27,7 +28,7 @@
   "dependencies": {
     "cloudevent": "~0.10.0",
     "fast-json-stringify": "^5.1.0",
-    "fastify-plugin": "^4.1.0"
+    "fastify-plugin": "^4.2.0"
   },
   "devDependencies": {
     "fastify": "^4.0.1",
