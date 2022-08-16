@@ -33,33 +33,59 @@ const pluginVersion = require('../package.json').version // get plugin version
  *
  * @param {!object} fastify Fastify instance
  * @param {object} [options={}] plugin configuration options
+ * <ul>
+ *     <li>baseNamespace (string, default `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`) as base namespace for events generated,</li
+ *     <li>cloudEventExtensions (object, default null) Extensions for events generated,</li>
+ *     <li>cloudEventOptions (object, default empty) Options for events generated,</li>
+ *     <li>idGenerator (function, default idMaker) to build ID for events generated,</li>
+ *     <li>includeHeaders (boolean, default false) flag to enable the add HTTP request Headers in events generated,</li>
+ *     <li>includeHttpAttributes (boolean, default false) flag to add some HTTP request attributes in events generated,</li>
+ *     <li>includeRedundantAttributes` (boolean, default false) flag to add some redundant attributes inside data in events generated,</li>
+ *     <li>onCloseCallback (function, no default) callback function for the 'onClose' hook,</li>
+ *     <li>onErrorCallback (function, no default) callback function for the 'onError' hook,</li>
+ *     <li>onReadyCallback (function, no default) callback function for the 'onReady' hook,</li>
+ *     <li>onRegisterCallback (function, no default) callback function for the 'onRegister' hook,</li>
+ *     <li>onRequestCallback (function, no default) callback function for the 'onRequest' hook,</li>
+ *     <li>onResponseCallback (function, no default) callback function for the 'onResponse' hook,</li>
+ *     <li>onRouteCallback (function, no default) callback function for the 'onRoute' hook,</li>
+ *     <li>onSendCallback (function, no default) callback function for the 'onSend' hook,</li>
+ *     <li>onTimeoutCallback (function, no default) callback function for the 'onTimeout' hook,</li>
+ *     <li>preHandlerCallback (function, no default) callback function for the 'preHandler' hook,</li>
+ *     <li>preParsingCallback (function, no default) callback function for the 'preParsing' hook,</li>
+ *     <li>preSerializationCallback (function, no default) callback function for the 'preSerialization' hook,</li>
+ *     <li>preValidationCallback (function, no default) callback function for the 'preValidation' hook,</li>
+ *     <li>serverUrl (string, default '/') used as base to calculate source URL in events generated,</li>
+ *     <li>serverUrlMode (string, default null so 'pluginAndRequestSimplified'; other values: 'pluginAndRequestUrl', 'pluginServerUrl','requestUrl') specify the way to calculate source URL in events generated,</li>
+ *     <li>See [README - cloudevent.js - GitHub]{@link https://github.com/smartiniOnGitHub/cloudevent.js/blob/master/README.md} for more info.</li>
+ *     <li>For Hooks, see [Hooks - Fastify reference - GitHub]{@link https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md} for more info.</li>
+ * </ul>
  *
  * @namespace
  */
 async function fastifyCloudEvents (fastify, options) {
   const {
-    serverUrl = '/',
-    serverUrlMode = null,
     baseNamespace = `com.github.fastify.plugins.${pluginName}-v${pluginVersion}`,
+    cloudEventExtensions = null,
+    cloudEventOptions = {},
     idGenerator = idMaker(),
     includeHeaders = false,
     includeHttpAttributes = false,
     includeRedundantAttributes = false,
-    onRequestCallback = null,
-    preParsingCallback = null,
-    preValidationCallback = null,
-    preHandlerCallback = null,
-    preSerializationCallback = null,
-    onErrorCallback = null,
-    onSendCallback = null,
-    onResponseCallback = null,
     onCloseCallback = null,
-    onRouteCallback = null,
-    onRegisterCallback = null,
+    onErrorCallback = null,
     onReadyCallback = null,
+    onRegisterCallback = null,
+    onRequestCallback = null,
+    onResponseCallback = null,
+    onRouteCallback = null,
+    onSendCallback = null,
     onTimeoutCallback = null,
-    cloudEventOptions = {},
-    cloudEventExtensions = null
+    preHandlerCallback = null,
+    preParsingCallback = null,
+    preSerializationCallback = null,
+    preValidationCallback = null,
+    serverUrl = '/',
+    serverUrlMode = null
   } = options
 
   ensureIsObjectPlain(fastify, 'fastify')
@@ -107,12 +133,14 @@ async function fastifyCloudEvents (fastify, options) {
    *
    * @param {!object} event the CloudEvent to serialize
    * @param {object} [options={}] optional serialization attributes:
-   *        - encoder (function, no default) a function that takes data and returns encoded data as a string,
-   *        - encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
-   *        - onlyValid (boolean, default false) to serialize only if it's a valid instance,
-   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
-   *        - timezoneOffset (number, default 0) to apply a different timezone offset
-   *        See {@link CloudEvent} and its [static method serializeEvent]{@link CloudEvent#serializeEvent} for similar options.
+   * <ul>
+   *     <li>encoder (function, no default) a function that takes data and returns encoded data as a string,</li>
+   *     <li>encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),</li>
+   *     <li>onlyValid (boolean, default false) to serialize only if it's a valid instance,</li>
+   *     <li>printDebugInfo (boolean, default false) to print some debug info to the console,</li>
+   *     <li>timezoneOffset (number, default 0) to apply a different timezone offset,</li>
+   *     <li>See [CloudEvent]{@link https://github.com/smartiniOnGitHub/cloudevent.js/blob/master/src/cloudevent.js} and its [static method serializeEvent]{@link CloudEvent#serializeEvent} for similar options.</li>
+   * </ul>
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} if onlyValid is true, and the given event is not a valid CloudEvent instance
