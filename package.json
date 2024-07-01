@@ -34,7 +34,7 @@
     "fastify": "^4.0.1",
     "jsdoc": "^4.0.3",
     "standard": "^17.0.0",
-    "tap": "^18.0.0"
+    "tap": "^20.0.0"
   },
   "peerDependencies": {},
   "engines": {
