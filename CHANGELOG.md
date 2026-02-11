@@ -1,5 +1,11 @@
 # Change Log
 
+## [5.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/5.0.0) (unreleased)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/4.0.0...5.0.0)
+Summary Changelog:
+- Updated requirements to Fastify '^5.0.0'
+- Updated all dependencies to latest (for Node.js 20 LTS)
+
 ## [4.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/4.0.0) (2022-08-16)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/3.0.0...4.0.0)
 Summary Changelog:
