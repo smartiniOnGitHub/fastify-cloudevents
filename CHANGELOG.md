@@ -1,6 +1,6 @@
 # Change Log
 
-## [5.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/5.0.0) (unreleased)
+## [5.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/5.0.0) (2026-02-12)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/4.0.0...5.0.0)
 Summary Changelog:
 - Updated requirements to Fastify '^5.0.0'
