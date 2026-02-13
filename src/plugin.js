@@ -23,6 +23,16 @@
 
 const fp = require('fastify-plugin')
 const { CloudEvent, CloudEventTransformer, JSONBatch } = require('cloudevent') // get CloudEvent definition and related utilities
+const {
+  ensureIsString,
+  ensureIsBoolean,
+  ensureIsObject,
+  ensureIsObjectPlain,
+  ensureIsFunction,
+  idMaker,
+  isDefinedAndNotNull,
+  isValue
+} = require('./utils')
 
 const pluginName = require('../package.json').name // get plugin name
 const pluginVersion = require('../package.json').version // get plugin version
@@ -448,7 +458,7 @@ async function fastifyCloudEvents (fastify, options) {
     })
   }
 
-    if (onListenCallback !== null) {
+  if (onListenCallback !== null) {
     // triggered when the server starts listening for requests
     fastify.addHook('onListen', async () => {
       const ce = new fastify.CloudEvent(idGenerator.next().value,
@@ -463,58 +473,6 @@ async function fastifyCloudEvents (fastify, options) {
   }
 
   // done()
-}
-
-// utility functions
-// TODO: move in a dedicated source ... wip
-
-function ensureIsString (arg, name = 'arg') {
-  if (arg !== null && typeof arg !== 'string') {
-    throw new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
-  }
-}
-
-function ensureIsBoolean (arg, name = 'arg') {
-  if (arg !== null && typeof arg !== 'boolean') {
-    throw new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
-  }
-}
-
-function ensureIsObject (arg, name = 'arg') {
-  if (arg !== null && typeof arg !== 'object') {
-    throw new TypeError(`The argument '${name}' must be a object, instead got a '${typeof arg}'`)
-  }
-}
-
-function ensureIsObjectPlain (arg, name = 'arg') {
-  if (arg !== null && Object.prototype.toString.call(arg) === '[object Object]') {
-    return new TypeError(`The argument '${name}' must be a plain object, instead got a '${typeof arg}'`)
-  }
-}
-
-function ensureIsFunction (arg, name = 'arg') {
-  if (arg !== null && typeof arg !== 'function') {
-    throw new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
-  }
-}
-
-const hostname = require('node:os').hostname()
-const idPrefix = `fastify@${hostname}`
-function * idMaker () {
-  while (true) {
-    const timestamp = CloudEventTransformer.timestampToNumber()
-    yield `${idPrefix}@${timestamp}`
-  }
-}
-
-function isDefinedAndNotNull (arg) {
-  return (arg !== undefined && arg !== null)
-}
-
-function isValue (arg) {
-  return ((arg !== undefined && arg !== null) &&
-    (typeof arg === 'string' || typeof arg === 'boolean' || (typeof arg === 'number' && !isNaN(arg)))
-  )
 }
 
 module.exports = fp(fastifyCloudEvents, {
