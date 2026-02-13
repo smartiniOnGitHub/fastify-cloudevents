@@ -17,7 +17,7 @@
 
 /**
  * Utility functions module.
- * @module utils
+ * @module utility
  */
 
 const { CloudEventTransformer } = require('cloudevent')
