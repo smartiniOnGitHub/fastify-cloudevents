@@ -112,9 +112,12 @@ Plugin options are:
   - anything other, will raise an `Error`
 - `onCloseCallback`, callback to handle generated CloudEvents in Fastify hook `onClose`, for the plugin
 - `onErrorCallback`, callback to handle generated CloudEvents in Fastify hook `onError`
+- `onListenCallback`, callback to handle generated CloudEvents in Fastify hook `onListen`, 
+  when the server starts listening for requests
 - `onReadyCallback`, callback to handle the generated CloudEvent in Fastify lifecycle function `ready`, 
   for the plugin (when the plugin has been loaded)
 - `onRegisterCallback`, callback to handle generated CloudEvents in Fastify hook `onRegister`
+- `onRequestAbortCallback`, callback to handle generated CloudEvents in Fastify hook `onRequestAbort`
 - `onRequestCallback`, callback to handle generated CloudEvents in Fastify hook `onRequest`
 - `onResponseCallback`, callback to handle generated CloudEvents in Fastify hook `onResponse`
 - `onRouteCallback`, callback to handle generated CloudEvents in Fastify hook `onRoute`

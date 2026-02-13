@@ -63,28 +63,30 @@ raiseEventAtStartServerScript()
 
 // register plugin with all its options (as a sample)
 fastify.register(require('../src/plugin'), {
-  serverUrl: k.serverUrl,
-  serverUrlMode: k.serverUrlMode,
   baseNamespace: k.baseNamespace,
+  cloudEventExtensions: k.cloudEventExtensions,
+  cloudEventOptions: k.cloudEventOptions,
   idGenerator: gen,
   includeHeaders: k.includeHeaders,
   includeHttpAttributes: k.includeHttpAttributes,
   includeRedundantAttributes: k.includeRedundantAttributes,
-  onRequestCallback: loggingCallback,
-  preParsingCallback: loggingCallback,
-  preValidationCallback: loggingCallback,
-  preHandlerCallback: loggingCallback,
-  preSerializationCallback: loggingCallback,
-  onErrorCallback: loggingCallback,
-  onSendCallback: loggingCallback,
-  onResponseCallback: loggingCallback,
-  onTimeoutCallback: loggingCallback,
   onCloseCallback: loggingCallback,
-  onRouteCallback: loggingCallback,
-  onRegisterCallback: loggingCallback,
+  onErrorCallback: loggingCallback,
+  onListenCallback: loggingCallback,
   onReadyCallback: loggingCallback,
-  cloudEventOptions: k.cloudEventOptions,
-  cloudEventExtensions: k.cloudEventExtensions
+  onRegisterCallback: loggingCallback,
+  onRequestAbortCallback: loggingCallback,
+  onRequestCallback: loggingCallback,
+  onResponseCallback: loggingCallback,
+  onRouteCallback: loggingCallback,
+  onSendCallback: loggingCallback,
+  onTimeoutCallback: loggingCallback,
+  preHandlerCallback: loggingCallback,
+  preParsingCallback: loggingCallback,
+  preSerializationCallback: loggingCallback,
+  preValidationCallback: loggingCallback,
+  serverUrl: k.serverUrl,
+  serverUrlMode: k.serverUrlMode
 })
 
 function loggingCallback (ce) {

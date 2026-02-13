@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.1.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/5.1.0) (2026-02-13)
+[Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/5.0.0...5.1.0)
+Summary Changelog:
+- Use 'cloudevent' latest release ('~0.20.0'), refreshed for Node.js 20 LTS
+- Add callbacks for hooks 'onListen', 'onRequestAbort'
+- Refactor some parts of code, to shorten plugin main source
+
 ## [5.0.0](https://github.com/smartiniOnGitHub/fastify-cloudevents/releases/tag/5.0.0) (2026-02-12)
 [Full Changelog](https://github.com/smartiniOnGitHub/fastify-cloudevents/compare/4.0.0...5.0.0)
 Summary Changelog:
