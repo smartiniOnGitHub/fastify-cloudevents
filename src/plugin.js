@@ -43,8 +43,10 @@ const pluginVersion = require('../package.json').version // get plugin version
  *     <li>includeRedundantAttributes` (boolean, default false) flag to add some redundant attributes inside data in events generated,</li>
  *     <li>onCloseCallback (function, no default) callback function for the 'onClose' hook,</li>
  *     <li>onErrorCallback (function, no default) callback function for the 'onError' hook,</li>
+ *     <li>onListenCallback (function, no default) callback function for the 'onListen' hook,</li>
  *     <li>onReadyCallback (function, no default) callback function for the 'onReady' hook,</li>
  *     <li>onRegisterCallback (function, no default) callback function for the 'onRegister' hook,</li>
+ *     <li>onRequestAbortCallback (function, no default) callback function for the 'onRequestAbort' hook,</li>
  *     <li>onRequestCallback (function, no default) callback function for the 'onRequest' hook,</li>
  *     <li>onResponseCallback (function, no default) callback function for the 'onResponse' hook,</li>
  *     <li>onRouteCallback (function, no default) callback function for the 'onRoute' hook,</li>
@@ -73,8 +75,10 @@ async function fastifyCloudEvents (fastify, options) {
     includeRedundantAttributes = false,
     onCloseCallback = null,
     onErrorCallback = null,
+    onListenCallback = null,
     onReadyCallback = null,
     onRegisterCallback = null,
+    onRequestAbortCallback = null,
     onRequestCallback = null,
     onResponseCallback = null,
     onRouteCallback = null,
@@ -98,19 +102,21 @@ async function fastifyCloudEvents (fastify, options) {
   ensureIsBoolean(includeHeaders, 'includeHeaders')
   ensureIsBoolean(includeHttpAttributes, 'includeHttpAttributes')
   ensureIsBoolean(includeRedundantAttributes, 'includeRedundantAttributes')
-  ensureIsFunction(onRequestCallback, 'onRequestCallback')
-  ensureIsFunction(preParsingCallback, 'preParsingCallback')
-  ensureIsFunction(preValidationCallback, 'preValidationCallback')
-  ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
-  ensureIsFunction(preSerializationCallback, 'preSerializationCallback')
-  ensureIsFunction(onErrorCallback, 'onErrorCallback')
-  ensureIsFunction(onSendCallback, 'onSendCallback')
-  ensureIsFunction(onResponseCallback, 'onResponseCallback')
   ensureIsFunction(onCloseCallback, 'onCloseCallback')
-  ensureIsFunction(onRouteCallback, 'onRouteCallback')
-  ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
+  ensureIsFunction(onErrorCallback, 'onErrorCallback')
+  ensureIsFunction(onListenCallback, 'onListenCallback')
   ensureIsFunction(onReadyCallback, 'onReadyCallback')
+  ensureIsFunction(onRegisterCallback, 'onRegisterCallback')
+  ensureIsFunction(onRequestAbortCallback, 'onRequestAbortCallback')
+  ensureIsFunction(onRequestCallback, 'onRequestCallback')
+  ensureIsFunction(onResponseCallback, 'onResponseCallback')
+  ensureIsFunction(onRouteCallback, 'onRouteCallback')
+  ensureIsFunction(onSendCallback, 'onSendCallback')
   ensureIsFunction(onTimeoutCallback, 'onTimeoutCallback')
+  ensureIsFunction(preHandlerCallback, 'preHandlerCallback')
+  ensureIsFunction(preParsingCallback, 'preParsingCallback')
+  ensureIsFunction(preSerializationCallback, 'preSerializationCallback')
+  ensureIsFunction(preValidationCallback, 'preValidationCallback')
   ensureIsObjectPlain(cloudEventOptions, 'cloudEventOptions')
   ensureIsObjectPlain(cloudEventExtensions, 'cloudEventExtensions')
 
@@ -274,6 +280,22 @@ async function fastifyCloudEvents (fastify, options) {
   // handle hooks, only when related callback are defined
   // see [Hooks - Fastify reference - GitHub](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md)
 
+  if (onRequestAbortCallback !== null) {
+    fastify.addHook('onRequestAbort', async (request, reply) => {
+      // small optimization: pass a null reply because no useful here
+      const ce = builders.buildCloudEventForHook('onRequestAbort', request, null)
+      // add some http related attributes to data, could be useful to have
+      if (includeHttpAttributes !== null && includeHttpAttributes === true) {
+        ce.data.request.httpVersion = request.raw.httpVersion
+        ce.data.request.originalUrl = request.raw.originalUrl
+        ce.data.request.upgrade = request.raw.upgrade
+      }
+      // console.log(`DEBUG - onRequestAbort: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
+      // send the event to the callback
+      await onRequestCallback(ce)
+    })
+  }
+
   if (onRequestCallback !== null) {
     fastify.addHook('onRequest', async (request, reply) => {
       // small optimization: pass a null reply because no useful here
@@ -426,10 +448,25 @@ async function fastifyCloudEvents (fastify, options) {
     })
   }
 
+    if (onListenCallback !== null) {
+    // triggered when the server starts listening for requests
+    fastify.addHook('onListen', async () => {
+      const ce = new fastify.CloudEvent(idGenerator.next().value,
+        `${baseNamespace}.onListen`,
+        builders.buildSourceUrl(),
+        builders.buildPluginDataForCE('server listening'), // data
+        cloudEventOptions,
+        cloudEventExtensions
+      )
+      await onListenCallback(ce)
+    })
+  }
+
   // done()
 }
 
 // utility functions
+// TODO: move in a dedicated source ... wip
 
 function ensureIsString (arg, name = 'arg') {
   if (arg !== null && typeof arg !== 'string') {
