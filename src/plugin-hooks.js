@@ -61,7 +61,7 @@ function setupHooks (fastify, options, builders) {
   // see [Hooks - Fastify reference - GitHub](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md)
 
   if (onRequestAbortCallback !== null) {
-    fastify.addHook('onRequestAbort', async (request, reply) => {
+    fastify.addHook('onRequestAbort', async (request) => {
       // small optimization: pass a null reply because no useful here
       const ce = builders.buildCloudEventForHook('onRequestAbort', request, null)
       // add some http related attributes to data, could be useful to have
@@ -241,6 +241,8 @@ function setupHooks (fastify, options, builders) {
       await onListenCallback(ce)
     })
   }
+
+  // done()
 }
 
 module.exports = setupHooks
