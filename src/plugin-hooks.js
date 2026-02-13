@@ -27,56 +27,36 @@ const { CloudEventTransformer } = require('cloudevent')
  * Setup and register all CloudEvent hooks with Fastify.
  *
  * @param {!object} fastify Fastify instance
- * @param {object} options Hook configuration options
- * @param {object} options.builders Builder utility for CloudEvents
- * @param {string} options.baseNamespace Base namespace for events
- * @param {object} options.idGenerator ID generator for events
- * @param {object} options.cloudEventOptions Options for CloudEvents
- * @param {object} options.cloudEventExtensions Extensions for CloudEvents
- * @param {boolean} options.includeHttpAttributes Flag to include HTTP attributes
- * @param {boolean} options.includeRedundantAttributes Flag to include redundant attributes
- * @param {function|null} options.onRequestAbortCallback Callback for onRequestAbort hook
- * @param {function|null} options.onRequestCallback Callback for onRequest hook
- * @param {function|null} options.preParsingCallback Callback for preParsing hook
- * @param {function|null} options.preValidationCallback Callback for preValidation hook
- * @param {function|null} options.preHandlerCallback Callback for preHandler hook
- * @param {function|null} options.preSerializationCallback Callback for preSerialization hook
- * @param {function|null} options.onErrorCallback Callback for onError hook
- * @param {function|null} options.onSendCallback Callback for onSend hook
- * @param {function|null} options.onResponseCallback Callback for onResponse hook
- * @param {function|null} options.onTimeoutCallback Callback for onTimeout hook
- * @param {function|null} options.onCloseCallback Callback for onClose hook
- * @param {function|null} options.onRouteCallback Callback for onRoute hook
- * @param {function|null} options.onRegisterCallback Callback for onRegister hook
- * @param {function|null} options.onReadyCallback Callback for onReady hook
- * @param {function|null} options.onListenCallback Callback for onListen hook
+ * @param {!object} options Hook configuration options
+ * @param {!object} builders Builders configuration options
  *
  * @inner
  */
-function setupHooks (fastify, {
-  builders,
-  baseNamespace,
-  idGenerator,
-  cloudEventOptions,
-  cloudEventExtensions,
-  includeHttpAttributes,
-  includeRedundantAttributes,
-  onRequestAbortCallback,
-  onRequestCallback,
-  preParsingCallback,
-  preValidationCallback,
-  preHandlerCallback,
-  preSerializationCallback,
-  onErrorCallback,
-  onSendCallback,
-  onResponseCallback,
-  onTimeoutCallback,
-  onCloseCallback,
-  onRouteCallback,
-  onRegisterCallback,
-  onReadyCallback,
-  onListenCallback
-}) {
+function setupHooks (fastify, options, builders) {
+  const {
+    baseNamespace = null,
+    idGenerator = null,
+    cloudEventOptions = null,
+    cloudEventExtensions = null,
+    includeHttpAttributes = false,
+    includeRedundantAttributes = false,
+    onRequestAbortCallback = null,
+    onRequestCallback = null,
+    preParsingCallback = null,
+    preValidationCallback = null,
+    preHandlerCallback = null,
+    preSerializationCallback = null,
+    onErrorCallback = null,
+    onSendCallback = null,
+    onResponseCallback = null,
+    onTimeoutCallback = null,
+    onCloseCallback = null,
+    onRouteCallback = null,
+    onRegisterCallback = null,
+    onReadyCallback = null,
+    onListenCallback = null
+  } = options
+
   // handle hooks, only when related callback are defined
   // see [Hooks - Fastify reference - GitHub](https://github.com/fastify/fastify/blob/main/docs/Reference/Hooks.md)
 
@@ -92,7 +72,7 @@ function setupHooks (fastify, {
       }
       // console.log(`DEBUG - onRequestAbort: created CloudEvent ${CloudEventTransformer.dumpObject(ce, 'ce')}`)
       // send the event to the callback
-      await onRequestCallback(ce)
+      await onRequestAbortCallback(ce)
     })
   }
 

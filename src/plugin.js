@@ -289,30 +289,7 @@ async function fastifyCloudEvents (fastify, options) {
   })
 
   // setup all hooks
-  setupHooks(fastify, {
-    builders,
-    baseNamespace,
-    idGenerator,
-    cloudEventOptions,
-    cloudEventExtensions,
-    includeHttpAttributes,
-    includeRedundantAttributes,
-    onRequestAbortCallback,
-    onRequestCallback,
-    preParsingCallback,
-    preValidationCallback,
-    preHandlerCallback,
-    preSerializationCallback,
-    onErrorCallback,
-    onSendCallback,
-    onResponseCallback,
-    onTimeoutCallback,
-    onCloseCallback,
-    onRouteCallback,
-    onRegisterCallback,
-    onReadyCallback,
-    onListenCallback
-  })
+  setupHooks(fastify, options, builders)
 
   // done()
 }
